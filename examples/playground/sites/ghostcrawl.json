@@ -1,0 +1,230 @@
+{
+  "id": "ghostcrawl",
+  "label": "ghostcrawl.io",
+  "url": "https://ghostcrawl.io",
+  "lanes": {
+    "scrape": {
+      "status_code": 200,
+      "title": "GhostCrawl \u2014 Browse the public web as a a real browser, at API speed",
+      "engine": "chromium",
+      "os": "linux",
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      "bytes": 12367,
+      "markdown": "### Scrape & Extract\nTurn any public URL into LLM-ready markdown, HTML, or schema-typed JSON. Every request from a coherent devi\u2026",
+      "resolved_url": "https://ghostcrawl.io"
+    },
+    "content": {
+      "engine": "chromium",
+      "title": "GhostCrawl \u2014 Browse the public web as a a real browser, at API speed",
+      "markdown": "### Scrape & Extract\nTurn any public URL into LLM-ready markdown, HTML, or schema-typed JSON. Every request from a coherent devi\u2026",
+      "bytes": 12367
+    },
+    "map": {
+      "count": 3,
+      "paths": [
+        "/aup",
+        "/terms",
+        "/privacy"
+      ]
+    },
+    "crawl": {
+      "max_pages": 12,
+      "pages": 12,
+      "urls": [
+        "/",
+        "/",
+        "/a.0d827518.css",
+        "/b.01aaf070.css",
+        "/g.fa2db6a7.js",
+        "/favicon.ico",
+        "/favicon-16.png",
+        "/favicon-32.png",
+        "/favicon-192.png",
+        "/favicon-512.png",
+        "/apple-touch-icon.png",
+        "/site.webmanifest"
+      ]
+    },
+    "search": {
+      "query": "ghostcrawl documentation",
+      "hits": [
+        {
+          "url": "https://github.com/BU3NO77XL/Ghost_Browser_MCP",
+          "title": "BU3NO77XL/Ghost_Browser_MCP - GitHub",
+          "snippet": "Improved fork of MCP adapted as Ghost MCP. Ghost MCP turns a real into a full MCP-native research, extraction, and page-reconstruction toolkit. It combines 225 "
+        },
+        {
+          "url": "https://ghostcrawl.io",
+          "title": "GhostCrawl \u2014 Reliable web data at scale",
+          "snippet": "Production browser engines for clean, structured web data."
+        },
+        {
+          "url": "https://docs.ghostcrawl.io",
+          "title": "GhostCrawl Documentation",
+          "snippet": "Guides, API reference, and quickstarts."
+        },
+        {
+          "url": "https://ghostcrawl.io/#pricing",
+          "title": "GhostCrawl Pricing",
+          "snippet": "Monthly plans with a residential-backed request allotment. Launch pricing — limited time."
+        }
+      ]
+    },
+    "extract": {
+      "schema_keys": [
+        "capabilities"
+      ],
+      "data": {
+        "capabilities": [
+          {
+            "name": "Four lanes, one engine fleet",
+            "summary": ""
+          },
+          {
+            "name": "Scrape & Extract",
+            "summary": "Turn any public URL into LLM-ready markdown, HTML, or schema-typed JSON. Every request fro\u2026"
+          },
+          {
+            "name": "Search & Crawl",
+            "summary": "Search and crawl the public web like an agent should. One profile holds across the whole s\u2026"
+          },
+          {
+            "name": "Cloud Browser",
+            "summary": "Give your agent a real Chromium, Firefox, or WebKit browser. WebSocket connect, live sessi\u2026"
+          },
+          {
+            "name": "Profiles",
+            "summary": "One identity, many sessions. Cookies, storage, and identity state persist between visits \u2014\u2026"
+          },
+          {
+            "name": "Roadmap",
+            "summary": ""
+          }
+        ]
+      },
+      "count": 6
+    },
+    "agent": {
+      "goal": "list the API capabilities exposed on the page",
+      "steps": [
+        {
+          "type": "observe",
+          "detail": "loaded ghostcrawl.io"
+        },
+        {
+          "type": "act",
+          "detail": "read main content"
+        },
+        {
+          "type": "extract",
+          "detail": "6 fields"
+        }
+      ],
+      "extracted": {
+        "capabilities": [
+          {
+            "name": "Four lanes, one engine fleet",
+            "summary": ""
+          },
+          {
+            "name": "Scrape & Extract",
+            "summary": "Turn any public URL into LLM-ready markdown, HTML, or schema-typed JSON. Every request fro\u2026"
+          },
+          {
+            "name": "Search & Crawl",
+            "summary": "Search and crawl the public web like an agent should. One profile holds across the whole s\u2026"
+          },
+          {
+            "name": "Cloud Browser",
+            "summary": "Give your agent a real Chromium, Firefox, or WebKit browser. WebSocket connect, live sessi\u2026"
+          },
+          {
+            "name": "Profiles",
+            "summary": "One identity, many sessions. Cookies, storage, and identity state persist between visits \u2014\u2026"
+          },
+          {
+            "name": "Roadmap",
+            "summary": ""
+          }
+        ]
+      },
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781373491,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-3ad12d05360fd385"
+      }
+    },
+    "sessions": {
+      "session_id": "",
+      "ttl_seconds": 86400,
+      "engine": "chromium",
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781373491,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-3ad12d05360fd385"
+      }
+    },
+    "stream": {
+      "session_id": "",
+      "frames": [
+        {
+          "tag": "network",
+          "text": "GET https://ghostcrawl.io \u2192 200"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "domcontentloaded"
+        },
+        {
+          "tag": "dom",
+          "text": "document ready \u00b7 12,367B"
+        },
+        {
+          "tag": "network",
+          "text": "networkidle"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "rendered \u00b7 chromium"
+        }
+      ]
+    },
+    "screenshot": {
+      "img": "shots/ghostcrawl.jpg",
+      "format": "jpeg",
+      "viewport": "1280\u00d7800",
+      "engine": "chromium",
+      "source": "engine"
+    },
+    "pdf": {
+      "img": "shots/ghostcrawl.jpg",
+      "file": "",
+      "paper": "a4",
+      "source": "engine"
+    },
+    "navigate": {
+      "img": "shots/ghostcrawl.jpg",
+      "session_id": ""
+    }
+  }
+}

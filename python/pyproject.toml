@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghostcrawl"
+version = "2.3.4"
+description = "Official Python SDK for the GhostCrawl local orchestration API."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "GhostCrawl" }]
+keywords = ["ghostcrawl", "scraping", "browser", "automation", "agent"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "httpx>=0.28.1",
+  "pydantic>=2.13",
+  "typer>=0.12",
+  "mcp>=1.27.1",
+  # Kiota runtime — required by the generated canonical core (_generated/).
+  # PyPI package names are microsoft-kiota-*; import paths are kiota_*.
+  "microsoft-kiota-abstractions>=1.7.0",
+  "microsoft-kiota-http>=1.10.0",
+  "microsoft-kiota-serialization-json>=1.7.0",
+  "microsoft-kiota-serialization-text>=1.0.0",
+  "microsoft-kiota-serialization-form>=1.0.0",
+  "microsoft-kiota-serialization-multipart>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "respx>=0.23.1",
+  "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+ghostcrawl = "ghostcrawl.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/ghostcrawl/ghostcrawl"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ghostcrawl*", "_generated*"]
+exclude = ["tests*", "examples*", "ghostcrawl.tests*", "_operator*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]

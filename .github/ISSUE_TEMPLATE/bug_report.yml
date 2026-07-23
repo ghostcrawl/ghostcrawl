@@ -1,0 +1,49 @@
+name: Bug report
+description: File a bug against the SDK or CLI
+labels: ["bug", "triage"]
+body:
+  - type: dropdown
+    id: sdk
+    attributes:
+      label: SDK
+      description: Which SDK or interface are you using?
+      options:
+        - Python
+        - Node
+        - Node CLI
+        - Python LangChain
+        - CLI
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of the SDK or CLI are you running?
+      placeholder: "e.g. 0.4.0"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: >
+        Provide the smallest possible code snippet or command sequence that
+        reproduces the problem. Include any relevant environment details
+        (OS, Python/Node version, Docker version if self-hosting).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual behavior
+      description: What did you expect to happen, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output (verbatim)
+      description: Paste the full error message or stack trace here.
+      render: shell

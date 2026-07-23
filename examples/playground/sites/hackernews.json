@@ -1,0 +1,283 @@
+{
+  "id": "hackernews",
+  "label": "news.ycombinator.com",
+  "url": "https://news.ycombinator.com",
+  "lanes": {
+    "scrape": {
+      "status_code": 200,
+      "title": "Hacker News",
+      "engine": "chromium",
+      "os": "linux",
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      "bytes": 34928,
+      "markdown": "",
+      "resolved_url": "https://news.ycombinator.com"
+    },
+    "content": {
+      "engine": "chromium",
+      "title": "Hacker News",
+      "markdown": "",
+      "bytes": 34928
+    },
+    "map": {
+      "count": 14,
+      "paths": [
+        "/",
+        "/news",
+        "/newest",
+        "/front",
+        "/newcomments",
+        "/ask",
+        "/show",
+        "/jobs",
+        "/submit",
+        "/login",
+        "/vote",
+        "/from",
+        "/user",
+        "/item"
+      ]
+    },
+    "crawl": {
+      "max_pages": 12,
+      "pages": 14,
+      "urls": [
+        "/",
+        "/news",
+        "/newest",
+        "/front",
+        "/newcomments",
+        "/ask",
+        "/show",
+        "/jobs",
+        "/submit",
+        "/login",
+        "/vote",
+        "/from"
+      ]
+    },
+    "search": {
+      "query": "hacker news",
+      "hits": [
+        {
+          "url": "https://hackernews.space/",
+          "title": "Top Stories - Hacker News",
+          "snippet": "The most popular on right now 1 There is a shadow hanging over this Fable thing (12gramsofcarbon.com) 42 \u2022 theahura \u2022 2h ago \u2022 5TopStoriesstoriesHackerNews"
+        },
+        {
+          "url": "https://www.tophn.co/?tab=24h",
+          "title": "Top Hacker News",
+          "snippet": "Browse in modern way: article cover, AI immersive translation/summary, responsive UI, RSS, PWA, dark modetopHackerNewsstories"
+        },
+        {
+          "url": "https://thehackernews.com/",
+          "title": "The Hacker News | #1 Trusted Source for Cybersecurity News",
+          "snippet": "The is the cybersecurity platform, delivering real-time updates, threat intelligence, data breach reports, expert analysis, and actionable insights for infosec "
+        },
+        {
+          "url": "https://news.ycombinator.com/best",
+          "title": "Top Links | Hacker News",
+          "snippet": "Most-upvoted of the last 48 hours. You can change the number of hours like this: best?h=24.stories"
+        },
+        {
+          "url": "https://news.ycombinator.com/",
+          "title": "Hacker News",
+          "snippet": "is a platform for sharing and discussing technology, startups, and programming topics, fostering a community of tech enthusiasts.HackerNews"
+        },
+        {
+          "url": "https://gbhackers.com/",
+          "title": "GBHackers News - No #1 Cybersecurity News Platform",
+          "snippet": "With GBHackers Security we cover Cyber Security , Hacking , Technology updates, Research & others.NewsNews"
+        }
+      ]
+    },
+    "extract": {
+      "schema_keys": [
+        "stories"
+      ],
+      "data": {
+        "stories": [
+          {
+            "title": "US bans differential privacy in Census data",
+            "url": "https://desfontain.es/blog/banning-noise.html",
+            "points": 391
+          },
+          {
+            "title": "Treating pancreatic tumours may have revealed cancer's master switch",
+            "url": "https://economist.com/science-and-technology/2026/06/12/treating-pancreatic-tumours-may-have-revealed-cancers-master-switch",
+            "points": 136
+          },
+          {
+            "title": "Every Frame Perfect",
+            "url": "https://tonsky.me/blog/every-frame-perfect/",
+            "points": 250
+          },
+          {
+            "title": "Appreciating Exif",
+            "url": "https://brentfitzgerald.com/posts/appreciating-exif/",
+            "points": 58
+          },
+          {
+            "title": "Amazon CEO's Talks with U.S. Officials Triggered Crackdown on Anthropic Models",
+            "url": "https://www.wsj.com/tech/ai/amazon-ceos-talks-with-u-s-officials-triggered-crackdown-on-anthropic-models-dcc90578",
+            "points": 96
+          },
+          {
+            "title": "Introduction to the experience of rendering Arabic typography&its technical debt",
+            "url": "https://lr0.org/blog/p/arabic/",
+            "points": 91
+          },
+          {
+            "title": "Show HN: Verso \u2013 A $14.99 Mac word processor with no subscription",
+            "url": "https://www.versowriter.app",
+            "points": 11
+          },
+          {
+            "title": "The adder at the heart of Intel's 8087 floating-point chip",
+            "url": "https://www.righto.com/2026/06/intel-8087-adder-reverse-engineered.html",
+            "points": 21
+          }
+        ]
+      },
+      "count": 8
+    },
+    "agent": {
+      "goal": "extract the front-page stories with title, points and comment count",
+      "steps": [
+        {
+          "type": "observe",
+          "detail": "loaded news.ycombinator.com"
+        },
+        {
+          "type": "act",
+          "detail": "read main content"
+        },
+        {
+          "type": "extract",
+          "detail": "8 fields"
+        }
+      ],
+      "extracted": {
+        "stories": [
+          {
+            "title": "US bans differential privacy in Census data",
+            "url": "https://desfontain.es/blog/banning-noise.html",
+            "points": 391
+          },
+          {
+            "title": "Treating pancreatic tumours may have revealed cancer's master switch",
+            "url": "https://economist.com/science-and-technology/2026/06/12/treating-pancreatic-tumours-may-have-revealed-cancers-master-switch",
+            "points": 136
+          },
+          {
+            "title": "Every Frame Perfect",
+            "url": "https://tonsky.me/blog/every-frame-perfect/",
+            "points": 250
+          },
+          {
+            "title": "Appreciating Exif",
+            "url": "https://brentfitzgerald.com/posts/appreciating-exif/",
+            "points": 58
+          },
+          {
+            "title": "Amazon CEO's Talks with U.S. Officials Triggered Crackdown on Anthropic Models",
+            "url": "https://www.wsj.com/tech/ai/amazon-ceos-talks-with-u-s-officials-triggered-crackdown-on-anthropic-models-dcc90578",
+            "points": 96
+          },
+          {
+            "title": "Introduction to the experience of rendering Arabic typography&its technical debt",
+            "url": "https://lr0.org/blog/p/arabic/",
+            "points": 91
+          },
+          {
+            "title": "Show HN: Verso \u2013 A $14.99 Mac word processor with no subscription",
+            "url": "https://www.versowriter.app",
+            "points": 11
+          },
+          {
+            "title": "The adder at the heart of Intel's 8087 floating-point chip",
+            "url": "https://www.righto.com/2026/06/intel-8087-adder-reverse-engineered.html",
+            "points": 21
+          }
+        ]
+      },
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "sessions": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "ttl_seconds": 86400,
+      "engine": "chromium",
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "stream": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "frames": [
+        {
+          "tag": "network",
+          "text": "GET https://news.ycombinator.com \u2192 200"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "domcontentloaded"
+        },
+        {
+          "tag": "dom",
+          "text": "document ready \u00b7 34,928B"
+        },
+        {
+          "tag": "network",
+          "text": "networkidle"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "rendered \u00b7 chromium"
+        }
+      ]
+    },
+    "screenshot": {
+      "img": "shots/hackernews.jpg",
+      "format": "jpeg",
+      "viewport": "1280\u00d7800",
+      "engine": "chromium",
+      "source": "engine"
+    },
+    "pdf": {
+      "img": "shots/hackernews.jpg",
+      "file": "",
+      "paper": "a4",
+      "source": "engine"
+    },
+    "navigate": {
+      "img": "shots/hackernews.jpg",
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac"
+    }
+  }
+}

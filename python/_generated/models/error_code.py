@@ -1,0 +1,27 @@
+from enum import Enum
+
+class ErrorCode(str, Enum):
+    Bad_request = "bad_request",
+    Unauthorized = "unauthorized",
+    Forbidden = "forbidden",
+    Payment_required = "payment_required",
+    Not_found = "not_found",
+    Conflict = "conflict",
+    Byo_proxy_invalid = "byo_proxy_invalid",
+    Tier_unavailable = "tier_unavailable",
+    Rate_limited = "rate_limited",
+    Quota_backend_unavailable = "quota_backend_unavailable",
+    Pool_exhausted = "pool_exhausted",
+    Egress_integrity_failed = "egress_integrity_failed",
+    Render_hung = "render_hung",
+    Engine_crashed = "engine_crashed",
+    Render_timeout = "render_timeout",
+    Engine_timeout = "engine_timeout",
+    Service_unavailable = "service_unavailable",
+    Internal_error = "internal_error",
+    Target_http_error = "target_http_error",
+    Navigation_failed = "navigation_failed",
+    Blocked = "blocked",
+    Captcha_required = "captcha_required",
+    Empty_content = "empty_content",
+

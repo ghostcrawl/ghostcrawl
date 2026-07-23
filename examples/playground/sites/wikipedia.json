@@ -1,0 +1,225 @@
+{
+  "id": "wikipedia",
+  "label": "en.wikipedia.org",
+  "url": "https://en.wikipedia.org/wiki/Web_scraping",
+  "lanes": {
+    "scrape": {
+      "status_code": 200,
+      "title": "Web scraping - Wikipedia",
+      "engine": "chromium",
+      "os": "linux",
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      "bytes": 373669,
+      "markdown": "# Web scraping\n- \u0627\u0644\u0639\u0631\u0628\u064a\u0629\n- \u0627\u0644\u062f\u0627\u0631\u062c\u0629\n- Catal\u00e0\n- \u010ce\u0161tina\n- Deutsch\n- Espa\u00f1ol\n- Euskara\n- \u0641\u0627\u0631\u0633\u06cc\n- Fran\u00e7ais\n- Bahasa Indonesia\n- \u00cdslenska\n- Italiano\n- \u65e5\u672c\u8a9e\n- \ud55c\uad6d\uc5b4\n- Latvie\u0161u\n- Nederlands\n- Portugu\u00eas\n- \u0420\u0443\u0441\u0441\u043a\u0438\u0439\n- T\u00fcrk\u00e7e\n- \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430\n- \u7cb5\u8a9e",
+      "resolved_url": "https://en.wikipedia.org/wiki/Web_scraping"
+    },
+    "content": {
+      "engine": "chromium",
+      "title": "Web scraping - Wikipedia",
+      "markdown": "# Web scraping\n- \u0627\u0644\u0639\u0631\u0628\u064a\u0629\n- \u0627\u0644\u062f\u0627\u0631\u062c\u0629\n- Catal\u00e0\n- \u010ce\u0161tina\n- Deutsch\n- Espa\u00f1ol\n- Euskara\n- \u0641\u0627\u0631\u0633\u06cc\n- Fran\u00e7ais\n- Bahasa Indonesia\n- \u00cdslenska\n- Italiano\n- \u65e5\u672c\u8a9e\n- \ud55c\uad6d\uc5b4\n- Latvie\u0161u\n- Nederlands\n- Portugu\u00eas\n- \u0420\u0443\u0441\u0441\u043a\u0438\u0439\n- T\u00fcrk\u00e7e\n- \u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430\n- \u7cb5\u8a9e",
+      "bytes": 373669
+    },
+    "map": {
+      "count": 14,
+      "paths": [
+        "/wiki/Main_Page",
+        "/wiki/Wikipedia:Contents",
+        "/wiki/Portal:Current_events",
+        "/wiki/Special:Random",
+        "/wiki/Wikipedia:About",
+        "/wiki/Wikipedia:Contact_us",
+        "/wiki/Help:Contents",
+        "/wiki/Help:Introduction",
+        "/wiki/Wikipedia:Community_portal",
+        "/wiki/Special:RecentChanges",
+        "/wiki/Wikipedia:File_upload_wizard",
+        "/wiki/Special:SpecialPages",
+        "/wiki/Special:Search",
+        "/w/index.php"
+      ]
+    },
+    "crawl": {
+      "max_pages": 12,
+      "pages": 14,
+      "urls": [
+        "/wiki/Main_Page",
+        "/wiki/Wikipedia:Contents",
+        "/wiki/Portal:Current_events",
+        "/wiki/Special:Random",
+        "/wiki/Wikipedia:About",
+        "/wiki/Wikipedia:Contact_us",
+        "/wiki/Help:Contents",
+        "/wiki/Help:Introduction",
+        "/wiki/Wikipedia:Community_portal",
+        "/wiki/Special:RecentChanges",
+        "/wiki/Wikipedia:File_upload_wizard",
+        "/wiki/Special:SpecialPages"
+      ]
+    },
+    "search": {
+      "query": "web scraping wikipedia",
+      "hits": [
+        {
+          "url": "https://en.wikipedia.org/wiki/Web_scraping",
+          "title": "Web scraping - Wikipedia",
+          "snippet": ", harvesting, or data extraction is data used for extracting data from websites. [1] software may directly access the World Wide using the Hypertext Transfer Pr"
+        },
+        {
+          "url": "https://www.geeksforgeeks.org/python/web-scraping-from-wikipedia-using-python-a-complete-guide/",
+          "title": "Web scraping from Wikipedia using Python - GeeksforGeeks",
+          "snippet": "is the process of automatically extracting data from websites. It enables programmers to collect structured information from pages without manual effort. In thi"
+        },
+        {
+          "url": "https://decodo.com/blog/scraping-wikipedia",
+          "title": "How to Scrape Wikipedia: Complete Beginner's Tutorial",
+          "snippet": "A beginner-friendly guide on how to scrape , including setup, extracting tables and infoboxes, and handling common issues.Wikipedia"
+        },
+        {
+          "url": "https://www.freecodecamp.org/news/scraping-wikipedia-articles-with-python/",
+          "title": "How to Scrape Wikipedia Articles with Python - freeCodeCamp.org",
+          "snippet": "Learn how to create a scraper in Python that bounces around on by following random links. This article shows you the code, the steps, and the results of this fu"
+        },
+        {
+          "url": "https://blog.apify.com/how-to-scrape-wikipedia/",
+          "title": "How to scrape Wikipedia with Python - blog.apify.com",
+          "snippet": "How to scrape ? To scrape , use a language like Python and a library like Crawlee to fetch the URLs, parse the HTML, and extract the information needed. Or, you"
+        },
+        {
+          "url": "https://en.wikipedia.org/wiki/Category:Web_scraping",
+          "title": "Category:Web scraping - Wikipedia",
+          "snippet": "Pages in category \" \" The following 34 pages are in this category, out of 34 total. This list may not reflect recent changes.Webscraping"
+        }
+      ]
+    },
+    "extract": {
+      "schema_keys": [
+        "title",
+        "summary",
+        "sections"
+      ],
+      "data": {
+        "title": "Web scraping",
+        "summary": ", , or is used for from . Web scraping software may directly access the using the or a web browser. While web scraping can be done manually by a software user, the term typically refers to automated processes implemented using a or . It is a form of copying in which specific data\u2026",
+        "sections": [
+          "Contents",
+          "History",
+          "Techniques",
+          "Legal issues",
+          "Methods to prevent web scraping",
+          "See also",
+          "References",
+          "Human copy-and-paste"
+        ]
+      },
+      "count": 8
+    },
+    "agent": {
+      "goal": "extract the article title, summary and section headings",
+      "steps": [
+        {
+          "type": "observe",
+          "detail": "loaded en.wikipedia.org"
+        },
+        {
+          "type": "act",
+          "detail": "read main content"
+        },
+        {
+          "type": "extract",
+          "detail": "8 fields"
+        }
+      ],
+      "extracted": {
+        "title": "Web scraping",
+        "summary": ", , or is used for from . Web scraping software may directly access the using the or a web browser. While web scraping can be done manually by a software user, the term typically refers to automated processes implemented using a or . It is a form of copying in which specific data\u2026",
+        "sections": [
+          "Contents",
+          "History",
+          "Techniques",
+          "Legal issues",
+          "Methods to prevent web scraping",
+          "See also",
+          "References",
+          "Human copy-and-paste"
+        ]
+      },
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "sessions": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "ttl_seconds": 86400,
+      "engine": "chromium",
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "stream": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "frames": [
+        {
+          "tag": "network",
+          "text": "GET https://en.wikipedia.org/wiki/Web_scraping \u2192 200"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "domcontentloaded"
+        },
+        {
+          "tag": "dom",
+          "text": "document ready \u00b7 373,669B"
+        },
+        {
+          "tag": "network",
+          "text": "networkidle"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "rendered \u00b7 chromium"
+        }
+      ]
+    },
+    "screenshot": {
+      "img": "shots/wikipedia.jpg",
+      "format": "jpeg",
+      "viewport": "1280\u00d7800",
+      "engine": "chromium",
+      "source": "engine"
+    },
+    "pdf": {
+      "img": "shots/wikipedia.jpg",
+      "file": "",
+      "paper": "a4",
+      "source": "engine"
+    },
+    "navigate": {
+      "img": "shots/wikipedia.jpg",
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac"
+    }
+  }
+}

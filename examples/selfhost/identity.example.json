@@ -1,0 +1,18 @@
+{
+  "claim_os": "windows",
+  "claim_browser": "chrome",
+  "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "canvas": "0011223344556677",
+  "webgl": {
+    "vendor": "Google Inc. (Intel)",
+    "renderer": "ANGLE (Intel, Intel(R) HD Graphics 620 Direct3D11 vs_5_0 ps_5_0)"
+  },
+  "audio": "0.12345678901234",
+  "screen": {
+    "width": 1920,
+    "height": 1080,
+    "availWidth": 1920,
+    "availHeight": 1040
+  },
+  "tz": "America/New_York"
+}

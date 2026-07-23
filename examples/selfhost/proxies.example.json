@@ -1,0 +1,12 @@
+{
+  "proxies": [
+    {
+      "url": "socks5://your-proxy.example.com:1080",
+      "auth": "username:password",
+      "claim_os": "windows",
+      "geo": "US",
+      "asn": null,
+      "sticky_session_id": null
+    }
+  ]
+}

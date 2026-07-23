@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / Support
+    url: https://github.com/ghostcrawl/ghostcrawl/discussions
+    about: "Ask in Discussions — Issues are for bugs and feature requests only"
+  - name: Report a security vulnerability
+    url: https://github.com/ghostcrawl/ghostcrawl/security/advisories/new
+    about: "Do NOT open a public issue for security reports — use the private channel"

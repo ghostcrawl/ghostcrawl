@@ -1,0 +1,283 @@
+{
+  "id": "books",
+  "label": "books.toscrape.com",
+  "url": "https://books.toscrape.com",
+  "lanes": {
+    "scrape": {
+      "status_code": 200,
+      "title": "All products | Books to Scrape - Sandbox",
+      "engine": "chromium",
+      "os": "linux",
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      "bytes": 50989,
+      "markdown": "### A Light in the ...\n\u00a351.77\nIn stock",
+      "resolved_url": "https://books.toscrape.com"
+    },
+    "content": {
+      "engine": "chromium",
+      "title": "All products | Books to Scrape - Sandbox",
+      "markdown": "### A Light in the ...\n\u00a351.77\nIn stock",
+      "bytes": 50989
+    },
+    "map": {
+      "count": 14,
+      "paths": [
+        "/index.html",
+        "/catalogue/category/books_1/index.html",
+        "/catalogue/category/books/travel_2/index.html",
+        "/catalogue/category/books/mystery_3/index.html",
+        "/catalogue/category/books/historical-fiction_4/index.html",
+        "/catalogue/category/books/sequential-art_5/index.html",
+        "/catalogue/category/books/classics_6/index.html",
+        "/catalogue/category/books/philosophy_7/index.html",
+        "/catalogue/category/books/romance_8/index.html",
+        "/catalogue/category/books/womens-fiction_9/index.html",
+        "/catalogue/category/books/fiction_10/index.html",
+        "/catalogue/category/books/childrens_11/index.html",
+        "/catalogue/category/books/religion_12/index.html",
+        "/catalogue/category/books/nonfiction_13/index.html"
+      ]
+    },
+    "crawl": {
+      "max_pages": 12,
+      "pages": 14,
+      "urls": [
+        "/index.html",
+        "/catalogue/category/books_1/index.html",
+        "/catalogue/category/books/travel_2/index.html",
+        "/catalogue/category/books/mystery_3/index.html",
+        "/catalogue/category/books/historical-fiction_4/index.html",
+        "/catalogue/category/books/sequential-art_5/index.html",
+        "/catalogue/category/books/classics_6/index.html",
+        "/catalogue/category/books/philosophy_7/index.html",
+        "/catalogue/category/books/romance_8/index.html",
+        "/catalogue/category/books/womens-fiction_9/index.html",
+        "/catalogue/category/books/fiction_10/index.html",
+        "/catalogue/category/books/childrens_11/index.html"
+      ]
+    },
+    "search": {
+      "query": "books to scrape catalogue",
+      "hits": [
+        {
+          "url": "https://books.toscrape.com/",
+          "title": "All products | Books to Scrape - Sandbox",
+          "snippet": "Travel Mystery Historical Fiction Sequential Art Classics Philosophy Romance Womens Fiction Fiction Childrens Religion Nonfiction Music Default Science Fiction "
+        },
+        {
+          "url": "https://www.geeksforgeeks.org/python/scrap-books-using-beautifulsoup-from-books-toscrape-in-python/",
+          "title": "Scrap books using Beautifulsoup from books.toscrape in Python",
+          "snippet": "But in most cases, a huge amount of data is required which is difficult for a human to . Therefore, we have Web scraping tools to automate the process. One such"
+        },
+        {
+          "url": "https://stackoverflow.com/questions/78284698/websraping-in-python-using-books-to-scrape-website",
+          "title": "WebSraping in python using Books to Scrape website",
+          "snippet": "WebSraping in python using website Asked 2 years, 2 months ago Modified 1 year, 11 months ago Viewed 547 timesBookstoScrape"
+        },
+        {
+          "url": "https://github.com/MantenaMonish/BookScraper",
+          "title": "GitHub - MantenaMonish/BookScraper: A Python web scraper for extracting ...",
+          "snippet": "A Python web scraper for extracting details from \" .\" Uses requests and BeautifulSoup to gather titles, prices, ratings, availability, images, and descriptions "
+        },
+        {
+          "url": "https://ryangadingabdullah.medium.com/scraping-book-data-from-books-to-scrape-with-python-using-beautifulsoup-basic-version-v1-29eb974a2384",
+          "title": "Scraping Book Data from \"Books to Scrape\" with Python Using ...",
+          "snippet": "The function scrape_multiple_pages() iterates through each page, from 1 to the specified number of pages (total_pages). The page URL is constructed dynamically "
+        },
+        {
+          "url": "https://www.kaggle.com/datasets/sachinmehan655/books-dataset",
+          "title": "Books to Scrape - Complete Book Listing Dataset - Kaggle",
+          "snippet": "\ud83d\udcda - Dataset Description \ud83d\udcdd Overview of .csv This dataset contains listings scraped from the website, a popular sandbox site for practicing web scraping technique"
+        }
+      ]
+    },
+    "extract": {
+      "schema_keys": [
+        "books"
+      ],
+      "data": {
+        "books": [
+          {
+            "title": "A Light in the Attic",
+            "price": "\u00a351.77",
+            "in_stock": true
+          },
+          {
+            "title": "Tipping the Velvet",
+            "price": "\u00a353.74",
+            "in_stock": true
+          },
+          {
+            "title": "Soumission",
+            "price": "\u00a350.10",
+            "in_stock": true
+          },
+          {
+            "title": "Sharp Objects",
+            "price": "\u00a347.82",
+            "in_stock": true
+          },
+          {
+            "title": "Sapiens: A Brief History of Humankind",
+            "price": "\u00a354.23",
+            "in_stock": true
+          },
+          {
+            "title": "The Requiem Red",
+            "price": "\u00a322.65",
+            "in_stock": true
+          },
+          {
+            "title": "The Dirty Little Secrets of Getting Your Dream Job",
+            "price": "\u00a333.34",
+            "in_stock": true
+          },
+          {
+            "title": "The Coming Woman: A Novel Based on the Life of the Infamous Feminist, Victoria Woodhull",
+            "price": "\u00a317.93",
+            "in_stock": true
+          }
+        ]
+      },
+      "count": 8
+    },
+    "agent": {
+      "goal": "extract the list of books with title, price and availability",
+      "steps": [
+        {
+          "type": "observe",
+          "detail": "loaded books.toscrape.com"
+        },
+        {
+          "type": "act",
+          "detail": "read main content"
+        },
+        {
+          "type": "extract",
+          "detail": "8 fields"
+        }
+      ],
+      "extracted": {
+        "books": [
+          {
+            "title": "A Light in the Attic",
+            "price": "\u00a351.77",
+            "in_stock": true
+          },
+          {
+            "title": "Tipping the Velvet",
+            "price": "\u00a353.74",
+            "in_stock": true
+          },
+          {
+            "title": "Soumission",
+            "price": "\u00a350.10",
+            "in_stock": true
+          },
+          {
+            "title": "Sharp Objects",
+            "price": "\u00a347.82",
+            "in_stock": true
+          },
+          {
+            "title": "Sapiens: A Brief History of Humankind",
+            "price": "\u00a354.23",
+            "in_stock": true
+          },
+          {
+            "title": "The Requiem Red",
+            "price": "\u00a322.65",
+            "in_stock": true
+          },
+          {
+            "title": "The Dirty Little Secrets of Getting Your Dream Job",
+            "price": "\u00a333.34",
+            "in_stock": true
+          },
+          {
+            "title": "The Coming Woman: A Novel Based on the Life of the Infamous Feminist, Victoria Woodhull",
+            "price": "\u00a317.93",
+            "in_stock": true
+          }
+        ]
+      },
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "sessions": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "ttl_seconds": 86400,
+      "engine": "chromium",
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "stream": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "frames": [
+        {
+          "tag": "network",
+          "text": "GET https://books.toscrape.com \u2192 200"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "domcontentloaded"
+        },
+        {
+          "tag": "dom",
+          "text": "document ready \u00b7 50,989B"
+        },
+        {
+          "tag": "network",
+          "text": "networkidle"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "rendered \u00b7 chromium"
+        }
+      ]
+    },
+    "screenshot": {
+      "img": "shots/books.jpg",
+      "format": "jpeg",
+      "viewport": "1280\u00d7800",
+      "engine": "chromium",
+      "source": "engine"
+    },
+    "pdf": {
+      "img": "shots/books.jpg",
+      "file": "",
+      "paper": "a4",
+      "source": "engine"
+    },
+    "navigate": {
+      "img": "shots/books.jpg",
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac"
+    }
+  }
+}

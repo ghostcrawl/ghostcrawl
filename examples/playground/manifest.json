@@ -1,0 +1,216 @@
+{
+  "_comment": "Allowlist for the marketing playground. Each site is scraped ONCE via the real ghostcrawl backend (and a real headless render for screenshot/pdf); the genuine results are cached under sites/<id>.json + binary assets, then replayed verbatim on the marketing site. Regenerate with: ghostcrawl.io/scripts/capture_playground.py",
+  "generated_by": "scripts/capture_playground.py",
+  "lanes": [
+    "scrape",
+    "search",
+    "extract",
+    "agent",
+    "navigate",
+    "crawl",
+    "screenshot",
+    "pdf",
+    "sessions",
+    "stream"
+  ],
+  "hero_site": "ghostcrawl",
+  "default_site": "ghostcrawl",
+  "sites": [
+    {
+      "id": "ghostcrawl",
+      "label": "ghostcrawl.io",
+      "url": "https://ghostcrawl.io",
+      "search_query": "ghostcrawl documentation",
+      "extract_intent": "list the API capabilities exposed on the page",
+      "extract_schema": {
+        "type": "object",
+        "required": [
+          "capabilities"
+        ],
+        "properties": {
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "example",
+      "label": "example.com",
+      "url": "https://example.com",
+      "search_query": "example domain",
+      "extract_intent": "extract the page heading and body text",
+      "extract_schema": {
+        "type": "object",
+        "required": [
+          "heading"
+        ],
+        "properties": {
+          "heading": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "more_info_url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "books",
+      "label": "books.toscrape.com",
+      "url": "https://books.toscrape.com",
+      "search_query": "books to scrape catalogue",
+      "extract_intent": "extract the list of books with title, price and availability",
+      "extract_schema": {
+        "type": "object",
+        "required": [
+          "books"
+        ],
+        "properties": {
+          "books": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title",
+                "price"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": "string"
+                },
+                "in_stock": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "quotes",
+      "label": "quotes.toscrape.com",
+      "url": "https://quotes.toscrape.com",
+      "search_query": "famous author quotes",
+      "extract_intent": "extract each quote with its author and tags",
+      "extract_schema": {
+        "type": "object",
+        "required": [
+          "quotes"
+        ],
+        "properties": {
+          "quotes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "text",
+                "author"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "author": {
+                  "type": "string"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "hackernews",
+      "label": "news.ycombinator.com",
+      "url": "https://news.ycombinator.com",
+      "search_query": "hacker news",
+      "extract_intent": "extract the front-page stories with title, points and comment count",
+      "extract_schema": {
+        "type": "object",
+        "required": [
+          "stories"
+        ],
+        "properties": {
+          "stories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "title"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "points": {
+                  "type": "integer"
+                },
+                "comments": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "wikipedia",
+      "label": "en.wikipedia.org",
+      "url": "https://en.wikipedia.org/wiki/Web_scraping",
+      "search_query": "web scraping wikipedia",
+      "extract_intent": "extract the article title, summary and section headings",
+      "extract_schema": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

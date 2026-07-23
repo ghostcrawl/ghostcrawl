@@ -1,0 +1,310 @@
+{
+  "id": "quotes",
+  "label": "quotes.toscrape.com",
+  "url": "https://quotes.toscrape.com",
+  "lanes": {
+    "scrape": {
+      "status_code": 200,
+      "title": "Quotes to Scrape",
+      "engine": "chromium",
+      "os": "linux",
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      "bytes": 10953,
+      "markdown": "# Quotes to Scrape\nLogin\n## Top Ten tags\nQuotes by: GoodReads.com\nMade with by \u2764Zyte",
+      "resolved_url": "https://quotes.toscrape.com"
+    },
+    "content": {
+      "engine": "chromium",
+      "title": "Quotes to Scrape",
+      "markdown": "# Quotes to Scrape\nLogin\n## Top Ten tags\nQuotes by: GoodReads.com\nMade with by \u2764Zyte",
+      "bytes": 10953
+    },
+    "map": {
+      "count": 14,
+      "paths": [
+        "/",
+        "/login",
+        "/author/Albert-Einstein",
+        "/tag/change/page/1/",
+        "/tag/deep-thoughts/page/1/",
+        "/tag/thinking/page/1/",
+        "/tag/world/page/1/",
+        "/author/J-K-Rowling",
+        "/tag/abilities/page/1/",
+        "/tag/choices/page/1/",
+        "/tag/inspirational/page/1/",
+        "/tag/life/page/1/",
+        "/tag/live/page/1/",
+        "/tag/miracle/page/1/"
+      ]
+    },
+    "crawl": {
+      "max_pages": 12,
+      "pages": 182,
+      "urls": [
+        "/",
+        "/static/bootstrap.min.css",
+        "/static/main.css",
+        "/",
+        "/login",
+        "/author/Albert-Einstein",
+        "/tag/change/page/1/",
+        "/tag/deep-thoughts/page/1/",
+        "/tag/thinking/page/1/",
+        "/tag/world/page/1/",
+        "/author/J-K-Rowling",
+        "/tag/abilities/page/1/"
+      ]
+    },
+    "search": {
+      "query": "famous author quotes",
+      "hits": [
+        {
+          "url": "https://github.com/rovshenhojayev/Quotes-to-Scrape",
+          "title": "GitHub - rovshenhojayev/Quotes-to-Scrape: Quotes Scraper is a Scrapy ...",
+          "snippet": "About Scraper is a Scrapy-based project designed to extract , , and from \" .\" It efficiently handles pagination and supports multiple output formats like JSON, "
+        },
+        {
+          "url": "https://automize.dev/qwxey5uypwk/",
+          "title": "Scraping Tags from Quotes - A Step-by-Step Guide \u2014 Automize",
+          "snippet": "In today's example, we will be scraping along with their corresponding and from a dedicated webpage. The , , and are the unique elements we want to focus on.quo"
+        },
+        {
+          "url": "https://quotes.toscrape.com/",
+          "title": "Quotes to Scrape",
+          "snippet": ": change deep-thoughts thinking world \"It is our choices, Harry, that show what we truly are, far more than our abilities.\" by J.K. Rowling (about) :TagsTags"
+        },
+        {
+          "url": "https://www.geeksforgeeks.org/python/scraping-quotes-using-python/",
+          "title": "Scraping Quotes using Python - GeeksforGeeks",
+          "snippet": "Step 4: Extract details, and links In this step, we extract all information related to each . Extracts text, Extracts name, Extracts profile link, extracts all "
+        },
+        {
+          "url": "https://bhavyasree.github.io/PythonClass/Notebooks/18.scrape-quotes/",
+          "title": "Web Scraping - Quotes - Python Class - GitHub Pages",
+          "snippet": "Use what you know about for loops and string concatenation to loop through all the pages and get all the unique on the website. Keep in mind there are many ways"
+        }
+      ]
+    },
+    "extract": {
+      "schema_keys": [
+        "quotes"
+      ],
+      "data": {
+        "quotes": [
+          {
+            "text": "\u201cThe world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.\u201d",
+            "author": "Albert Einstein",
+            "tags": [
+              "change",
+              "deep-thoughts",
+              "thinking",
+              "world"
+            ]
+          },
+          {
+            "text": "\u201cIt is our choices, Harry, that show what we truly are, far more than our abilities.\u201d",
+            "author": "J.K. Rowling",
+            "tags": [
+              "abilities",
+              "choices"
+            ]
+          },
+          {
+            "text": "\u201cThere are only two ways to live your life. One is as though nothing is a miracle. The other is as though everything is a miracle.\u201d",
+            "author": "Albert Einstein",
+            "tags": [
+              "inspirational",
+              "life",
+              "live",
+              "miracle",
+              "miracles"
+            ]
+          },
+          {
+            "text": "\u201cThe person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.\u201d",
+            "author": "Jane Austen",
+            "tags": [
+              "aliteracy",
+              "books",
+              "classic",
+              "humor"
+            ]
+          },
+          {
+            "text": "\u201cImperfection is beauty, madness is genius and it's better to be absolutely ridiculous than absolutely boring.\u201d",
+            "author": "Marilyn Monroe",
+            "tags": [
+              "be-yourself",
+              "inspirational"
+            ]
+          },
+          {
+            "text": "\u201cTry not to become a man of success. Rather become a man of value.\u201d",
+            "author": "Albert Einstein",
+            "tags": [
+              "adulthood",
+              "success",
+              "value"
+            ]
+          }
+        ]
+      },
+      "count": 6
+    },
+    "agent": {
+      "goal": "extract each quote with its author and tags",
+      "steps": [
+        {
+          "type": "observe",
+          "detail": "loaded quotes.toscrape.com"
+        },
+        {
+          "type": "act",
+          "detail": "read main content"
+        },
+        {
+          "type": "extract",
+          "detail": "6 fields"
+        }
+      ],
+      "extracted": {
+        "quotes": [
+          {
+            "text": "\u201cThe world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.\u201d",
+            "author": "Albert Einstein",
+            "tags": [
+              "change",
+              "deep-thoughts",
+              "thinking",
+              "world"
+            ]
+          },
+          {
+            "text": "\u201cIt is our choices, Harry, that show what we truly are, far more than our abilities.\u201d",
+            "author": "J.K. Rowling",
+            "tags": [
+              "abilities",
+              "choices"
+            ]
+          },
+          {
+            "text": "\u201cThere are only two ways to live your life. One is as though nothing is a miracle. The other is as though everything is a miracle.\u201d",
+            "author": "Albert Einstein",
+            "tags": [
+              "inspirational",
+              "life",
+              "live",
+              "miracle",
+              "miracles"
+            ]
+          },
+          {
+            "text": "\u201cThe person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.\u201d",
+            "author": "Jane Austen",
+            "tags": [
+              "aliteracy",
+              "books",
+              "classic",
+              "humor"
+            ]
+          },
+          {
+            "text": "\u201cImperfection is beauty, madness is genius and it's better to be absolutely ridiculous than absolutely boring.\u201d",
+            "author": "Marilyn Monroe",
+            "tags": [
+              "be-yourself",
+              "inspirational"
+            ]
+          },
+          {
+            "text": "\u201cTry not to become a man of success. Rather become a man of value.\u201d",
+            "author": "Albert Einstein",
+            "tags": [
+              "adulthood",
+              "success",
+              "value"
+            ]
+          }
+        ]
+      },
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "sessions": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "ttl_seconds": 86400,
+      "engine": "chromium",
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "stream": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "frames": [
+        {
+          "tag": "network",
+          "text": "GET https://quotes.toscrape.com \u2192 200"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "domcontentloaded"
+        },
+        {
+          "tag": "dom",
+          "text": "document ready \u00b7 10,953B"
+        },
+        {
+          "tag": "network",
+          "text": "networkidle"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "rendered \u00b7 chromium"
+        }
+      ]
+    },
+    "screenshot": {
+      "img": "shots/quotes.jpg",
+      "format": "jpeg",
+      "viewport": "1280\u00d7800",
+      "engine": "chromium",
+      "source": "engine"
+    },
+    "pdf": {
+      "img": "shots/quotes.jpg",
+      "file": "",
+      "paper": "a4",
+      "source": "engine"
+    },
+    "navigate": {
+      "img": "shots/quotes.jpg",
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac"
+    }
+  }
+}

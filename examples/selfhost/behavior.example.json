@@ -1,0 +1,8 @@
+{
+  "human_actions": [
+    { "kind": "dwell", "ms": 500 },
+    { "kind": "move", "x": 640, "y": 400 },
+    { "kind": "wheel", "x": 640, "y": 400, "dy": -300 },
+    { "kind": "dwell", "ms": 200 }
+  ]
+}

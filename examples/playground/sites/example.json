@@ -1,0 +1,183 @@
+{
+  "id": "example",
+  "label": "example.com",
+  "url": "https://example.com",
+  "lanes": {
+    "scrape": {
+      "status_code": 200,
+      "title": "Example Domain",
+      "engine": "chromium",
+      "os": "linux",
+      "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      "bytes": 544,
+      "markdown": "# Example Domain\nThis domain is for use in documentation examples without needing permission. Avoid use in operations.\nLearn more",
+      "resolved_url": "https://example.com"
+    },
+    "content": {
+      "engine": "chromium",
+      "title": "Example Domain",
+      "markdown": "# Example Domain\nThis domain is for use in documentation examples without needing permission. Avoid use in operations.\nLearn more",
+      "bytes": 544
+    },
+    "map": {
+      "count": 1,
+      "paths": [
+        "/"
+      ]
+    },
+    "crawl": {
+      "max_pages": 12,
+      "pages": 1,
+      "urls": [
+        "/"
+      ]
+    },
+    "search": {
+      "query": "example domain",
+      "hits": [
+        {
+          "url": "https://www.iana.org/domains/reserved",
+          "title": "IANA-managed Reserved Domains",
+          "snippet": "IANA-managed Certain are set aside, and nominally registered to \"IANA\", for specific policy or technical purposes. As described in RFC 2606 and RFC 6761, a numb"
+        },
+        {
+          "url": "https://nameocean.net/article/reserved-domains-and-documentation-why-examplecom-matters-for-your-projects/",
+          "title": "Reserved Domains and Documentation: Why example.com Matters for Your ...",
+          "snippet": "Good with proper becomes the guardrail that keeps developers building responsibly. Moving Forward The next time you're writing a blog post, creating a code samp"
+        },
+        {
+          "url": "https://developers.google.com/style/examples",
+          "title": "Example domains and names | Google developer documentation style guide ...",
+          "snippet": "names When you need a generic name in an , use .com, .org, or .net. These are by the Internet Assigned Numbers Authority for use in . Alternatively, you can use"
+        },
+        {
+          "url": "https://en.wikipedia.org/wiki/Example.com",
+          "title": "example.com - Wikipedia",
+          "snippet": "The names .com, .net, .org, and .edu are second-level names in the Name System of the Internet. They are by the Internet Assigned Numbers Authority (IANA) at th"
+        },
+        {
+          "url": "https://www.iana.org/help/example-domains",
+          "title": "Example Domains - Internet Assigned Numbers Authority",
+          "snippet": "As described in RFC 2606 and RFC 6761, a number of such as .com and .org are maintained for purposes. These may be used as illustrative in documents without pri"
+        },
+        {
+          "url": "https://nameocean.net/article/reserved-domains-and-reserved-judgment-why-examplecom-matters-more-than-you-think/",
+          "title": "Reserved Domains and Reserved Judgment: Why Example.com Matters More ...",
+          "snippet": "are a small detail that separates professional from amateur hour. They're the difference between a tutorial that developers trust and one that leaves them nervo"
+        }
+      ]
+    },
+    "extract": {
+      "schema_keys": [
+        "heading",
+        "body",
+        "more_info_url"
+      ],
+      "data": {
+        "heading": "Example Domain",
+        "body": "This domain is for use in documentation examples without needing permission. Avoid use in operations.",
+        "more_info_url": "https://iana.org/domains/example"
+      },
+      "count": 0
+    },
+    "agent": {
+      "goal": "extract the page heading and body text",
+      "steps": [
+        {
+          "type": "observe",
+          "detail": "loaded example.com"
+        },
+        {
+          "type": "act",
+          "detail": "read main content"
+        },
+        {
+          "type": "extract",
+          "detail": "typed fields"
+        }
+      ],
+      "extracted": {
+        "heading": "Example Domain",
+        "body": "This domain is for use in documentation examples without needing permission. Avoid use in operations.",
+        "more_info_url": "https://iana.org/domains/example"
+      },
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "sessions": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "ttl_seconds": 86400,
+      "engine": "chromium",
+      "receipt": {
+        "version": "ghostcrawl-receipt/1",
+        "route": "/agent",
+        "lane": "rest",
+        "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+        "engine_requested": "auto",
+        "engine_public_names": [
+          "chrome",
+          "firefox",
+          "webkit"
+        ],
+        "issued_at": 1781374143,
+        "disclaimer": "diagnostic-not-warranty",
+        "receipt_id": "receipt-7683b28807e230bc"
+      }
+    },
+    "stream": {
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac",
+      "frames": [
+        {
+          "tag": "network",
+          "text": "GET https://example.com \u2192 200"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "domcontentloaded"
+        },
+        {
+          "tag": "dom",
+          "text": "document ready \u00b7 544B"
+        },
+        {
+          "tag": "network",
+          "text": "networkidle"
+        },
+        {
+          "tag": "lifecycle",
+          "text": "rendered \u00b7 chromium"
+        }
+      ]
+    },
+    "screenshot": {
+      "img": "shots/example.jpg",
+      "format": "jpeg",
+      "viewport": "1280\u00d7800",
+      "engine": "chromium",
+      "source": "engine"
+    },
+    "pdf": {
+      "img": "shots/example.jpg",
+      "file": "",
+      "paper": "a4",
+      "source": "engine"
+    },
+    "navigate": {
+      "img": "shots/example.jpg",
+      "session_id": "0dc6d0c7-45a4-4a0f-8afd-99d015a7e7ac"
+    }
+  }
+}

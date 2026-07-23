@@ -1,0 +1,8 @@
+Warning: KiotaBuilder OpenAPI warning: #/ - A servers entry (v3) or host + basePath + schemes properties (v2) was not present in the OpenAPI description. The root URL will need to be set manually with the request adapter.
+Warning: KiotaBuilder OpenAPI warning: #/paths/~1v1~1recordings~1{session_id}~1visual - A GET operation with a body was found. The request body will be ignored.
+Warning: KiotaBuilder OpenAPI warning: #/paths/~1v1~1recordings~1{session_id}~1visual~1frames - A GET operation with a body was found. The request body will be ignored.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/MapBody/properties/url - The format uri is not supported by Kiota and the string type will be used.
+Warning: KiotaBuilder OpenAPI warning: #/components/schemas/ProblemDetails/properties/type - The format uri is not supported by Kiota and the string type will be used.
+Error: KiotaBuilder OpenAPI error: #/components/schemas/ErrorEnvelope/examples - Cannot create a list from this type of node.
+Warning: KiotaBuilder No server url found in the OpenAPI document. The base url will need to be set when using the client.
+Warning: KiotaBuilder Could not create error type for 429 in (null)

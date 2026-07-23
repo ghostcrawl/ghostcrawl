@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "ghostcrawl": {
+      "url": "https://mcp.ghostcrawl.io",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "@ghostcrawl/sdk",
+  "version": "2.3.4",
+  "description": "Official Node.js SDK for the GhostCrawl orchestration API.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/gen-version.mjs && rm -rf dist && tsc -p tsconfig.json && tsc -p tsconfig.cjs.json && node scripts/postbuild.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "ghostcrawl",
+    "sdk",
+    "scrape",
+    "extract",
+    "agent",
+    "browser",
+    "automation"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@microsoft/kiota-abstractions": "^1.0.0-preview.103",
+    "@microsoft/kiota-http-fetchlibrary": "^1.0.0-preview.103",
+    "@microsoft/kiota-serialization-form": "^1.0.0-preview.103",
+    "@microsoft/kiota-serialization-json": "^1.0.0-preview.103",
+    "@microsoft/kiota-serialization-multipart": "^1.0.0-preview.103",
+    "@microsoft/kiota-serialization-text": "^1.0.0-preview.103",
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "msw": "^2.14.6",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
+  },
+  "overrides": {
+    "@hono/node-server": ">=2.0.5"
+  }
+}

@@ -1,0 +1,32 @@
+name: Feature request
+description: >
+  Suggest an improvement to the SDK, CLI, or docs.
+  Note: backend and engine changes are NOT accepted here — those are
+  operator-only and handled in private.
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: >
+        What problem are you trying to solve? Describe the concrete
+        scenario where this feature would help you.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_behavior
+    attributes:
+      label: Proposed behavior
+      description: >
+        How would the SDK, CLI, or docs behave differently? Include any
+        API sketches, code examples, or command-line usage you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: >
+        Have you tried any workarounds? Is there an existing approach that
+        partially addresses the need?
