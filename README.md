@@ -238,7 +238,6 @@ See [ghostcrawl.io](https://ghostcrawl.io) for the full, current pricing.
 | CLI | [`@ghostcrawl/cli`](https://www.npmjs.com/package/@ghostcrawl/cli) | `npm install -g @ghostcrawl/cli` |
 | LangChain | [`ghostcrawl-langchain`](https://pypi.org/project/ghostcrawl-langchain/) | `pip install ghostcrawl-langchain` |
 | PHP | [`ghostcrawl/ghostcrawl`](https://packagist.org/packages/ghostcrawl/ghostcrawl) | `composer require ghostcrawl/ghostcrawl` |
-| Scrapy | n/a | *Coming soon* |
 
 ---
 
