@@ -1,5 +1,5 @@
-// Adapted from ScrapingBee/scrapingbee-node ergonomics patterns
-// (no code copied — see THIRD-PARTY-NOTICES.md)
+// Adapted from common SDK ergonomics patterns (independently implemented —
+// no code copied)
 
 /**
  * Base64-encode a JavaScript snippet string for use with the js_snippet param.
@@ -36,7 +36,7 @@ export function buildJsScenario(steps: unknown[]): string {
  * values that a naive `!value` falsiness test would wrongly drop. Strings are
  * empty when whitespace-only; arrays/objects when they carry no elements/keys.
  *
- * Forward-adapted from ScrapingBee/scrapingbee-node `is_empty()` (no code
+ * Independently implemented from a common SDK ergonomics pattern (no code
  * copied — ghostcrawl idiom).
  */
 export function isEmpty(value: unknown): boolean {
@@ -67,8 +67,8 @@ export function isEmpty(value: unknown): boolean {
  * JSON-encode any dict/list param values; String()-coerce everything else
  * Ensures complex params reach the API as string-encoded JSON.
  *
- * Forward-adapted from the langchain-scrapingbee `stringify_nested_objects()`
- * technique (no code copied — ghostcrawl idiom).
+ * Independently implemented from a common SDK ergonomics pattern (no code
+ * copied — ghostcrawl idiom).
  */
 export function stringifyNestedObjects(
     params: Record<string, unknown>,

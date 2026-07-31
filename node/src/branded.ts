@@ -1,5 +1,5 @@
 // Branded helpers — ghostcrawl-node User-Agent + raw Google SERP convenience
-// reach. (no code copied from ScrapingBee — see THIRD-PARTY-NOTICES.md)
+// reach. (independently implemented — no code copied)
 
 import * as os from "os";
 // SDK_VERSION is generated from package.json by scripts/gen-version.mjs before

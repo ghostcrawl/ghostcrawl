@@ -34,18 +34,18 @@ the host.
 
 ## Local endpoints
 
-A running instance exposes three local surfaces:
+A running instance serves everything on a single local port (`47700`):
 
-| Surface | Default | Purpose |
-|---------|---------|---------|
-| REST API | `http://localhost:8000` | Same SDK surface as the cloud, pointed at your local instance. |
-| MCP | `http://localhost:3143` | Drive the local browsers from an agent. |
-| Dashboard | local web UI | Manage your instance, watch and control live sessions. |
+| Surface | URL | Purpose |
+|---------|-----|---------|
+| REST API | `http://localhost:47700` | Same SDK surface as the cloud, pointed at your local instance. |
+| MCP | `http://localhost:47700/mcp` | Drive the local browsers from an agent. |
+| Dashboard | `http://localhost:47700/dashboard` | Manage your instance, watch and control live sessions. |
 
 Point an SDK at your local instance by overriding the base URL:
 
 ```python
-client = GhostcrawlClient(api_key="YOUR_API_KEY", base_url="http://localhost:8000")
+client = GhostcrawlClient(api_key="YOUR_API_KEY", base_url="http://localhost:47700")
 ```
 
 Live browser viewing and control are available locally — it is your own

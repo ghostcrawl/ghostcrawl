@@ -1,4 +1,4 @@
-"""Phase 140.5 Plan 14 — CLI scrape --preset + binary auto-save (D-05e items 4, 3).
+"""CLI scrape --preset + binary auto-save.
 
 Uses typer's CliRunner with a monkeypatched _get_client that records the scrape
 kwargs (preset assertions) and returns a stubbed result (auto-save assertion).

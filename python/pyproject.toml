@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ghostcrawl"
-version = "2.3.4"
+version = "2.3.5"
 description = "Official Python SDK for the GhostCrawl local orchestration API."
 readme = "README.md"
 requires-python = ">=3.10"

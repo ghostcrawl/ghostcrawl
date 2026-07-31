@@ -1,6 +1,6 @@
 """Example: scrape Amazon product reviews via ghostcrawl /v1/extract schema rules.
 
-Docs-only example (HYBRID-EXAMPLE-DOCS per Phase 140.2 D-06). Uses /v1/extract
+Docs-only example. Uses /v1/extract
 with a JSON schema — zero parser maintenance for ghostcrawl since Amazon DOM
 drift is handled by updating the schema below.
 

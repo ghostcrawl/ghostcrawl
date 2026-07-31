@@ -17,7 +17,7 @@ async function main(): Promise<void> {
 
   // Canonical LLM-ready markdown scrape. On the cloud a no-identity scrape is served by
   // an auto-assigned SPOOFED identity, and the markdown envelope carries identity_id so
-  // this exact drive can be correlated to its egress-exit assignment (D-04).
+  // this exact drive can be correlated to its egress-exit assignment.
   const result = await client.scrape({
     url: "https://example.com",
     format: "markdown",

@@ -20,7 +20,7 @@ pip install ghostcrawl-langchain
 `ghostcrawl-langchain` is a **framework lane**, not a full SDK: it wraps the
 idiomatic *retrieval* subset of the GhostCrawl API as LangChain tools an agent
 can call. Everything else is an explicit **N/A** — not a gap, just not idiomatic
-as an LC retrieval `Tool`/loader (zero blank cells, zero padded-green; D-10/D-11).
+as an LC retrieval `Tool`/loader (zero blank cells, zero padded-green).
 
 | Capability | Status | Tool / rationale |
 |------------|--------|------------------|

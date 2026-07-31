@@ -1,4 +1,4 @@
-"""Phase 140.5 Plan 14 — Python cookie URL-encode helper (D-05e item 5).
+"""Python cookie URL-encode helper.
 
 Tests `format_cookies_urlencoded` and confirms the plain `format_cookies`
 joiner is left unchanged (back-compat / zero-loss-of-functionality).

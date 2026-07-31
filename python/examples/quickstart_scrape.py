@@ -22,8 +22,8 @@ async def main() -> None:
     async with GhostCrawlClient(token=token) as client:
         result = await client.scrape(url="https://example.com", format="markdown")
         print("Scrape status:", result.get("status", "unknown"))
-        # identity_id (Phase 140.4-16 response envelope field) — printed so a caller can
-        # correlate this exact drive to its server-side egress-exit assignment (D-04, phase 177).
+        # identity_id (response envelope field) — printed so a caller can
+        # correlate this exact drive to its server-side egress-exit assignment.
         print("identity_id:", result.get("identity_id", "unknown"))
         # The API returns content in the field matching the requested format.
         # format="markdown" → result["markdown"]; format="html" → result["html"]

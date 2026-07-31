@@ -22,7 +22,7 @@ from mcp.client.streamable_http import streamable_http_client  # current name; o
 
 
 # ----------------------------------------------------------------------------
-# Canonical tool-name reconciliation (D-11)
+# Canonical tool-name reconciliation
 # ----------------------------------------------------------------------------
 # The native GhostCrawl MCP server (``ghostcrawl.mcp.tools.TOOL_REGISTRY``) exposes
 # every tool under the canonical ``ghostcrawl_*`` (data-plane) / ``act_*`` (browser

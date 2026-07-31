@@ -23,7 +23,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
-// ─── Canonical tool-name reconciliation (D-11) ──────────────────────────────
+// ─── Canonical tool-name reconciliation ─────────────────────────────────────
 // The native GhostCrawl MCP server (ghostcrawl.mcp.tools.TOOL_REGISTRY) exposes
 // every tool under the canonical `ghostcrawl_*` (data-plane) / `act_*` (browser
 // primitive) / `action_record_*` namespaces — NOT the bare `navigate` / `act`

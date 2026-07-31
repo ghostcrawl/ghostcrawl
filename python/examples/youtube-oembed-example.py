@@ -1,7 +1,7 @@
 """Example: fetch YouTube video metadata via ghostcrawl /v1/scrape against
 YouTube's public oEmbed endpoint.
 
-Docs-only example (parallels MKT-AMAZON-REVIEWS-EXAMPLE per Phase 140.2 D-08).
+Docs-only example.
 ghostcrawl does NOT own a YouTube oEmbed route — this example shows how to
 hit youtube.com/oembed through ghostcrawl's generic /v1/scrape, which keeps
 auth + stealth + observability consistent with the rest of the SaaS.

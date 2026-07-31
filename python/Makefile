@@ -1,10 +1,10 @@
-# Phase 178 — python lane one-command parity runner (R3).
+# python lane one-command parity runner.
 #
 # `make parity-e2e` runs tests/parity_e2e.py, which exercises EVERY user-surface
 # row in scripts/phase178/rowset.json ONCE against the REAL cloud test tenant and
 # writes one transcript per row to 178-EVIDENCE/python/ (TRANSCRIPT-SCHEMA.md).
 #
-# Secrets (D-04): the token is read from GHOSTCRAWL_API_KEY (NEVER hardcoded); if
+# Secrets: the token is read from GHOSTCRAWL_API_KEY (NEVER hardcoded); if
 # it is unset the runner STOPS and fabricates nothing. The real-backend sweep is
 # wrapped in the shared flock run-lock (scripts/phase178/parity-run.sh) so
 # concurrent-wave lanes serialize their hits to the single shared tenant (W2).

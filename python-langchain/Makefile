@@ -1,4 +1,4 @@
-# Phase 178 — python-langchain framework-lane one-command parity runner (R8).
+# python-langchain framework-lane one-command parity runner.
 #
 # `make parity-e2e` runs tests/parity_e2e.py, which exercises the idiomatic
 # LangChain-tool retrieval subset (scrape/content/extract/map/crawl/usage) against
@@ -7,7 +7,7 @@
 # with a one-line WHY, and writes one transcript per rowset row to
 # 178-EVIDENCE/python-langchain/ (TRANSCRIPT-SCHEMA.md — counts + var-names only).
 #
-# Secrets (D-04): the token is read from GHOSTCRAWL_API_KEY (NEVER hardcoded); if it
+# Secrets: the token is read from GHOSTCRAWL_API_KEY (NEVER hardcoded); if it
 # is unset the runner STOPS and fabricates nothing. The real-backend sweep is wrapped
 # in the shared flock run-lock (scripts/phase178/parity-run.sh) so concurrent-wave
 # lanes serialize their hits to the single shared tenant (W2). This is a live-network
