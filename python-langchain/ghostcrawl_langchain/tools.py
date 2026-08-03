@@ -979,7 +979,7 @@ class GhostCrawlCrawlTool(BaseTool):
         **_: Any,
     ) -> str:
         # /v1/crawl requires ``seed_urls`` (array) — a bare ``url`` field is a 422
-        # "Field required" (verified by real execution). Map the tool's
+        # "Field required" (verified by real execution against the live API). Map the tool's
         # ergonomic ``url`` onto the ``seed_urls`` the crawl route contract expects.
         body: Dict[str, Any] = {
             "seed_urls": [url],

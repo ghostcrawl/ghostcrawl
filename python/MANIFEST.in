@@ -4,5 +4,4 @@ recursive-include ghostcrawl py.typed *.pyi
 prune tests
 prune ghostcrawl/tests
 prune examples
-prune _operator
 global-exclude __pycache__ *.pyc

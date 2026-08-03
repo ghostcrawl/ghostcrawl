@@ -54,7 +54,7 @@ def _run(value: Any) -> Any:
 # Top-level app
 # ---------------------------------------------------------------------------
 
-__version__ = "2.3.4"  # keep in sync with sdks/python/pyproject.toml (test_version_matches_pyproject guards drift)
+__version__ = "2.3.5"  # keep in sync with sdks/python/pyproject.toml (test_version_matches_pyproject guards drift)
 
 
 def _version_callback(value: bool) -> None:

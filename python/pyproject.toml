@@ -52,7 +52,7 @@ Homepage = "https://github.com/ghostcrawl/ghostcrawl"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["ghostcrawl*", "_generated*"]
-exclude = ["tests*", "examples*", "ghostcrawl.tests*", "_operator*"]
+exclude = ["tests*", "examples*", "ghostcrawl.tests*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
