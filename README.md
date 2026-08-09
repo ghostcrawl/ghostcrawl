@@ -54,6 +54,9 @@ Protocol surface, so any agent can drive it directly.
 
 - **It gets through.** Pages render and return authentic results where ordinary
   headless setups get blocked or fed altered content.
+- **CAPTCHAs handled for you.** When a site throws a CAPTCHA, it's cleared
+  automatically as part of the request — included on every paid plan, with no
+  third-party solver to wire up and no per-solve fee.
 - **Three real engines.** Chrome, Firefox, and WebKit. Pick one or let
   `auto` choose. The same site looks the same to GhostCrawl as it does to a
   real visitor.
@@ -78,6 +81,7 @@ Protocol surface, so any agent can drive it directly.
 | **Extract** | Pull structured JSON from a page against a schema you provide. |
 | **Browser control** | Drive a live session: navigate, click, type, scroll, screenshot. |
 | **Agent (MCP)** | Give an agent a goal; it navigates and acts to complete it. |
+| **CAPTCHA solving** | Clears CAPTCHA challenges automatically as part of the request — included on paid plans. |
 | **Search / SERP** | Query search engines and verticals (web, news, shopping, and more). |
 | **Sessions** | Sticky, reusable browser sessions with consistent identity. |
 | **Identity profiles** | Persistent, coherent browser identities that survive across runs. |
