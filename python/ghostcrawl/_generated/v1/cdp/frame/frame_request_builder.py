@@ -14,25 +14,25 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 from warnings import warn
 
 if TYPE_CHECKING:
-    from .....models.problem_details import ProblemDetails
-    from .....models.takeover_action_body import TakeoverActionBody
+    from ....models.cdp_frame_request import CdpFrameRequest
+    from ....models.problem_details import ProblemDetails
 
-class TakeoverRequestBuilder(BaseRequestBuilder):
+class FrameRequestBuilder(BaseRequestBuilder):
     """
-    Builds and executes requests for operations under /v1/sessions/{profile_-id}/takeover
+    Builds and executes requests for operations under /v1/cdp/frame
     """
     def __init__(self,request_adapter: RequestAdapter, path_parameters: Union[str, dict[str, Any]]) -> None:
         """
-        Instantiates a new TakeoverRequestBuilder and sets the default values.
+        Instantiates a new FrameRequestBuilder and sets the default values.
         param path_parameters: The raw url or the url-template parameters for the request.
         param request_adapter: The request adapter to use to execute the requests.
         Returns: None
         """
-        super().__init__(request_adapter, "{+baseurl}/v1/sessions/{profile_%2Did}/takeover", path_parameters)
+        super().__init__(request_adapter, "{+baseurl}/v1/cdp/frame", path_parameters)
     
-    async def post(self,body: TakeoverActionBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
+    async def post(self,body: CdpFrameRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        POST /v1/sessions/{id}/takeover with {"action": "mint"} delegates to the HMAC-token mint logic (same as /takeover_token). {"action": "release"} delegates to the control flag release logic (same as /takeover_release). with an action discriminator, while the underlying REST surface exposes two dedicated sub-paths. Both entry points share identical auth, tier,
+        Capture a JPEG frame of a live browser session. Returns a single base64-encoded JPEG frame of a live interactive session. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -42,7 +42,7 @@ class TakeoverRequestBuilder(BaseRequestBuilder):
         request_info = self.to_post_request_information(
             body, request_configuration
         )
-        from .....models.problem_details import ProblemDetails
+        from ....models.problem_details import ProblemDetails
 
         error_mapping: dict[str, type[ParsableFactory]] = {
             "422": ProblemDetails,
@@ -51,9 +51,9 @@ class TakeoverRequestBuilder(BaseRequestBuilder):
             raise Exception("Http core is null") 
         return await self.request_adapter.send_primitive_async(request_info, "bytes", error_mapping)
     
-    def to_post_request_information(self,body: TakeoverActionBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
+    def to_post_request_information(self,body: CdpFrameRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        POST /v1/sessions/{id}/takeover with {"action": "mint"} delegates to the HMAC-token mint logic (same as /takeover_token). {"action": "release"} delegates to the control flag release logic (same as /takeover_release). with an action discriminator, while the underlying REST surface exposes two dedicated sub-paths. Both entry points share identical auth, tier,
+        Capture a JPEG frame of a live browser session. Returns a single base64-encoded JPEG frame of a live interactive session. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
@@ -66,18 +66,18 @@ class TakeoverRequestBuilder(BaseRequestBuilder):
         request_info.set_content_from_parsable(self.request_adapter, "application/json", body)
         return request_info
     
-    def with_url(self,raw_url: str) -> TakeoverRequestBuilder:
+    def with_url(self,raw_url: str) -> FrameRequestBuilder:
         """
         Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         param raw_url: The raw URL to use for the request builder.
-        Returns: TakeoverRequestBuilder
+        Returns: FrameRequestBuilder
         """
         if raw_url is None:
             raise TypeError("raw_url cannot be null.")
-        return TakeoverRequestBuilder(self.request_adapter, raw_url)
+        return FrameRequestBuilder(self.request_adapter, raw_url)
     
     @dataclass
-    class TakeoverRequestBuilderPostRequestConfiguration(RequestConfiguration[QueryParameters]):
+    class FrameRequestBuilderPostRequestConfiguration(RequestConfiguration[QueryParameters]):
         """
         Configuration for the request such as headers, query parameters, and middleware options.
         """

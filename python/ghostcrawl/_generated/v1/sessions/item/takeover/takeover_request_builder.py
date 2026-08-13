@@ -14,25 +14,25 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 from warnings import warn
 
 if TYPE_CHECKING:
-    from ....models.cdp_frame_request import CdpFrameRequest
-    from ....models.problem_details import ProblemDetails
+    from .....models.problem_details import ProblemDetails
+    from .....models.takeover_action_body import TakeoverActionBody
 
-class FrameRequestBuilder(BaseRequestBuilder):
+class TakeoverRequestBuilder(BaseRequestBuilder):
     """
-    Builds and executes requests for operations under /v1/cdp/frame
+    Builds and executes requests for operations under /v1/sessions/{profile_-id}/takeover
     """
     def __init__(self,request_adapter: RequestAdapter, path_parameters: Union[str, dict[str, Any]]) -> None:
         """
-        Instantiates a new FrameRequestBuilder and sets the default values.
+        Instantiates a new TakeoverRequestBuilder and sets the default values.
         param path_parameters: The raw url or the url-template parameters for the request.
         param request_adapter: The request adapter to use to execute the requests.
         Returns: None
         """
-        super().__init__(request_adapter, "{+baseurl}/v1/cdp/frame", path_parameters)
+        super().__init__(request_adapter, "{+baseurl}/v1/sessions/{profile_%2Did}/takeover", path_parameters)
     
-    async def post(self,body: CdpFrameRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
+    async def post(self,body: TakeoverActionBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Engine-agnostic live-view frame capture (cross-engine). Returns a single base64-encoded JPEG frame of a live interactive session, using the same capture path across Chromium, Firefox, and WebKit. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
+        Start or release an interactive takeover of a live browser session. Send ``{"action": "mint"}`` to begin a takeover: you receive a short-lived token you can use to open the interactive session and drive it yourself. Send ``{"action": "release"}`` to hand control back and return the session to view-only. Requires a paid plan and ownership of the session.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -42,7 +42,7 @@ class FrameRequestBuilder(BaseRequestBuilder):
         request_info = self.to_post_request_information(
             body, request_configuration
         )
-        from ....models.problem_details import ProblemDetails
+        from .....models.problem_details import ProblemDetails
 
         error_mapping: dict[str, type[ParsableFactory]] = {
             "422": ProblemDetails,
@@ -51,9 +51,9 @@ class FrameRequestBuilder(BaseRequestBuilder):
             raise Exception("Http core is null") 
         return await self.request_adapter.send_primitive_async(request_info, "bytes", error_mapping)
     
-    def to_post_request_information(self,body: CdpFrameRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
+    def to_post_request_information(self,body: TakeoverActionBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Engine-agnostic live-view frame capture (cross-engine). Returns a single base64-encoded JPEG frame of a live interactive session, using the same capture path across Chromium, Firefox, and WebKit. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
+        Start or release an interactive takeover of a live browser session. Send ``{"action": "mint"}`` to begin a takeover: you receive a short-lived token you can use to open the interactive session and drive it yourself. Send ``{"action": "release"}`` to hand control back and return the session to view-only. Requires a paid plan and ownership of the session.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
@@ -66,18 +66,18 @@ class FrameRequestBuilder(BaseRequestBuilder):
         request_info.set_content_from_parsable(self.request_adapter, "application/json", body)
         return request_info
     
-    def with_url(self,raw_url: str) -> FrameRequestBuilder:
+    def with_url(self,raw_url: str) -> TakeoverRequestBuilder:
         """
         Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         param raw_url: The raw URL to use for the request builder.
-        Returns: FrameRequestBuilder
+        Returns: TakeoverRequestBuilder
         """
         if raw_url is None:
             raise TypeError("raw_url cannot be null.")
-        return FrameRequestBuilder(self.request_adapter, raw_url)
+        return TakeoverRequestBuilder(self.request_adapter, raw_url)
     
     @dataclass
-    class FrameRequestBuilderPostRequestConfiguration(RequestConfiguration[QueryParameters]):
+    class TakeoverRequestBuilderPostRequestConfiguration(RequestConfiguration[QueryParameters]):
         """
         Configuration for the request such as headers, query parameters, and middleware options.
         """

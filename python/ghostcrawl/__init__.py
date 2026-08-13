@@ -1,7 +1,7 @@
 """GhostCrawl Python SDK — public package surface.
 
 The canonical client is :class:`ghostcrawl.facade.GhostCrawlClient`, a thin
-async ergonomic layer over the Kiota-generated core (``_generated/``). All HTTP
+async ergonomic layer over the Kiota-generated core (``ghostcrawl/_generated/``). All HTTP
 transport, auth, serialization, and model mapping live in the generated core;
 the facade maps idiomatic calls onto the generated request-builders.
 

@@ -7,7 +7,7 @@ without change, ``GhostCrawl`` and ``Client`` are aliases of that facade, and
 the functional ``identity(...)`` convenience wrapper resolves through it.
 
 Everything HTTP, auth, serialization, and model mapping lives in the generated
-core (``_generated/``); this module is purely a thin compatibility shim.
+core (``ghostcrawl/_generated/``); this module is purely a thin compatibility shim.
 """
 
 from __future__ import annotations

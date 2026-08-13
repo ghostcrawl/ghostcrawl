@@ -46,7 +46,7 @@ from kiota_http.httpx_request_adapter import HttpxRequestAdapter
 
 # _generated/ lives at sdks/python/_generated/ (sibling to ghostcrawl/).
 # Include _generated* in pyproject.toml packages.find so it ships with the SDK.
-from _generated.ghostcrawl_client import GhostCrawlClient as _KiotaClient  # type: ignore[import]
+from ghostcrawl._generated.ghostcrawl_client import GhostCrawlClient as _KiotaClient  # type: ignore[import]
 
 # Public ghostcrawl error classes (the ones re-exported from the package root).
 # Aliased so transport errors from the generated core can be re-raised as the
@@ -624,7 +624,7 @@ class CrawlRunsClient:
             it finished within ``wait_timeout``; otherwise the latest
             (non-terminal) run so the caller may :meth:`wait` again.
         """
-        from _generated.v1.crawl_runs.crawl_runs_post_request_body import (
+        from ghostcrawl._generated.v1.crawl_runs.crawl_runs_post_request_body import (
             CrawlRunsPostRequestBody,
         )
 
@@ -762,8 +762,8 @@ class SessionsClient:
 
         Calls ``POST /v1/sessions/create`` via the generated builder.
         """
-        from _generated.models.session_create_request import SessionCreateRequest
-        from _generated.models.session_create_request_profile import (
+        from ghostcrawl._generated.models.session_create_request import SessionCreateRequest
+        from ghostcrawl._generated.models.session_create_request_profile import (
             SessionCreateRequest_profile,
         )
 
@@ -781,8 +781,8 @@ class SessionsClient:
         ``ExtendRequestBuilder.post`` rejects a null body, and the new TTL is
         carried by the ``ttl_seconds`` field (30s..24h).
         """
-        from _generated.models.extend_body import ExtendBody
-        from _generated.models.extend_body_ttl_seconds import (
+        from ghostcrawl._generated.models.extend_body import ExtendBody
+        from ghostcrawl._generated.models.extend_body_ttl_seconds import (
             ExtendBody_ttl_seconds,
         )
 
@@ -817,7 +817,7 @@ class ProfilesClient:
 
     async def create(self, name: str, **config: typing.Any) -> dict:
         """Create a new profile."""
-        from _generated.models.profile_create_request import ProfileCreateRequest
+        from ghostcrawl._generated.models.profile_create_request import ProfileCreateRequest
 
         body = ProfileCreateRequest()
         body.name = name
@@ -826,7 +826,7 @@ class ProfilesClient:
 
     async def update(self, name: str, **config: typing.Any) -> dict:
         """Update a profile."""
-        from _generated.models.profile_update_request import ProfileUpdateRequest
+        from ghostcrawl._generated.models.profile_update_request import ProfileUpdateRequest
 
         body = ProfileUpdateRequest()
         body.additional_data = config
@@ -865,7 +865,7 @@ class WebhooksClient:
         The API field is ``event_types``; ``events`` is accepted as a
         back-compat alias for it.
         """
-        from _generated.models.webhook_create_request import WebhookCreateRequest
+        from ghostcrawl._generated.models.webhook_create_request import WebhookCreateRequest
 
         body = WebhookCreateRequest()
         body.url = url  # type: ignore[assignment]
@@ -904,7 +904,7 @@ class SchedulesClient:
 
     async def create(self, cron: str, *, task: dict, **kwargs: typing.Any) -> dict:
         """Create a new schedule."""
-        from _generated.models.schedule_create_request import ScheduleCreateRequest
+        from ghostcrawl._generated.models.schedule_create_request import ScheduleCreateRequest
 
         body = ScheduleCreateRequest()
         body.cron_expr = cron  # ScheduleCreateRequest uses cron_expr field
@@ -933,7 +933,7 @@ class DatasetsClient:
 
     async def create(self, name: str, **kwargs: typing.Any) -> dict:
         """Create a new dataset."""
-        from _generated.v1.datasets.datasets_post_request_body import (
+        from ghostcrawl._generated.v1.datasets.datasets_post_request_body import (
             DatasetsPostRequestBody,
         )
 
@@ -952,7 +952,7 @@ class DatasetsClient:
 
     async def append(self, name: str, rows: list) -> dict:
         """Append rows to a dataset."""
-        from _generated.v1.datasets.item.rows.append.append_post_request_body import (
+        from ghostcrawl._generated.v1.datasets.item.rows.append.append_post_request_body import (
             AppendPostRequestBody,
         )
 
@@ -997,7 +997,7 @@ class KVClient:
 
     async def set(self, key: str, value: typing.Any) -> dict:
         """Set a key-value pair."""
-        from _generated.v1.kv.item.with_key_put_request_body import (
+        from ghostcrawl._generated.v1.kv.item.with_key_put_request_body import (
             WithKeyPutRequestBody,
         )
 
@@ -1228,10 +1228,10 @@ class GhostCrawlClient:
         APIError
             On 5xx server errors.
         """
-        from _generated.models.scrape_request import ScrapeRequest
-        from _generated.models.scrape_request_engine import ScrapeRequest_engine
-        from _generated.models.scrape_request_format import ScrapeRequest_format
-        from _generated.models.scrape_request_url import ScrapeRequest_url
+        from ghostcrawl._generated.models.scrape_request import ScrapeRequest
+        from ghostcrawl._generated.models.scrape_request_engine import ScrapeRequest_engine
+        from ghostcrawl._generated.models.scrape_request_format import ScrapeRequest_format
+        from ghostcrawl._generated.models.scrape_request_url import ScrapeRequest_url
 
         body = ScrapeRequest()
         url_wrapper = ScrapeRequest_url()
@@ -1282,8 +1282,8 @@ class GhostCrawlClient:
         dict
             Response with ``results`` list and ``query`` metadata.
         """
-        from _generated.models.search_request import SearchRequest
-        from _generated.models.search_request_engine import SearchRequest_engine
+        from ghostcrawl._generated.models.search_request import SearchRequest
+        from ghostcrawl._generated.models.search_request_engine import SearchRequest_engine
 
         body = SearchRequest()
         body.query = query
@@ -1329,8 +1329,8 @@ class GhostCrawlClient:
         dict
             Extracted data matching the provided schema.
         """
-        from _generated.models.extract_request import ExtractRequest
-        from _generated.models.extract_request_url import ExtractRequest_url
+        from ghostcrawl._generated.models.extract_request import ExtractRequest
+        from ghostcrawl._generated.models.extract_request_url import ExtractRequest_url
 
         body = ExtractRequest()
         url_wrapper = ExtractRequest_url()
@@ -1377,7 +1377,7 @@ class GhostCrawlClient:
             latest non-terminal run, which may be waited on again via
             ``client.crawl_runs.wait(run_id)``.
         """
-        from _generated.models.deep_crawl_body import DeepCrawlBody
+        from ghostcrawl._generated.models.deep_crawl_body import DeepCrawlBody
 
         body = DeepCrawlBody()
         body.max_depth = max_depth
@@ -1413,7 +1413,7 @@ class GhostCrawlClient:
         dict
             Response with ``urls`` list and crawl metadata.
         """
-        from _generated.models.map_body import MapBody
+        from ghostcrawl._generated.models.map_body import MapBody
 
         body = MapBody()
         body.url = url  # MapBody has a direct `url: Optional[str]` field

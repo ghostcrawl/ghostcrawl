@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ghostcrawl"
-version = "2.3.5"
+version = "2.3.6"
 description = "Official Python SDK for the GhostCrawl local orchestration API."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -51,8 +51,18 @@ Homepage = "https://github.com/ghostcrawl/ghostcrawl"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["ghostcrawl*", "_generated*"]
+# _generated/ now lives UNDER the ghostcrawl package (ghostcrawl/_generated) so it
+# never installs as a top-level `_generated` module (name-collision hazard on PyPI —
+# the pre-2.3.6 wheel shipped a bare top-level `_generated`). `ghostcrawl*` captures
+# it; do NOT re-add a top-level `_generated*` include.
+#
+# namespaces = true is REQUIRED: the Kiota-generated tree carries NO __init__.py
+# files (PEP 420 implicit namespace packages), so the default (regular-package) finder
+# would silently drop ghostcrawl/_generated from the wheel. This also survives kiota
+# regeneration, which never emits __init__.py.
+include = ["ghostcrawl*"]
 exclude = ["tests*", "examples*", "ghostcrawl.tests*"]
+namespaces = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

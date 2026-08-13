@@ -11,7 +11,7 @@ import { createUntypedNodeFromDiscriminatorValue, type BaseRequestBuilder, type 
  */
 export interface FrameRequestBuilder extends BaseRequestBuilder<FrameRequestBuilder> {
     /**
-     * Engine-agnostic live-view frame capture (cross-engine). Returns a single base64-encoded JPEG frame of a live interactive session, using the same capture path across Chromium, Firefox, and WebKit. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
+     * Capture a JPEG frame of a live browser session. Returns a single base64-encoded JPEG frame of a live interactive session. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<UntypedNode>}
@@ -19,7 +19,7 @@ export interface FrameRequestBuilder extends BaseRequestBuilder<FrameRequestBuil
      */
      post(body: CdpFrameRequest, requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<UntypedNode | undefined>;
     /**
-     * Engine-agnostic live-view frame capture (cross-engine). Returns a single base64-encoded JPEG frame of a live interactive session, using the same capture path across Chromium, Firefox, and WebKit. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
+     * Capture a JPEG frame of a live browser session. Returns a single base64-encoded JPEG frame of a live interactive session. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {"format":"jpeg","data":"<base64>","engine","width","height"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}

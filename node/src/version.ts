@@ -2,4 +2,4 @@
 // Mirrors package.json "version" so branded.ts can read it without
 // module-system-specific resolution (import.meta / createRequire), keeping the
 // dual ESM+CJS build green.
-export const SDK_VERSION = "2.3.5";
+export const SDK_VERSION = "2.3.6";
