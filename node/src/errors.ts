@@ -330,6 +330,18 @@ interface KiotaApiErrorLike {
     [key: string]: unknown;
 }
 
+/**
+ * True when `err` is (or wraps) a JSON-parse failure — a native `SyntaxError`
+ * or any error whose message reports invalid JSON. Used to convert a malformed
+ * response body into a typed domain error instead of leaking a raw SyntaxError.
+ */
+export function isJsonParseError(err: unknown): boolean {
+    if (err instanceof SyntaxError) return true;
+    if (err === null || typeof err !== "object") return false;
+    const msg = (err as { message?: unknown }).message;
+    return typeof msg === "string" && /is not valid json|unexpected (?:token|end of json)/i.test(msg);
+}
+
 /** Best-effort extraction of a problem+json body off a thrown Kiota error. */
 function extractProblemBody(err: unknown): unknown {
     if (err === null || typeof err !== "object") return undefined;
@@ -357,6 +369,17 @@ function extractProblemBody(err: unknown): unknown {
  */
 export function translateKiotaError(err: unknown): unknown {
     if (err === null || typeof err !== "object") return err;
+    // A malformed response body (e.g. a garbage 200) surfaces as a JSON
+    // SyntaxError thrown from deep inside the Kiota deserializer. It carries no
+    // HTTP status, so it would otherwise fall through untranslated and leak a
+    // raw `SyntaxError: ... is not valid JSON` to the caller. Wrap it in the
+    // canonical domain family instead.
+    if (isJsonParseError(err)) {
+        return new GhostCrawlError({
+            message: "GhostCrawl returned a response body that could not be parsed as JSON.",
+            cause: err,
+        });
+    }
     const k = err as KiotaApiErrorLike;
     const status = typeof k.responseStatusCode === "number" ? k.responseStatusCode : undefined;
     if (status === undefined) return err;
@@ -429,3 +452,17 @@ export function scanResultError<T>(result: T): T {
         requestId,
     });
 }
+
+// --------------------------------------------------------------------------- #
+// Cross-SDK-parity + README aliases. The six sibling SDKs (python/go/java/ruby/
+// php/csharp) — and this SDK's own "Error handling" README example — name the
+// typed errors AuthenticationError / PaymentRequiredError / RateLimitError /
+// InvalidRequestError / APIError. Export those as aliases of the canonical
+// GhostCrawl* classes so a user's copy-pasted try/catch resolves (they are the
+// SAME class objects, so `instanceof` works either way).
+// --------------------------------------------------------------------------- #
+export const AuthenticationError = GhostCrawlAuthError;
+export const PaymentRequiredError = GhostCrawlQuotaError;
+export const RateLimitError = GhostCrawlRateLimitError;
+export const InvalidRequestError = GhostCrawlInvalidRequestError;
+export const APIError = GhostCrawlServerError;

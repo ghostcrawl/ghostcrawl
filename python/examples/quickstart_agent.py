@@ -5,16 +5,15 @@ The task payload supports an ordered ``steps`` list of ``observe`` / ``act`` /
 
 Run with:
 
-    GHOSTCRAWL_API_KEY=gck_live_... python examples/quickstart_agent.py
+    GHOSTCRAWL_API_KEY=gck_live_YOUR_KEY python examples/quickstart_agent.py
 """
 
 from __future__ import annotations
 
-import asyncio
 import json
 import os
 
-from ghostcrawl import Client
+from ghostcrawl import GhostCrawl
 
 
 TASK = {
@@ -47,25 +46,24 @@ TASK = {
 }
 
 
-async def main() -> None:
-    api_key = os.environ.get("GHOSTCRAWL_API_KEY", "gc_live_replace_me")
-    base_url = os.environ.get("GHOSTCRAWL_BASE_URL", "https://api.ghostcrawl.io")
+def main() -> None:
+    token = os.environ.get("GHOSTCRAWL_API_KEY", "gck_live_YOUR_KEY")
 
-    async with Client(api_key=api_key, base_url=base_url) as gc:
-        # `task=` takes a full task dict; `engine=` is forwarded to the request body.
-        response = await gc.agent(task=TASK, engine="webkit")
+    gc = GhostCrawl(token=token)
+    # `task=` takes a full task dict; `engine=` is forwarded to the request body.
+    response = gc.agent(task=TASK, engine="webkit")
 
-        # The agent capability is gated — when it is not enabled for the
-        # account the API replies with a `detail` envelope instead of a result.
-        if "detail" in response:
-            print(f"Agent endpoint unavailable: {response['detail']}")
-            return
+    # The agent capability is gated — when it is not enabled for the
+    # account the API replies with a `detail` envelope instead of a result.
+    if "detail" in response:
+        print(f"Agent endpoint unavailable: {response['detail']}")
+        return
 
-        payload = response.get("payload", {})
-        print("steps executed:", payload.get("steps_executed"))
-        print("extracted     :")
-        print(json.dumps(payload.get("extracted", {}), indent=2))
+    payload = response.get("payload", {})
+    print("steps executed:", payload.get("steps_executed"))
+    print("extracted     :")
+    print(json.dumps(payload.get("extracted", {}), indent=2))
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

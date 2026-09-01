@@ -16,7 +16,8 @@ Legacy surface (kept, NOT removed — forward compatibility):
     ghostcrawl auth login
 
 Security: API key is NEVER accepted via CLI arg.
-Read path: ~/.config/ghostcrawl/config.toml → GHOSTCRAWL_API_KEY env.
+Read path precedence: GHOSTCRAWL_API_KEY env > ./ghostcrawl.toml (cwd) >
+~/.config/ghostcrawl/config.toml (fallback for existing users).
 In `init` only: interactive hidden prompt (bash history safe — no arg path).
 """
 
@@ -26,15 +27,15 @@ import asyncio
 import json
 import os
 import pathlib
-import stat
-from typing import Any, Optional
+import tempfile
+import time
+from typing import Any
 
 import typer
 
-from ghostcrawl import GhostCrawlClient
-from ghostcrawl import GhostCrawl
+from ghostcrawl import GhostCrawl, GhostCrawlClient
 from ghostcrawl.cli._batch import run_batch
-from ghostcrawl.errors.identity_errors import AuthenticationError, InvalidRequestError
+from ghostcrawl.errors.identity_errors import AuthenticationError
 
 
 def _run(value: Any) -> Any:
@@ -66,7 +67,9 @@ def _version_callback(value: bool) -> None:
 
 app = typer.Typer(
     name="ghostcrawl",
-    help="GhostCrawl command-line interface (v0.5.0).",
+    # Version banner MUST track __version__ (2.3.6) — check_version_stamp.sh gates
+    # this exact line so a stale literal (the old v0.5.0 drift) cannot linger.
+    help="GhostCrawl command-line interface (v2.3.6).",
     no_args_is_help=True,
     add_completion=False,
 )
@@ -74,7 +77,7 @@ app = typer.Typer(
 
 @app.callback()
 def _main(
-    version: Optional[bool] = typer.Option(
+    version: bool | None = typer.Option(
         None,
         "--version",
         callback=_version_callback,
@@ -113,15 +116,25 @@ def _config_path() -> pathlib.Path:
     return _config_dir() / "config.toml"
 
 
-def _read_config_key() -> Optional[str]:
-    """Read api_key from config.toml. Returns None if file absent or key missing."""
-    path = _config_path()
+# Working-directory config file name. The cwd config takes precedence over
+# the ~/.config fallback so a project can pin its own key next to its code.
+_CWD_CONFIG_FILENAME = "ghostcrawl.toml"
+
+
+def _cwd_config_path() -> pathlib.Path:
+    """Return the working-directory config path (``./ghostcrawl.toml``)."""
+    return pathlib.Path.cwd() / _CWD_CONFIG_FILENAME
+
+
+def _parse_api_key_from_file(path: pathlib.Path) -> str | None:
+    """Parse ``api_key = "..."`` from a TOML-ish config file (comment-safe)."""
     if not path.exists():
         return None
     try:
-        text = path.read_text(encoding="utf-8")
-        for line in text.splitlines():
+        for line in path.read_text(encoding="utf-8").splitlines():
             line = line.strip()
+            if not line or line.startswith("#"):
+                continue
             if line.startswith("api_key"):
                 parts = line.split("=", 1)
                 if len(parts) == 2:
@@ -132,8 +145,31 @@ def _read_config_key() -> Optional[str]:
     return None
 
 
-def _resolve_api_key() -> Optional[str]:
-    """Key resolution: legacy config reader → _config_store → GHOSTCRAWL_API_KEY env."""
+def _read_config_key() -> str | None:
+    """Read api_key from ~/.config config.toml. None if file absent or key missing."""
+    return _parse_api_key_from_file(_config_path())
+
+
+def _read_cwd_config_key() -> str | None:
+    """Read api_key from ``./ghostcrawl.toml``. None if file absent or key missing."""
+    return _parse_api_key_from_file(_cwd_config_path())
+
+
+def _resolve_api_key() -> str | None:
+    """Key resolution: env WINS, then the working-dir file, then ~/.config.
+
+    Resolution order (highest priority first):
+        1. ``GHOSTCRAWL_API_KEY`` environment variable
+        2. ``./ghostcrawl.toml`` (working directory)
+        3. ``~/.config/ghostcrawl/config.toml`` (fallback for existing users,
+           via the legacy reader → ``_config_store``)
+    """
+    env_key = os.environ.get("GHOSTCRAWL_API_KEY", "").strip()
+    if env_key:
+        return env_key
+    cwd_key = _read_cwd_config_key()
+    if cwd_key:
+        return cwd_key
     key = _read_config_key()
     if key:
         return key
@@ -144,8 +180,7 @@ def _resolve_api_key() -> Optional[str]:
             return key
     except ImportError:
         pass
-    env_key = os.environ.get("GHOSTCRAWL_API_KEY", "").strip()
-    return env_key if env_key else None
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -210,50 +245,291 @@ def _to_dict(obj: object) -> object:
 # ---------------------------------------------------------------------------
 
 
-@app.command()
-def init() -> None:
-    """Interactive first-time setup: prompt for API key and write config.toml.
+def _write_config(api_key: str) -> pathlib.Path:
+    """Persist *api_key* to config.toml with hardened permissions.
 
-    Writes ~/.config/ghostcrawl/config.toml (XDG-compliant; chmod 0o600).
-    Pings GET /v1/profiles to validate the key before saving succeeds.
-    Re-prompts on 401. API key is never echoed to the terminal.
-
-    Security: API key is entered via hidden prompt only — never
-    passed as a CLI argument, so it is not visible in ps(1) or shell history.
+    Directory chmod 0o700, file chmod 0o600 (owner read/write only) — the key
+    is never world-readable. Returns the config path.
     """
+    config_dir = _config_dir()
+    config_dir.mkdir(parents=True, exist_ok=True)
+    config_dir.chmod(0o700)
+    config_path = _config_path()
+    config_path.write_text(f'api_key = "{api_key}"\n', encoding="utf-8")
+    config_path.chmod(0o600)
+    return config_path
+
+
+def _write_cwd_config(api_key: str) -> pathlib.Path:
+    """Persist *api_key* to ``./ghostcrawl.toml`` (cwd default), chmod 0o600.
+
+    Returns the absolute path written so the caller can surface it to the user.
+    The key is never world-readable.
+    """
+    config_path = _cwd_config_path().resolve()
+    config_path.write_text(f'api_key = "{api_key}"\n', encoding="utf-8")
+    try:
+        config_path.chmod(0o600)
+    except OSError:  # pragma: no cover - non-POSIX / permission edge
+        pass
+    return config_path
+
+
+def _safe_close(client: Any) -> None:
+    """Best-effort close of a sync client (no-op if it has no ``close``)."""
+    close = getattr(client, "close", None)
+    if callable(close):
+        try:
+            close()
+        except Exception:  # pragma: no cover - cleanup is best-effort
+            pass
+
+
+def _probe_me_no_spend(api_key: str, base_url: str) -> bool:
+    """No-spend key probe against ``GET /v1/me``.
+
+    Returns ``True`` ONLY on a 200 (the endpoint exists AND accepts this key —
+    validated with zero scrape spend, per 189-06). Any other status (404/405 =
+    endpoint absent; 401/403 = does not accept this key type) OR a transport
+    error returns ``False`` so the caller falls back to the real ``POST /v1/scrape``
+    auth path — a ``/v1/me`` non-200 is NEVER a final auth verdict.
+
+    Only attempted for live-format keys (``gck_live_``): the no-spend probe is
+    meaningful only for a real API key; other formats validate via the real auth
+    path directly. The key travels only in the ``Authorization`` header over
+    HTTPS and is never logged.
+    """
+    if not api_key.startswith("gck_live_"):
+        return False
+    import httpx
+
+    url = base_url.rstrip("/") + "/v1/me"
+    try:
+        resp = httpx.get(
+            url,
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=httpx.Timeout(6.0, connect=3.0),
+        )
+    except Exception:  # noqa: BLE001 - any transport error → fall back to scrape
+        return False
+    return resp.status_code == 200
+
+
+def _validate_key(api_key: str, base_url: str) -> None:
+    """Validate *api_key* against the REAL auth path a working key passes.
+
+    Order: (1) prefer a no-spend ``GET /v1/me``; (2) if it cannot validate
+    this key type, fall back to a trivial ``POST /v1/scrape`` — the exact auth
+    path a working key passes. Raises ``AuthenticationError`` on genuine
+    rejection; other exceptions propagate for the caller to downgrade to a single
+    honest message. Never calls ``/v1/profiles`` (the old false-negative path).
+    """
+    if _probe_me_no_spend(api_key, base_url):
+        return
+    # Real auth path — a minimal scrape of a trivial URL via the sync client
+    # (no per-call asyncio.run; the footgun the CLI used to carry).
+    client = GhostCrawl(token=api_key, base_url=base_url)
+    try:
+        client.scrape(url="https://example.com", render_js=False)
+    finally:
+        _safe_close(client)
+
+
+# ---------------------------------------------------------------------------
+# Self-host init kit
+# ---------------------------------------------------------------------------
+
+# Customer-safe image tag — never expose engine codenames or internal mechanics
+# on this surface (self-host ships as ghostcrawl:2.3.6).
+_SELF_HOST_IMAGE = "ghostcrawl:2.3.6"
+_SELF_HOST_BASE_URL = "http://localhost:8080"
+
+_SELF_HOST_CONFIG_TEMPLATE = f"""# GhostCrawl self-host configuration.
+# The SDK/CLI talks to your local GhostCrawl container — no cloud key required.
+# Point base_url at wherever you expose the container (default below).
+base_url = "{_SELF_HOST_BASE_URL}"
+
+# A self-host deployment does not need a cloud API key. If your deployment is
+# configured to require one, uncomment and set it here (kept out of version control):
+# api_key = "your-self-host-key"
+"""
+
+_SELF_HOST_ENV_TEMPLATE = """# GhostCrawl self-host environment.
+# Copy/edit as needed, then `docker compose up -d`.
+
+# Host port the API is published on (matches base_url in ghostcrawl.toml).
+HOST_PORT=8080
+
+# License key for your self-host deployment (obtain from your account portal).
+GHOSTCRAWL_LICENSE_KEY=
+"""
+
+_SELF_HOST_COMPOSE_TEMPLATE = f"""# GhostCrawl self-host stack.
+# Start with:  docker compose up -d
+# Then point the SDK/CLI at http://localhost:8080 (see ghostcrawl.toml).
+services:
+  ghostcrawl:
+    image: {_SELF_HOST_IMAGE}
+    restart: unless-stopped
+    ports:
+      - "${{HOST_PORT:-8080}}:8080"
+    environment:
+      GHOSTCRAWL_LICENSE_KEY: "${{GHOSTCRAWL_LICENSE_KEY:-}}"
+    # The onefile extracts to an exec-capable tmpfs at runtime.
+    tmpfs:
+      - /run/gc:mode=1777,exec
+    healthcheck:
+      test: ["CMD", "python3", "/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+"""
+
+_SELF_HOST_README_TEMPLATE = f"""# GhostCrawl self-host kit
+
+This directory contains everything you need to run GhostCrawl locally and point
+the SDK/CLI at it — no cloud account required.
+
+## Files
+
+- `docker-compose.yml` — the {_SELF_HOST_IMAGE} service.
+- `.env` — host port and license key.
+- `ghostcrawl.toml` — SDK/CLI config with `base_url` pointed at your local instance.
+
+## Run it
+
+```bash
+# 1. Set your license key (and any options) in .env
+#    GHOSTCRAWL_LICENSE_KEY=...
+
+# 2. Start the stack
+docker compose up -d
+
+# 3. Verify it is healthy
+docker compose ps
+
+# 4. Use the SDK/CLI against your local instance (reads ./ghostcrawl.toml)
+ghostcrawl scrape https://example.com
+```
+
+The SDK resolves configuration with the precedence
+`GHOSTCRAWL_API_KEY` env > `./ghostcrawl.toml` (this file) > `~/.config`.
+Because `base_url` here points at `{_SELF_HOST_BASE_URL}`, every request stays
+on your machine.
+"""
+
+
+def _write_self_host_kit() -> list[pathlib.Path]:
+    """Drop a ready-to-run self-host kit into the working directory.
+
+    Writes ``ghostcrawl.toml`` (base_url → local), ``docker-compose.yml``, ``.env``,
+    and ``README.md``. Requires NO cloud key. Returns the written paths. Existing
+    files are left untouched (never clobber a user's edits).
+    """
+    cwd = pathlib.Path.cwd()
+    files = {
+        "ghostcrawl.toml": _SELF_HOST_CONFIG_TEMPLATE,
+        "docker-compose.yml": _SELF_HOST_COMPOSE_TEMPLATE,
+        ".env": _SELF_HOST_ENV_TEMPLATE,
+        "README.md": _SELF_HOST_README_TEMPLATE,
+    }
+    written: list[pathlib.Path] = []
+    for name, content in files.items():
+        path = (cwd / name).resolve()
+        if path.exists():
+            typer.echo(f"Skipping existing {name} (not overwritten).")
+            written.append(path)
+            continue
+        path.write_text(content, encoding="utf-8")
+        written.append(path)
+    return written
+
+
+@app.command()
+def init(
+    self_host: bool = typer.Option(
+        False,
+        "--self-host",
+        help=(
+            "Drop a ready-to-run self-host kit (ghostcrawl.toml + docker-compose.yml "
+            "+ .env + README.md) into the working directory. Needs no cloud key."
+        ),
+    ),
+) -> None:
+    """Interactive first-time setup: resolve/prompt for the API key and write ./ghostcrawl.toml.
+
+    Writes ``./ghostcrawl.toml`` in the working directory (chmod 0o600) by default
+    and prints the exact absolute path written. Validates the key against
+    the real auth path — a no-spend ``GET /v1/me`` when it accepts the key type,
+    otherwise a trivial ``POST /v1/scrape`` (the same path a working ``gck_live_``
+    key passes). Prints exactly ONE truthful outcome.
+
+    Config precedence: ``GHOSTCRAWL_API_KEY`` env > ``./ghostcrawl.toml``
+    (cwd) > ``~/.config/ghostcrawl/config.toml`` (fallback for existing users);
+    the resolution order is surfaced in the output.
+
+    With ``--self-host``: instead of prompting for a cloud key, drop a
+    ready-to-run kit (``ghostcrawl.toml`` + ``docker-compose.yml`` + ``.env`` +
+    ``README.md``) into the working directory. The SDK/CLI then works fully against
+    the local self-host ``base_url`` with no cloud dependency.
+
+    Security: the key is entered via hidden prompt only (never a CLI argument, so
+    not visible in ps(1) or shell history) and is never echoed to the terminal.
+    """
+    if self_host:
+        written = _write_self_host_kit()
+        typer.echo("Self-host kit written:")
+        for path in written:
+            typer.echo(f"  {path}")
+        typer.echo(
+            "Next: set GHOSTCRAWL_LICENSE_KEY in .env, run `docker compose up -d`, "
+            "then `ghostcrawl scrape https://example.com`."
+        )
+        return
+
     base_url = os.environ.get("GHOSTCRAWL_BASE_URL", "").strip() or "https://api.ghostcrawl.io"
 
-    while True:
-        api_key: str = typer.prompt(
-            "GhostCrawl API key",
-            hide_input=True,
-            prompt_suffix=": ",
-        )
+    # Surface the resolution order (env > cwd file > home fallback).
+    typer.echo(
+        "Resolution order: GHOSTCRAWL_API_KEY env > "
+        "./ghostcrawl.toml > ~/.config/ghostcrawl/config.toml"
+    )
 
-        # Validate the key before writing to disk
+    env_key = os.environ.get("GHOSTCRAWL_API_KEY", "").strip()
+
+    while True:
+        if env_key:
+            api_key: str = env_key
+            typer.echo(
+                "Using the key from GHOSTCRAWL_API_KEY (env overrides the config file)."
+            )
+        else:
+            api_key = typer.prompt(
+                "GhostCrawl API key",
+                hide_input=True,
+                prompt_suffix=": ",
+            )
+
         try:
-            client = GhostCrawl(api_key=api_key, base_url=base_url)
-            _run(client.profiles.list())
+            _validate_key(api_key, base_url)
         except AuthenticationError:
             typer.echo(
                 "Key rejected (401). Run `ghostcrawl init` again with the correct key.",
                 err=True,
             )
-            raise typer.Exit(code=1)
-        except Exception as exc:
-            typer.echo(f"Warning: could not validate key ({exc}). Writing config anyway.", err=True)
+            raise typer.Exit(code=1) from None
+        except Exception as exc:  # noqa: BLE001 - one honest outcome, never both
+            # Single honest message (never a warning AND "validated"): save so the
+            # user isn't blocked by a transient network hiccup, but say so plainly.
+            config_path = _write_cwd_config(api_key)
+            typer.echo(
+                f"Saved to {config_path}, but could not verify the key "
+                f"(check network/key): {type(exc).__name__}.",
+                err=True,
+            )
+            break
 
-        # Write config to disk with 0o600 permissions
-        config_dir = _config_dir()
-        config_dir.mkdir(parents=True, exist_ok=True)
-        # chmod the directory to 0o700
-        config_dir.chmod(0o700)
-
-        config_path = _config_path()
-        config_path.write_text(f'api_key = "{api_key}"\n', encoding="utf-8")
-        # chmod the file to 0o600 (owner read/write only)
-        config_path.chmod(0o600)
-
+        config_path = _write_cwd_config(api_key)
         typer.echo(f"Config written to {config_path}; key validated.")
         break
 
@@ -263,10 +539,31 @@ def init() -> None:
 # ---------------------------------------------------------------------------
 
 
+def _is_cloud_mode(license_token_path: pathlib.Path | None) -> bool:
+    """Detect the hosted-API (cloud) user.
+
+    Cloud = the base URL is the hosted API (``api.ghostcrawl.io``) AND there is
+    no self-host signal — no ``--license-token``, no ``GHOSTCRAWL_BINARY_URL``,
+    and no ``GHOSTCRAWL_LICENSE_KEY``. Any of those present means the user is
+    setting up a self-host / local-engine install, which reaches the download
+    path. Cloud users must never hit the ``GHOSTCRAWL_BINARY_URL`` wall.
+    """
+    base_url = (
+        os.environ.get("GHOSTCRAWL_BASE_URL", "").strip() or "https://api.ghostcrawl.io"
+    )
+    is_hosted_api = "api.ghostcrawl.io" in base_url
+    has_selfhost_signal = bool(
+        license_token_path is not None
+        or os.environ.get("GHOSTCRAWL_BINARY_URL", "").strip()
+        or os.environ.get("GHOSTCRAWL_LICENSE_KEY", "").strip()
+    )
+    return is_hosted_api and not has_selfhost_signal
+
+
 @app.command()
 def install(
     os_target: str = typer.Option("linux-x86_64", "--os", help="Target OS/arch (e.g. linux-x86_64)."),
-    license_token_path: Optional[pathlib.Path] = typer.Option(
+    license_token_path: pathlib.Path | None = typer.Option(
         None,
         "--license-token",
         help=(
@@ -289,8 +586,20 @@ def install(
 
     Scope: linux-x86_64 only. Cross-platform binary bundles land at the
     FUTURE milestone (v1.6+). Attempting --os with a non-linux-x86_64 value exits 1.
+
+    Mode-aware: hosted-API (cloud) users have nothing to install and get a
+    friendly exit 0 — never the GHOSTCRAWL_BINARY_URL wall. Only self-host /
+    local-engine setups reach the binary-download path.
     """
     import httpx
+
+    # ---- Cloud users need no local engine — friendly exit before any wall ----
+    if _is_cloud_mode(license_token_path):
+        typer.echo(
+            "You're using the hosted GhostCrawl API — `install` is only for "
+            "self-host / local-engine deployments. Nothing to install."
+        )
+        raise typer.Exit(code=0)
 
     # ---- optional --license-token write (atomic, mode 0600) ----
     # Token format gate: the token MUST start with "ghc_".
@@ -387,10 +696,10 @@ def install(
             typer.echo("")  # newline after progress
     except httpx.HTTPStatusError as exc:
         typer.echo(f"Error: download failed with HTTP {exc.response.status_code}.", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     except Exception as exc:
         typer.echo(f"Error: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     # chmod 0o755 the downloaded artifact
     dest.chmod(0o755)
@@ -463,7 +772,7 @@ def scrape(
     render_js: bool = typer.Option(False, "--render-js", help="Execute JavaScript."),
     country: str = typer.Option("us", "--country", help="ISO 3166-1 alpha-2 country code."),
     output_format: str = typer.Option("html", "--format", help="Output format: html|markdown."),
-    preset: Optional[str] = typer.Option(
+    preset: str | None = typer.Option(
         None,
         "--preset",
         help=(
@@ -472,7 +781,7 @@ def scrape(
             "Explicit flags override preset values."
         ),
     ),
-    output: Optional[pathlib.Path] = typer.Option(
+    output: pathlib.Path | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -528,7 +837,7 @@ def scrape(
         )
     except Exception as exc:
         typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
 
     payload = _to_dict(result)
 
@@ -599,7 +908,7 @@ def batch(
         )
     except Exception as exc:
         typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     _emit(summary, pretty=True)
 
 
@@ -611,7 +920,7 @@ def batch(
 @app.command()
 def extract(
     url: str = typer.Argument(..., help="URL to extract structured data from."),
-    schema_path: Optional[pathlib.Path] = typer.Option(None, "--schema", help="Path to JSON schema file."),
+    schema_path: pathlib.Path | None = typer.Option(None, "--schema", help="Path to JSON schema file."),
     pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
 ) -> None:
     """Extract structured data via /v1/extract."""
@@ -626,10 +935,10 @@ def extract(
         result = _run(client.extract(url=url, schema=schema if schema else {}))
     except _json.JSONDecodeError as exc:
         typer.echo(f"Error: --schema file is not valid JSON: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     except Exception as exc:
         typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     _emit(_to_dict(result), pretty)
 
 
@@ -642,7 +951,7 @@ def extract(
 def crawl(
     url: str = typer.Argument(..., help="Seed URL for the crawl."),
     max_depth: int = typer.Option(2, "--max-depth", help="Maximum crawl depth."),
-    out: Optional[str] = typer.Option(None, "--out", help="Output file path (JSON)."),
+    out: str | None = typer.Option(None, "--out", help="Output file path (JSON)."),
     pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
 ) -> None:
     """Start a crawl run (v1.3 /v1/crawl-runs, NOT the legacy /v1/crawl endpoint).
@@ -661,7 +970,7 @@ def crawl(
         result = _run(crawl_runs.start(url=url, max_depth=max_depth))
     except Exception as exc:
         typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     payload = _to_dict(result)
     if out:
         pathlib.Path(out).write_text(
@@ -689,7 +998,161 @@ def map(  # noqa: A001 — shadowing builtin map is acceptable for CLI command n
         result = _run(client.map(url=url))
     except Exception as exc:
         typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(1) from None
+    _emit(_to_dict(result), pretty)
+
+
+# ---------------------------------------------------------------------------
+# content command (parity with the Node CLI's `content`)
+# ---------------------------------------------------------------------------
+
+
+@app.command()
+def content(
+    url: str = typer.Argument(..., help="URL to fetch content from."),
+    engine: str = typer.Option(
+        "auto", "--engine", help="Browser engine (auto | chrome | firefox | webkit)."
+    ),
+    pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
+) -> None:
+    """Fetch a URL's rendered content via /v1/content."""
+    client = _get_client()
+    try:
+        result = _run(client.content(url=url, engine=engine))
+    except Exception as exc:
+        typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(1) from None
+    _emit(_to_dict(result), pretty)
+
+
+# ---------------------------------------------------------------------------
+# pdf command (parity with the Node CLI's `pdf`)
+# ---------------------------------------------------------------------------
+
+
+@app.command()
+def pdf(
+    url: str = typer.Argument(..., help="URL to render to PDF."),
+    paper_format: str = typer.Option(
+        "a4", "--paper-format", help="Paper format (a4 | letter | legal | tabloid)."
+    ),
+    landscape: bool = typer.Option(False, "--landscape", help="Landscape orientation."),
+    out: pathlib.Path | None = typer.Option(
+        None, "--out", help="Output file path (default: a temp file)."
+    ),
+    pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
+) -> None:
+    """Render a URL to PDF via /v1/pdf (Chrome-only; writes PDF bytes to a file).
+
+    PDF output is Chrome-only, so — mirroring the Node CLI — the engine is
+    pinned to ``"chrome"`` rather than exposed as a flag.
+    """
+    client = _get_client()
+    try:
+        data = _run(
+            client.pdf(url=url, paper_format=paper_format, landscape=landscape, engine="chrome")
+        )
+    except Exception as exc:
+        typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(1) from None
+    payload = bytes(data)
+    dest = out if out is not None else (
+        pathlib.Path(tempfile.gettempdir()) / f"ghostcrawl-page-{int(time.time() * 1000)}.pdf"
+    )
+    dest.write_bytes(payload)
+    _emit({"url": url, "bytes": len(payload), "path": str(dest)}, pretty)
+
+
+# ---------------------------------------------------------------------------
+# screenshot command (parity with the Node CLI's `screenshot`)
+# ---------------------------------------------------------------------------
+
+
+@app.command()
+def screenshot(
+    url: str = typer.Argument(..., help="URL to screenshot."),
+    output_format: str = typer.Option("png", "--format", help="Image format (png | jpeg | webp)."),
+    full_page: bool = typer.Option(False, "--full-page", help="Capture the full scrollable page."),
+    selector: str | None = typer.Option(
+        None, "--selector", help="CSS selector scoping the capture to one element."
+    ),
+    out: pathlib.Path | None = typer.Option(
+        None, "--out", help="Output file path (default: a temp file)."
+    ),
+    pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
+) -> None:
+    """Capture a screenshot via /v1/screenshot (writes image bytes to a file)."""
+    client = _get_client()
+    kwargs: dict = {"format": output_format, "full_page": full_page}
+    if selector is not None:
+        kwargs["screenshot_selector"] = selector
+    try:
+        data = _run(client.screenshot(url=url, **kwargs))
+    except Exception as exc:
+        typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(1) from None
+    payload = bytes(data)
+    dest = out if out is not None else (
+        pathlib.Path(tempfile.gettempdir())
+        / f"ghostcrawl-screenshot-{int(time.time() * 1000)}.{output_format}"
+    )
+    dest.write_bytes(payload)
+    _emit({"url": url, "format": output_format, "bytes": len(payload), "path": str(dest)}, pretty)
+
+
+# ---------------------------------------------------------------------------
+# search command (parity with the Node CLI's `search`)
+# ---------------------------------------------------------------------------
+
+
+@app.command()
+def search(
+    query: str = typer.Argument(..., help="Search query string."),
+    engine: str = typer.Option("google", "--engine", help="Search backend (google | bing | duckduckgo)."),
+    limit: int = typer.Option(10, "--limit", help="Max results (1-20)."),
+    provider_key: str | None = typer.Option(
+        None,
+        "--provider-key",
+        help=(
+            "Your BYO search-backend API key (sent as "
+            "X-Provider-Authorization: Bearer). Without it the API replies "
+            "401 search_backend_key_missing."
+        ),
+    ),
+    pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
+) -> None:
+    """Web search via /v1/search (BYO — needs your own search-backend key)."""
+    client = _get_client()
+    try:
+        result = _run(
+            client.search(query, engine=engine, limit=limit, provider_key=provider_key)
+        )
+    except Exception as exc:
+        typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(1) from None
+    _emit(_to_dict(result), pretty)
+
+
+# ---------------------------------------------------------------------------
+# crawl-runs command (parity with the Node CLI's flat `crawl-runs` list)
+# ---------------------------------------------------------------------------
+
+
+@app.command("crawl-runs")
+def crawl_runs_list(
+    pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
+) -> None:
+    """List crawl-run status via GET /v1/crawl-runs."""
+    client = _get_client()
+    crawl_runs = getattr(client, "crawl_runs", None)
+    if crawl_runs is None:
+        typer.echo("Error: crawl_runs sub-client missing on the client", err=True)
         raise typer.Exit(1)
+    try:
+        result = _run(crawl_runs.list())
+    except Exception as exc:
+        typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
+        raise typer.Exit(1) from None
     _emit(_to_dict(result), pretty)
 
 
@@ -708,7 +1171,7 @@ def session_list(
         result = _run(client.sessions.list())
     except Exception as exc:
         typer.echo(f"Error: {type(exc).__name__}: {exc}", err=True)
-        raise typer.Exit(1)
+        raise typer.Exit(1) from None
     _emit(_to_dict(result), pretty)
 
 
@@ -751,7 +1214,7 @@ def config_set_key(key: str = typer.Argument(..., help="Your ghostcrawl API key.
 @config_app.command("show")
 def config_show() -> None:
     """Print persisted config key (masked)."""
-    from ._config_store import read_api_key, config_path
+    from ._config_store import config_path, read_api_key
     key = read_api_key()
     if key is None:
         typer.echo(f"No key set. Path: {config_path()}")

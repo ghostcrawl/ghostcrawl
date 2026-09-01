@@ -1,11 +1,10 @@
 # Retry-policy helpers for the GhostCrawl SDK.
 from __future__ import annotations
+
 import os
 from dataclasses import dataclass, field
-from typing import FrozenSet
 
-
-_DEFAULT_RETRY_STATUS: FrozenSet[int] = frozenset({500, 502, 503, 504})
+_DEFAULT_RETRY_STATUS: frozenset[int] = frozenset({500, 502, 503, 504})
 
 
 @dataclass(frozen=True)
@@ -17,13 +16,13 @@ class RetryPolicy:
     actual retries; this captures the intended policy.
     """
     max_retries: int = 2
-    retry_status_codes: FrozenSet[int] = field(
+    retry_status_codes: frozenset[int] = field(
         default_factory=lambda: _DEFAULT_RETRY_STATUS
     )
     backoff_factor: float = 0.5
 
     @classmethod
-    def from_env(cls) -> "RetryPolicy":
+    def from_env(cls) -> RetryPolicy:
         """Read GHOSTCRAWL_MAX_RETRIES env var; default to 2 on any error."""
         try:
             n = int(os.environ.get("GHOSTCRAWL_MAX_RETRIES", "2"))
@@ -51,5 +50,5 @@ def with_retries(client, n: int):
     # Defensive fallback for non-standard clients: best-effort attribute copy.
     import copy as _copy
     new = _copy.copy(client)
-    setattr(new, "max_retries", n)
+    new.max_retries = n
     return new

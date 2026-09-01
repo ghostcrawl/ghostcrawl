@@ -20,8 +20,28 @@
  * This matches the Python wrapper's per-call session pattern.
  */
 
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+// The MCP client wrapper is OPTIONAL. `@modelcontextprotocol/sdk` is an optional
+// peer dependency (it pulls a large tree a REST/SDK user never needs), so it is
+// NOT installed by default. Import only the TYPES statically (erased at compile);
+// the runtime values are loaded lazily in createClient() so that merely importing
+// GhostCrawlMCPClient — or the package barrel — never requires the peer.
+import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
+
+async function loadMcpRuntime() {
+  try {
+    const [{ Client }, { StreamableHTTPClientTransport }] = await Promise.all([
+      import("@modelcontextprotocol/sdk/client/index.js"),
+      import("@modelcontextprotocol/sdk/client/streamableHttp.js"),
+    ]);
+    return { Client, StreamableHTTPClientTransport };
+  } catch (err) {
+    throw new Error(
+      "The GhostCrawl MCP client requires the optional '@modelcontextprotocol/sdk' " +
+        "peer dependency. Install it with:  npm install @modelcontextprotocol/sdk",
+      { cause: err }
+    );
+  }
+}
 
 // ─── Canonical tool-name reconciliation ─────────────────────────────────────
 // The native GhostCrawl MCP server (ghostcrawl.mcp.tools.TOOL_REGISTRY) exposes
@@ -89,6 +109,7 @@ export class GhostCrawlMCPClient {
 
   /** Create a connected MCP Client for a single tool call. */
   private async createClient(): Promise<Client> {
+    const { Client, StreamableHTTPClientTransport } = await loadMcpRuntime();
     const transport = new StreamableHTTPClientTransport(new URL(this.mcpUrl), {
       requestInit: {
         headers: {

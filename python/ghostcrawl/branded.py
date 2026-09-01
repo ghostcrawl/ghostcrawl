@@ -1,9 +1,9 @@
 # Branded User-Agent factory for ghostcrawl-python SDK
 from __future__ import annotations
+
 import platform
 import sys
 from importlib.metadata import PackageNotFoundError, version
-from typing import Optional
 
 
 def _ua_string() -> str:
@@ -29,7 +29,7 @@ def _ua_string() -> str:
 
 def branded_client(
     api_key: str,
-    base_url: Optional[str] = None,
+    base_url: str | None = None,
     **kwargs,
 ):
     """Construct the canonical ``GhostCrawlClient`` (Kiota-backed facade).
@@ -75,7 +75,7 @@ def google_hotels(
     rooms: int = 1,
     currency: str = "USD",
     country_code: str = "us",
-    base_url: Optional[str] = None,
+    base_url: str | None = None,
     **kwargs,
 ):
     """Fetch Google Hotels (Travel) listings via POST /v1/google/hotels.
@@ -125,7 +125,11 @@ def google_hotels(
                 "country_code": country_code,
             },
         )
-        resp.raise_for_status()
+        if resp.status_code >= 400:
+            # Uphold the SDK-wide contract: every caught failure is a typed
+            # GhostCrawlError (.code/.status_code), never a raw httpx error.
+            from ghostcrawl.facade import _error_from_http_response  # noqa: PLC0415
+            raise _error_from_http_response(resp)
         return resp.json()
 
 
@@ -134,7 +138,7 @@ def google_sports(
     query: str,
     *,
     country_code: str = "us",
-    base_url: Optional[str] = None,
+    base_url: str | None = None,
     **kwargs,
 ):
     """Fetch the Google sports knowledge panel via POST /v1/google/sports.
@@ -174,5 +178,9 @@ def google_sports(
                 "country_code": country_code,
             },
         )
-        resp.raise_for_status()
+        if resp.status_code >= 400:
+            # Uphold the SDK-wide contract: every caught failure is a typed
+            # GhostCrawlError (.code/.status_code), never a raw httpx error.
+            from ghostcrawl.facade import _error_from_http_response  # noqa: PLC0415
+            raise _error_from_http_response(resp)
         return resp.json()

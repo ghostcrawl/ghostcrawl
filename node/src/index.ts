@@ -33,6 +33,14 @@ export {
     GhostCrawlInvalidRequestError,
     GhostCrawlServerError,
     GhostCrawlScrapeError,
+    // Cross-SDK-parity + README aliases: these are the
+    // SAME class objects as the GhostCrawl* names above, exported under the names
+    // the README error-handling example (and the six sibling SDKs) use.
+    AuthenticationError,
+    PaymentRequiredError,
+    RateLimitError,
+    InvalidRequestError,
+    APIError,
     classifyHttpError,
     translateKiotaError,
     scanResultError,

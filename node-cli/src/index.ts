@@ -11,10 +11,11 @@
  * API key: GHOSTCRAWL_API_KEY env var, or a key saved via `ghostcrawl init`.
  */
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { dirname, join } from "node:path";
 import { Command } from "commander";
 import { scrapeCommand } from "./commands/scrape.js";
+import { batchCommand } from "./commands/batch.js";
 import { crawlCommand } from "./commands/crawl.js";
 import { crawlRunsCommand } from "./commands/crawlRuns.js";
 import { sessionCommand } from "./commands/session.js";
@@ -39,7 +40,7 @@ function resolveVersion(): string {
   } catch {
     /* fall through to compile-time fallback */
   }
-  return "2.3.0";
+  return "2.3.6";
 }
 
 const program = new Command();
@@ -49,6 +50,7 @@ program
   .version(resolveVersion());
 
 program.addCommand(scrapeCommand());
+program.addCommand(batchCommand());
 program.addCommand(contentCommand());
 program.addCommand(screenshotCommand());
 program.addCommand(pdfCommand());
@@ -64,4 +66,12 @@ program.addCommand(configCommand());
 program.addCommand(initCommand());
 program.addCommand(installCommand());
 
-program.parse();
+// Export the configured program so tooling (e.g. the CLI-parity gate) can
+// enumerate the command tree from the object instead of parsing --help text.
+export { program };
+
+// Only drive the CLI when this file is the process entry point — importing it
+// (for introspection) must NOT parse argv or exit.
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
+  program.parse();
+}

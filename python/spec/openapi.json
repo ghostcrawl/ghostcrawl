@@ -5416,6 +5416,118 @@
         ]
       }
     },
+    "/v1/me": {
+      "get": {
+        "operationId": "get_me_v1_me_get",
+        "summary": "Account profile",
+        "description": "Return the caller's account profile: user, primary team, and tier. Promoted customer surface (real and in-schema; pruned from the published spec, re-added for the SDKs).",
+        "tags": [
+          "account"
+        ],
+        "responses": {
+          "200": {
+            "description": "Account profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "MeResponse",
+                  "properties": {
+                    "user_id": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "email_verified": {
+                      "type": "boolean"
+                    },
+                    "created_at": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "name": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "primary_team": {
+                      "type": "object",
+                      "title": "TeamResponse",
+                      "properties": {
+                        "team_id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "tier": {
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/me/usage": {
+      "get": {
+        "operationId": "get_usage_v1_me_usage_get",
+        "summary": "Usage and quota",
+        "description": "Return usage/cost for the current billing window plus the prepaid wallet balance, scoped to the caller's team. The rate/quota-visibility surface.",
+        "tags": [
+          "account"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "period",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day",
+              "title": "Period"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usage and quota report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "UsageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/page/cookies": {
       "delete": {
         "operationId": "page_cookies_delete_v1_page_cookies_delete",

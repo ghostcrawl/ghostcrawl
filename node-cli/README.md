@@ -14,6 +14,22 @@ npm install -g @ghostcrawl/cli
 
 Requires Node.js >= 18.
 
+## First-time setup
+
+```bash
+# Save + validate your API key (writes ~/.config/ghostcrawl/config.toml, mode 0600)
+ghostcrawl init
+```
+
+`init` validates the key against the real auth path (a no-spend `GET /v1/me`,
+falling back to a trivial scrape) and prints exactly one truthful outcome — a
+valid key is never reported as unverified.
+
+Hosted-API (cloud) users have nothing to install locally — `ghostcrawl install`
+exits 0 with a friendly note. `install` only downloads a local engine for
+self-host deployments (when a `--license-token`, `GHOSTCRAWL_BINARY_URL`, or
+`GHOSTCRAWL_LICENSE_KEY` signal is present).
+
 ## Quick Start
 
 ```bash

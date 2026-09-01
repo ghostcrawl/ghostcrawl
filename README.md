@@ -78,7 +78,7 @@ Protocol surface, so any agent can drive it directly.
 |------------|--------------|
 | **Scrape** | Fetch a single page rendered by a real browser → HTML / Markdown / text. |
 | **Crawl** | Follow links from a seed URL with depth and page limits; resumable runs. |
-| **Extract** | Pull structured JSON from a page against a schema you provide. |
+| **Extract** | Pull structured JSON from a page against a schema you provide. Deterministic by default — reads the structured data pages already embed and fills your schema, no model to configure. |
 | **Browser control** | Drive a live session: navigate, click, type, scroll, screenshot. |
 | **Agent (MCP)** | Give an agent a goal; it navigates and acts to complete it. |
 | **CAPTCHA solving** | Clears CAPTCHA challenges automatically as part of the request — included on paid plans. |

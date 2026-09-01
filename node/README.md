@@ -16,28 +16,53 @@ Requires Node.js >= 18.
 
 ## Quickstart
 
+Copy-paste, drop in your key, run:
+
 ```typescript
 import { createGhostCrawlClient } from "@ghostcrawl/sdk";
 
-// Reads GHOSTCRAWL_API_KEY from environment, or pass token: explicitly
 const client = createGhostCrawlClient({ token: "gck_live_YOUR_KEY" });
+const result = await client.scrape({ url: "https://example.com" });
+console.log(result.content); // typed field — result["content"] also works
+```
 
-// Scrape a URL
-const result = await client.scrape({ url: "https://example.com", format: "markdown" });
-console.log(result.content);
+`result` is a typed `ScrapeResult` (`status`, `content`, `markdown`, `html`,
+`status_code`, `bytes`, `url`, `format`, `warnings`) that is ALSO index-accessible,
+so `result.content` and `result["content"]` both work — existing code that treats
+the response as a plain object keeps working unchanged.
 
-// Start a crawl and wait for it to finish (event-driven — no poll loop)
-const run = await client.crawlRuns.start({
-  url: "https://example.com",
-  maxDepth: 2,
-  maxPages: 50,
-  wait: true,        // block server-side until the run is terminal
-  timeout: 600,      // seconds (default 300)
-});
-console.log(run.status, run.pages_crawled);
+### Search — block until results are ready
 
-// Web search
-const results = await client.search({ query: "latest AI research", engine: "google", limit: 10 });
+`search` runs on two paths. On a warm rotation the backend answers immediately; on
+a cold rotation it queues a job. Pass `wait: true` and the SDK owns a **bounded
+client-side poll** (honoring `Retry-After` and the server deadline) so you write
+zero poll code:
+
+```typescript
+import { createGhostCrawlClient } from "@ghostcrawl/sdk";
+
+const client = createGhostCrawlClient({ token: "gck_live_YOUR_KEY" });
+const results = await client.search({ query: "latest AI research", wait: true });
+console.log(results.status, results.results); // SearchResult: status, results, query
+```
+
+> `search` wait is a client-side bounded poll (the search-job contract has no
+> server `?wait=true`); `crawl` wait is a server-side long-poll. Same `wait` DX,
+> different mechanism under the hood — see below.
+
+### Concurrency — the idiomatic async shape
+
+This client is **async-native**: every method returns a `Promise`, and the
+idiomatic way to run work in parallel is `await` + `Promise.all` — no thread pool,
+no bolt-on "sync" wrapper. Batch a set of scrapes concurrently:
+
+```typescript
+import { createGhostCrawlClient } from "@ghostcrawl/sdk";
+
+const client = createGhostCrawlClient({ token: "gck_live_YOUR_KEY" });
+const urls = ["https://example.com", "https://example.org", "https://example.net"];
+const pages = await Promise.all(urls.map((url) => client.scrape({ url })));
+console.log(pages.map((p) => p.status_code));
 ```
 
 ## Crawl runs — wait for completion
@@ -209,7 +234,16 @@ try {
 
 ## MCP Wrapper
 
+The MCP wrapper drives the same API as `createGhostCrawlClient`, over the Model
+Context Protocol. It is **optional** — the MCP SDK is not installed by default, so
+install the peer dependency first:
+
+```bash
+npm install @modelcontextprotocol/sdk
+```
+
 ```typescript
+// Same API as createGhostCrawlClient, exposed over MCP.
 import { GhostCrawlMCPClient } from "@ghostcrawl/sdk";
 
 const mcp = new GhostCrawlMCPClient({
@@ -266,6 +300,22 @@ const client = createGhostCrawlClient({
   token: "gck_live_YOUR_KEY",
   baseUrl: "http://localhost:8080",
 });
+```
+
+## Account & session persona
+
+`me()` returns your account profile — including `max_concurrency`, the number of
+sessions your plan may run at once. `usage()` reports the current billing window.
+`sessionPersona(sessionId)` returns a running session's customer-safe persona: a
+display-only whitelist of `device_class`, `os_class`, `browser_class`, and `locale`
+(never any raw or internal detail).
+
+```typescript
+const me = await client.me();
+console.log(me.max_concurrency);                 // concurrent-session ceiling for your plan
+
+const persona = await client.sessionPersona(sessionId);
+console.log(persona.device_class, persona.os_class, persona.browser_class, persona.locale);
 ```
 
 ## License

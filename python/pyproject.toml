@@ -21,13 +21,19 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+# Minimal, honest runtime deps. Only what `import ghostcrawl` + the CLI actually
+# use. Heavy/optional capabilities (MCP client) are extras — see below. pydantic
+# was declared but imported NOWHERE (neither the owned facade nor the generated
+# core use it) and was removed — it only ever arrived transitively via `mcp`,
+# which is now an extra too. This keeps `pip install ghostcrawl` lean.
 dependencies = [
   "httpx>=0.28.1",
-  "pydantic>=2.13",
+  # typer powers the `ghostcrawl` CLI (init/install/scrape) — first-class onboarding surface.
   "typer>=0.12",
-  "mcp>=1.27.1",
   # Kiota runtime — required by the generated canonical core (_generated/).
-  # PyPI package names are microsoft-kiota-*; import paths are kiota_*.
+  # PyPI package names are microsoft-kiota-*; import paths are kiota_*. These are
+  # small pure-Python packages; the generated client registers all four serializer
+  # backends at import time, so all four are required for `import ghostcrawl`.
   "microsoft-kiota-abstractions>=1.7.0",
   "microsoft-kiota-http>=1.10.0",
   "microsoft-kiota-serialization-json>=1.7.0",
@@ -37,10 +43,19 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# `pip install ghostcrawl[mcp]` — the optional typed MCP client wrapper
+# (ghostcrawl.mcp.wrapper). NOT in the base install: the `mcp` package pulls a
+# full ASGI/web-server stack (starlette, uvicorn, sse-starlette, jsonschema, …)
+# that a REST/SDK user never needs. No core module imports it (project directive:
+# "no pip mcp" in the default install).
+mcp = [
+  "mcp>=1.27.1",
+]
 dev = [
   "pytest>=8.0",
   "respx>=0.23.1",
   "pytest-asyncio>=0.23",
+  "mcp>=1.27.1",
 ]
 
 [project.scripts]
@@ -63,6 +78,42 @@ where = ["."]
 include = ["ghostcrawl*"]
 exclude = ["tests*", "examples*", "ghostcrawl.tests*"]
 namespaces = true
+
+[tool.ruff]
+# The Kiota-generated core (_generated/) is machine-emitted and re-generated
+# wholesale on every API change — it is not hand-maintained, so linting it is
+# noise. tests/examples are excluded too (test-only scaffolding, optional deps).
+target-version = "py310"
+line-length = 100
+extend-exclude = [
+  "ghostcrawl/_generated",
+  "ghostcrawl/tests",
+  "tests",
+  "examples",
+]
+
+[tool.ruff.lint]
+# Meaningful rule set for the hand-written surface — catches real bugs, not just
+# style. F=pyflakes (undefined names, unused imports), E/W=pycodestyle,
+# I=isort (import order), UP=pyupgrade (modern syntax), B=bugbear (real footguns).
+select = ["F", "E", "W", "I", "UP", "B"]
+ignore = [
+  "E501",  # line-length is formatter's job; long strings/URLs are fine.
+  "B008",  # typer/FastAPI-style callable defaults (typer.Option(...)) are idiomatic.
+]
+
+[tool.mypy]
+# Same exclusions as ruff: generated core + test/example scaffolding are not
+# part of the hand-maintained typed surface. Missing test-only stubs (respx,
+# pytest) are silenced by excluding tests, not by installing stubs.
+python_version = "3.10"
+exclude = [
+  "ghostcrawl/_generated/",
+  "ghostcrawl/tests/",
+  "tests/",
+  "examples/",
+]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

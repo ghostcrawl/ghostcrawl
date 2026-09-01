@@ -7,9 +7,9 @@ new commands (`config set-key`, `config show`) and is also lazily imported
 by main.py's _resolve_api_key() chain.
 """
 from __future__ import annotations
+
 import os
 import pathlib
-from typing import Optional
 
 _CONFIG_FILENAME = "config.toml"
 _APP_NAME = "ghostcrawl"
@@ -39,7 +39,7 @@ def write_api_key(key: str) -> pathlib.Path:
     return path
 
 
-def read_api_key() -> Optional[str]:
+def read_api_key() -> str | None:
     """Read api_key from config; returns None if missing/unreadable."""
     path = config_path()
     if not path.exists():

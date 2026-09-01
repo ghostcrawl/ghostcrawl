@@ -21,9 +21,9 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Optional
-
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Concurrency resolution
@@ -42,7 +42,7 @@ def resolve_concurrency(usage: dict, requested: int) -> int:
     Always returns ``min(cap, requested)`` so the operator may voluntarily run
     below the cap but can never exceed it.
     """
-    cap: Optional[int] = None
+    cap: int | None = None
     if isinstance(usage, dict):
         for key in ("concurrency", "max_concurrency"):
             val = usage.get(key)

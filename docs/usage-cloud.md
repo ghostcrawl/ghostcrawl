@@ -91,5 +91,7 @@ Live view, select an active session, and the browser streams to your screen.
 ## Limits and tiers
 
 Concurrency and request quotas depend on your plan. `GET /v1/me` reports
-your current tier, email, and team. Self-host users can also run
-`ghostcrawl status` to see container state, API health, and quota usage.
+your current tier, email, team, and `max_concurrency` — the maximum number of
+jobs your plan can run at the same time, so you can size your own worker pool to
+match. Self-host users can also run `ghostcrawl status` to see container state,
+API health, and quota usage.

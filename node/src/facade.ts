@@ -75,7 +75,7 @@ import { V1RequestBuilderNavigationMetadata } from "./_generated/v1/index.js";
 // translates every Kiota transport error and scans every 200 result through these
 // helpers, so a problem+json `code` becomes a typed error and an `ok:false`
 // result raises `GhostCrawlScrapeError` instead of looking like a success.
-import { translateKiotaError, scanResultError } from "./errors.js";
+import { translateKiotaError, scanResultError, classifyHttpError, GhostCrawlError } from "./errors.js";
 // Branded User-Agent (ghostcrawl-node/<version> Node/<v> <os>/<arch>). Applied to
 // the generic raw request() escape hatch so unmodeled endpoints carry the same
 // UA the modeled (Kiota) requests do.
@@ -83,11 +83,205 @@ import { uaString } from "./branded.js";
 // Timeout error raised when a wait()/start({wait:true}) call exceeds the caller
 // deadline without the run reaching a terminal state.
 import { GhostCrawlTimeoutError } from "./errors.js";
+// SDK-owned bounded client-side poll for search({ wait: true }).
+import { pollSearchJob, parseRetryAfter } from "./_searchPoll.js";
 
 const DEFAULT_BASE_URL = "https://api.ghostcrawl.io";
 
+/**
+ * Best-effort read of `<keyName> = "..."` from the CLI's config files, matching
+ * the CLI resolution order so `ghostcrawl init` output is honored by the SDK too:
+ * `./ghostcrawl.toml` (cwd) first, then `$XDG_CONFIG_HOME/ghostcrawl/config.toml`.
+ *
+ * Node-only: returns `undefined` anywhere `fs` is unavailable (browsers, edge
+ * runtimes) — the early `versions.node` guard runs before any `require`, so a
+ * browser bundle never touches `node:fs`. Never throws; config is optional.
+ */
+function readConfigValue(keyName: "api_key" | "base_url"): string | undefined {
+    const proc: any = typeof process !== "undefined" ? process : undefined;
+    if (!proc?.versions?.node) return undefined;
+    let fs: any, os: any, path: any;
+    try {
+        // `process.getBuiltinModule` (Node 22+) loads a builtin synchronously in
+        // BOTH the ESM and CJS builds without a static import (which would break
+        // browser bundles) and without `require` (absent in the ESM build). Fall
+        // back to `require` on older CJS runtimes; give up gracefully otherwise.
+        const getBuiltin: any = proc.getBuiltinModule?.bind(proc);
+        const load: (m: string) => any = getBuiltin
+            ? getBuiltin
+            : typeof require === "function"
+              ? (require as any)
+              : (() => {
+                    throw new Error("no builtin loader");
+                });
+        fs = load("node:fs");
+        os = load("node:os");
+        path = load("node:path");
+    } catch {
+        return undefined;
+    }
+    const xdg = (proc.env["XDG_CONFIG_HOME"] ?? "").trim();
+    const xdgBase = xdg.length > 0 ? xdg : path.join(os.homedir(), ".config");
+    const candidates = [
+        path.join(proc.cwd(), "ghostcrawl.toml"),
+        path.join(xdgBase, "ghostcrawl", "config.toml"),
+    ];
+    for (const p of candidates) {
+        try {
+            const txt: string = fs.readFileSync(p, "utf-8");
+            for (const raw of txt.split(/\r?\n/)) {
+                const line = raw.trim();
+                if (!line || line.startsWith("#") || !line.startsWith(keyName)) continue;
+                const idx = line.indexOf("=");
+                if (idx < 0) continue;
+                let rhs = line.slice(idx + 1).trim();
+                if (rhs.startsWith('"') && rhs.endsWith('"')) {
+                    rhs = rhs.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\");
+                }
+                if (rhs) return rhs;
+            }
+        } catch {
+            /* missing/unreadable file — try the next candidate */
+        }
+    }
+    return undefined;
+}
+
+/**
+ * Guarantee a STABLE `search` result shape regardless of poll outcome.
+ *
+ * The API carries the hit list under `items`, but the SDK's canonical parity
+ * field is `results`. Beyond aliasing `items` → `results` (non-destructive —
+ * `items` stays), the cold-rotation search-job contract can hand back a raw
+ * *running* handle (`{ status: "running", job_id, poll_url, ... }` — no `items`)
+ * when the client-side poll budget elapses before the job reaches terminal.
+ * Left raw, `result.query` / `result.results` are `undefined` — a surprise
+ * shape the caller cannot code against. This injects the caller's `query` and
+ * `engine` (only the SDK knows them) and normalizes `results` to a non-null
+ * array, so every `search` return — warm `200`, `wait: false` handle, or
+ * timed-out poll — always carries `query`/`engine`/`results`.
+ */
+function finalizeSearch(data: unknown, query?: string, engine?: string): SearchResult {
+    const obj = (
+        data && typeof data === "object" ? { ...(data as Record<string, unknown>) } : {}
+    ) as SearchResult;
+    if (obj.results === undefined || obj.results === null) {
+        const items = (obj as Record<string, unknown>)["items"];
+        obj.results = Array.isArray(items) ? (items as unknown[]) : [];
+    }
+    // Real query/engine always win over an absent/empty value from a bare handle.
+    if (query !== undefined && (obj.query === undefined || obj.query === null || obj.query === "")) {
+        obj.query = query;
+    }
+    if (engine !== undefined && (obj.engine === undefined || obj.engine === null)) {
+        obj.engine = engine;
+    }
+    return obj;
+}
+
 /** Small async sleep — used ONLY for transient-error backoff, never for polling. */
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Default per-request timeout (ms) for the raw-`fetch` escape-hatch paths
+ * (pdf/screenshot/content/search-wait/request). The Kiota transport imposes no
+ * client-side deadline; this bound keeps a stalled server from hanging a call
+ * indefinitely. Overridable per client via `GhostCrawlClientOptions.timeoutMs`.
+ */
+const DEFAULT_REQUEST_TIMEOUT_MS = 60_000;
+
+/**
+ * Map a non-2xx `fetch` Response to the canonical `GhostCrawl*` domain error —
+ * the SAME typed family the Kiota-modeled paths produce via `classifyHttpError`
+ * (a 402 → GhostCrawlQuotaError, 429 → GhostCrawlRateLimitError, …), keyed on
+ * the problem+json `code` when present and the HTTP status otherwise. Replaces
+ * the old bare untyped `Error` so callers of the raw-HTTP escape hatches route
+ * on `code`/`statusCode` uniformly. Reads the body via clone so the caller may
+ * still read it.
+ */
+async function httpErrorFromResponse(res: Response): Promise<GhostCrawlError> {
+    let body: unknown;
+    try {
+        const text = await res.clone().text();
+        body = text;
+        if (text) {
+            try {
+                body = JSON.parse(text);
+            } catch {
+                /* leave as raw text */
+            }
+        }
+    } catch {
+        body = undefined;
+    }
+    const retryAfter = res.headers.get("retry-after");
+    return classifyHttpError(res.status, {
+        body,
+        headers: retryAfter != null ? { "retry-after": retryAfter } : undefined,
+    });
+}
+
+/**
+ * `fetch` with a hard timeout (AbortController) and typed failure mapping. A
+ * timeout raises `GhostCrawlTimeoutError`; a transport/connection failure (DNS,
+ * refused, reset — normally a raw `TypeError: fetch failed`) is surfaced as a
+ * `GhostCrawlError` carrying the underlying `cause`, never a bare `TypeError`.
+ * A caller-supplied `signal` is honored alongside the timeout.
+ */
+async function fetchWithTimeout(
+    url: string,
+    init: RequestInit,
+    timeoutMs: number,
+    signal?: AbortSignal,
+): Promise<Response> {
+    const controller = new AbortController();
+    let timedOut = false;
+    const timer = setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+    }, timeoutMs);
+    const onAbort = (): void => controller.abort();
+    if (signal) {
+        if (signal.aborted) controller.abort();
+        else signal.addEventListener("abort", onAbort, { once: true });
+    }
+    try {
+        return await fetch(url, { ...init, signal: controller.signal });
+    } catch (err) {
+        if (timedOut) {
+            throw new GhostCrawlTimeoutError(
+                `Request to ${url} timed out after ${timeoutMs.toString()}ms`,
+                { cause: err },
+            );
+        }
+        if (signal?.aborted) {
+            throw new GhostCrawlTimeoutError(`Request to ${url} was aborted`, { cause: signal.reason ?? err });
+        }
+        throw new GhostCrawlError({ message: `Network request to ${url} failed`, cause: err });
+    } finally {
+        clearTimeout(timer);
+        if (signal) signal.removeEventListener("abort", onAbort);
+    }
+}
+
+/**
+ * Read a `fetch` Response body as JSON, converting a malformed body into a typed
+ * `GhostCrawlError` (never a raw `SyntaxError`). Used by the raw-HTTP success
+ * paths so a garbage 200 fails in the canonical error family.
+ */
+async function parseJsonResponse<T>(res: Response): Promise<T> {
+    const text = await res.text();
+    try {
+        return JSON.parse(text) as T;
+    } catch (err) {
+        throw new GhostCrawlError({
+            message: `GhostCrawl returned a response body that could not be parsed as JSON (HTTP ${res.status.toString()}).`,
+            statusCode: res.status,
+            body: text,
+            cause: err,
+        });
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Static bearer token provider
@@ -340,6 +534,74 @@ function buildV1Core(token: string, baseUrl: string): V1Builder {
 }
 
 // ---------------------------------------------------------------------------
+// Typed-but-index-accessible results
+//
+// Every per-lane result is BOTH statically typed (discoverable canonical fields)
+// AND index-accessible (`result["identity_id"]`) via the `[k: string]: unknown`
+// index signature, so existing callers that treat a result as a plain object
+// keep working unchanged while new code gets typed field access. The field names
+// are the SINGLE source of truth in parity/sdk_surface_contract.json (`lanes.*`)
+// and MUST be byte-identical across all seven SDKs. The raw Kiota `_generated/`
+// models are NEVER exposed to the user — the facade returns these owned
+// types. NB: these are structural TS interfaces (zero runtime cost); an
+// unwrapped response object IS one of these once cast, so index access to any
+// extra/unknown server field is preserved.
+// ---------------------------------------------------------------------------
+
+/** Result of `scrape` / `content` — parity lane `scrape`. */
+export interface ScrapeResult {
+    status?: string;
+    /** Cross-format alias for the rendered output (markdown/html/text). */
+    content?: string;
+    markdown?: string;
+    html?: string;
+    status_code?: number;
+    bytes?: number;
+    url?: string;
+    format?: string;
+    warnings?: unknown[];
+    /** Any extra/unknown server field remains index-accessible. */
+    [k: string]: unknown;
+}
+
+/** Result of `search` — parity lane `search`. */
+export interface SearchResult {
+    status?: string;
+    results?: unknown[];
+    query?: string;
+    engine?: string;
+    [k: string]: unknown;
+}
+
+/** A crawl run — parity lane `crawl`. Returned by `crawl` / `crawlRuns.*`. */
+export interface CrawlRun {
+    run_id?: string;
+    status?: string;
+    results?: unknown[];
+    [k: string]: unknown;
+}
+
+/** A single crawled/searched document — parity lane `document`. */
+export interface Document {
+    title?: string;
+    url?: string;
+    content?: string;
+    [k: string]: unknown;
+}
+
+/**
+ * Binary lane result (`pdf` / `screenshot`) — parity lanes `pdf` / `screenshot`.
+ * The binary methods return a raw `Uint8Array` for back-compat; this interface
+ * documents the canonical parity field names (`bytes`, `content_type`) shared
+ * across all seven SDKs.
+ */
+export interface BinaryResult {
+    bytes?: Uint8Array;
+    content_type?: string;
+    [k: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
 // Sub-client types
 // ---------------------------------------------------------------------------
 
@@ -541,11 +803,30 @@ export class CrawlRunsClient {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return callKiota(this._v1.crawlRuns.byRun_id(runId).cancel.post(null));
     }
+
+    /**
+     * Resume a paused / interrupted crawl run.
+     * Delegates to POST /v1/crawl-runs/{run_id}/resume via the generated builder.
+     */
+    async resume(runId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.crawlRuns.byRun_id(runId).resume.post(null));
+    }
 }
 
 /** Manage browser sessions — /v1/sessions */
 export class SessionsClient {
-    constructor(private readonly _v1: V1Builder) {}
+    /**
+     * @param _v1 Kiota v1 request-builder proxy.
+     * @param _request Raw authenticated JSON transport injected by the parent
+     *   client — used by the session-lifecycle routes that have no generated
+     *   builder (`takeover`, `terminate`), matching the me()/usage() delegation
+     *   path (auth + base URL + branded User-Agent through the same client).
+     */
+    constructor(
+        private readonly _v1: V1Builder,
+        private readonly _request?: (method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: unknown) => Promise<unknown>,
+    ) {}
 
     /** List all active sessions. Delegates to GET /v1/sessions. */
     async list(): Promise<Record<string, unknown>> {
@@ -553,11 +834,25 @@ export class SessionsClient {
         return callKiota(this._v1.sessions.get());
     }
 
-    /** Create a new browser session. Delegates to POST /v1/sessions/create. */
-    async create(options: { profileName: string; [key: string]: unknown }): Promise<Record<string, unknown>> {
-        const { profileName, ...rest } = options;
+    /**
+     * Create a new browser session. Delegates to POST /v1/sessions/create.
+     *
+     * Two creation modes (pass exactly one — passing both is a server-side
+     * validation error):
+     *   - profile-based: pass `profileName` to rehydrate a saved identity profile
+     *     (the org must already own a profile of that name, else the API 404s).
+     *   - engine-based (ad-hoc): omit `profileName` and the API opens a fresh
+     *     session on `engine` (`"chrome"`/`"firefox"`/`"webkit"`/`"auto"`; default
+     *     `"auto"`) with no saved profile required — the zero-setup path that works
+     *     on a brand-new key with no profiles.
+     */
+    async create(options: { profileName?: string; engine?: string; [key: string]: unknown } = {}): Promise<Record<string, unknown>> {
+        const { profileName, engine, ...rest } = options;
+        const body = profileName != null
+            ? { profile: profileName, ...rest }
+            : { engine: engine ?? "auto", ...rest };
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        return callKiota(this._v1.sessions.create.post(makeBody({ profile: profileName, ...rest })));
+        return callKiota(this._v1.sessions.create.post(makeBody(body)));
     }
 
     /** Extend a session's TTL. Delegates to POST /v1/sessions/{id}/extend. */
@@ -570,6 +865,268 @@ export class SessionsClient {
     async release(sessionId: string): Promise<Record<string, unknown>> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return callKiota(this._v1.sessions.byProfile_Id(sessionId).release.post(null));
+    }
+
+    /**
+     * Pin a session so the pool keeps it warm for reuse.
+     * Delegates to POST /v1/sessions/{session_id}/pin via the generated builder.
+     */
+    async pin(sessionId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.sessions.byProfile_Id(sessionId).pin.post(null));
+    }
+
+    /**
+     * Terminate a session immediately (hard stop, no return-to-pool).
+     * POST /v1/sessions/{session_id}/terminate. The generated core has no
+     * `terminate` builder (the route is absent from the customer-facing OpenAPI),
+     * so this is routed through the shared authenticated `request()` transport —
+     * no hand-rolled HTTP client (matches me()/usage()).
+     */
+    async terminate(sessionId: string): Promise<Record<string, unknown>> {
+        if (!this._request) throw new Error("terminate requires the parent client transport");
+        return (await this._request("POST", `/v1/sessions/${encodeURIComponent(sessionId)}/terminate`, {})) as Record<string, unknown>;
+    }
+
+    /**
+     * Take interactive control of a running session (human-in-the-loop).
+     * POST /v1/sessions/{session_id}/takeover. The generated core has no
+     * `takeover` builder, so this is routed through the shared authenticated
+     * `request()` transport. `action` and any extra fields are sent in the body.
+     */
+    async takeover(sessionId: string, options: { action?: string; [key: string]: unknown } = {}): Promise<Record<string, unknown>> {
+        if (!this._request) throw new Error("takeover requires the parent client transport");
+        return (await this._request("POST", `/v1/sessions/${encodeURIComponent(sessionId)}/takeover`, options)) as Record<string, unknown>;
+    }
+
+    /**
+     * Mint a one-time interactive-takeover token for a session.
+     * Delegates to POST /v1/sessions/{session_id}/takeover_token via the
+     * generated builder. The returned token authorizes a browser-based takeover UI.
+     */
+    async takeoverToken(sessionId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.sessions.byProfile_Id(sessionId).takeover_token.post(null));
+    }
+
+    /**
+     * Release an interactive takeover and hand control back to automation.
+     * Delegates to POST /v1/sessions/{session_id}/takeover_release via the
+     * generated builder.
+     */
+    async takeoverRelease(sessionId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.sessions.byProfile_Id(sessionId).takeover_release.post(null));
+    }
+
+    /**
+     * Start a session recording for `profileId`.
+     * Delegates to POST /v1/sessions/{profile_id}/recording/start via the builder.
+     */
+    async recordingStart(profileId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.sessions.byProfile_Id(profileId).recording.start.post(null));
+    }
+
+    /**
+     * Stop the in-progress session recording for `profileId`.
+     * Delegates to POST /v1/sessions/{profile_id}/recording/stop via the builder.
+     */
+    async recordingStop(profileId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.sessions.byProfile_Id(profileId).recording.stop.post(null));
+    }
+}
+
+/**
+ * Low-level CDP primitives for a live session — /v1/cdp.
+ *
+ * These are first-class customer surface. Delegates to the generated
+ * `v1.cdp` builders (`frame` / `url`); `input` has no generated builder (absent
+ * from the customer-facing OpenAPI) and is routed through the shared authenticated
+ * `request()` transport (auth + base URL + branded User-Agent) — no hand-rolled HTTP.
+ */
+export class CdpClient {
+    constructor(
+        private readonly _v1: V1Builder,
+        private readonly _request?: (method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: unknown) => Promise<unknown>,
+    ) {}
+
+    /** Drive a CDP `frame` command against the live page — POST /v1/cdp/frame. */
+    async frame(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.cdp.frame.post(makeBody(fields)));
+    }
+
+    /** Navigate / read the live page URL over CDP — POST /v1/cdp/url. */
+    async url(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.cdp.url.post(makeBody(fields)));
+    }
+
+    /**
+     * Dispatch a CDP `Input` event to the live page — POST /v1/cdp/input.
+     * The generated core has no `cdp.input` builder, so this is routed through the
+     * shared authenticated `request()` transport — no hand-rolled HTTP client.
+     */
+    async input(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        if (!this._request) throw new Error("cdp.input requires the parent client transport");
+        return (await this._request("POST", "/v1/cdp/input", fields)) as Record<string, unknown>;
+    }
+}
+
+/**
+ * High-level page primitives for a live session — /v1/page.
+ *
+ * These are first-class customer surface. Delegates to the generated
+ * `v1.page` builders (cookies get/set/delete, dom_snapshot, download, eval, har,
+ * scroll, upload, wait).
+ */
+export class PageClient {
+    constructor(private readonly _v1: V1Builder) {}
+
+    /** Read cookies from the live page — GET /v1/page/cookies. */
+    async getCookies(options: { profileId?: string; domain?: string; name?: string } = {}): Promise<Record<string, unknown>> {
+        const qp: Record<string, unknown> = {};
+        if (options.profileId !== undefined) qp.profile_id = options.profileId;
+        if (options.domain !== undefined) qp.domain = options.domain;
+        if (options.name !== undefined) qp.name = options.name;
+        return callKiota(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            this._v1.page.cookies.get({ queryParameters: qp }),
+        );
+    }
+
+    /** Set cookies on the live page — POST /v1/page/cookies. */
+    async setCookies(cookies: unknown[], fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.cookies.post(makeBody({ cookies, ...fields })));
+    }
+
+    /** Delete cookies from the live page — DELETE /v1/page/cookies. */
+    async deleteCookies(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.cookies.delete(makeBody(fields)));
+    }
+
+    /** Capture a DOM snapshot of the live page — POST /v1/page/dom_snapshot. */
+    async domSnapshot(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.dom_snapshot.post(makeBody(fields)));
+    }
+
+    /** Trigger / capture a file download on the live page — POST /v1/page/download. */
+    async download(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.download.post(makeBody(fields)));
+    }
+
+    /** Evaluate an expression in the live page context — POST /v1/page/eval. */
+    async eval(expression: string, fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.eval.post(makeBody({ expression, ...fields })));
+    }
+
+    /** Capture the live page's network HAR log — POST /v1/page/har. */
+    async har(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.har.post(makeBody(fields)));
+    }
+
+    /** Scroll the live page — POST /v1/page/scroll. */
+    async scroll(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.scroll.post(makeBody(fields)));
+    }
+
+    /** Attach a file to a file input on the live page — POST /v1/page/upload. */
+    async upload(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.upload.post(makeBody(fields)));
+    }
+
+    /**
+     * Wait for a condition on the live page — POST /v1/page/wait.
+     * e.g. `{ selector, timeout_ms, state: "visible" }` — passed through as body.
+     */
+    async wait(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.wait.post(makeBody(fields)));
+    }
+}
+
+/**
+ * Manage captured file downloads — /v1/downloads.
+ *
+ * The generated core has no `downloads` builder (the route family is absent from
+ * the customer-facing OpenAPI), so every method is routed through the shared
+ * authenticated `request()` transport — no hand-rolled HTTP client (matches
+ * me()/usage()).
+ */
+export class DownloadsClient {
+    constructor(
+        private readonly _request: (method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: unknown) => Promise<unknown>,
+    ) {}
+
+    /** List captured downloads — GET /v1/downloads. */
+    async list(): Promise<Record<string, unknown>> {
+        return (await this._request("GET", "/v1/downloads")) as Record<string, unknown>;
+    }
+
+    /** Get a single download's metadata — GET /v1/downloads/{download_id}. */
+    async get(downloadId: string): Promise<Record<string, unknown>> {
+        return (await this._request("GET", `/v1/downloads/${encodeURIComponent(downloadId)}`)) as Record<string, unknown>;
+    }
+
+    /** Delete a captured download — DELETE /v1/downloads/{download_id}. */
+    async delete(downloadId: string): Promise<Record<string, unknown>> {
+        return (await this._request("DELETE", `/v1/downloads/${encodeURIComponent(downloadId)}`)) as Record<string, unknown>;
+    }
+}
+
+/**
+ * Manage reusable storage states (cookies/localStorage) — /v1/storage-states.
+ *
+ * Delegates to the generated `v1.storageStates` builders (collection get/post,
+ * item get/delete/attach, and the top-level detach).
+ */
+export class StorageStatesClient {
+    constructor(private readonly _v1: V1Builder) {}
+
+    /** List saved storage states — GET /v1/storage-states. */
+    async list(): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.storageStates.get());
+    }
+
+    /** Create / capture a new storage state — POST /v1/storage-states. */
+    async create(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.storageStates.post(makeBody(fields)));
+    }
+
+    /** Get a storage state by id or name — GET /v1/storage-states/{id_or_name}. */
+    async get(idOrName: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.storageStates.byId_or_name(idOrName).get());
+    }
+
+    /** Delete a storage state — DELETE /v1/storage-states/{id_or_name}. */
+    async delete(idOrName: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.storageStates.byId_or_name(idOrName).delete());
+    }
+
+    /** Attach a storage state to a profile — POST /v1/storage-states/{id_or_name}/attach. */
+    async attach(idOrName: string, options: { profileId: string }): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.storageStates.byId_or_name(idOrName).attach.post(makeBody({ profile_id: options.profileId })));
+    }
+
+    /** Detach the storage state from a profile — POST /v1/storage-states/detach. */
+    async detach(options: { profileId: string }): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.storageStates.detach.post(makeBody({ profile_id: options.profileId })));
     }
 }
 
@@ -638,6 +1195,24 @@ export class WebhooksClient {
     async rotateSecret(webhookId: string): Promise<Record<string, unknown>> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return callKiota(this._v1.webhooks.byWebhook_id(webhookId).rotateSecret.post(null));
+    }
+
+    /**
+     * List recent delivery attempts for a webhook — GET .../deliveries.
+     * The delivery history (which events were sent, which failed and why) — the
+     * input to {@link retryDelivery}.
+     */
+    async listDeliveries(webhookId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.webhooks.byWebhook_id(webhookId).deliveries.get());
+    }
+
+    /** Re-attempt a single failed delivery — POST .../deliveries/{id}/retry. */
+    async retryDelivery(webhookId: string, deliveryId: string): Promise<Record<string, unknown>> {
+        return callKiota(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            this._v1.webhooks.byWebhook_id(webhookId).deliveries.byDelivery_id(deliveryId).retry.post(null),
+        );
     }
 }
 
@@ -752,6 +1327,102 @@ export class DatasetsClient {
     }
 }
 
+/**
+ * Live visual-recording lifecycle for one session — `recordings.visual`.
+ *
+ * Delegates to the generated `recordings.byRecording_Id(sessionId).visual`
+ * builders (`start` / `stop` / `frames` + the manifest `get`). This is the
+ * live-observability surface — watch your browser working in near real time.
+ * The generated builders model an empty tenant body; it is ignored server-side
+ * (the tenant comes from the Bearer token), so an empty `{}` body is sent.
+ */
+export class VisualRecordingClient {
+    constructor(
+        private readonly _v1: V1Builder,
+        private readonly _sessionId: string,
+    ) {}
+
+    private _visual(): unknown {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+        return this._v1.recordings.byRecording_Id(this._sessionId).visual;
+    }
+
+    /** Start a visual recording for the live session — POST .../visual/start. */
+    async start(): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota((this._visual() as { start: { post: (b: unknown) => Promise<unknown> } }).start.post(makeBody({})));
+    }
+
+    /** Stop and finalise the visual recording — POST .../visual/stop. */
+    async stop(): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota((this._visual() as { stop: { post: (b: unknown) => Promise<unknown> } }).stop.post(makeBody({})));
+    }
+
+    /** Get the recording manifest pointer — GET .../visual. */
+    async manifest(): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota((this._visual() as { get: (b: unknown) => Promise<unknown> }).get(makeBody({})));
+    }
+
+    /**
+     * List a page of frame references — GET .../visual/frames. Returns
+     * `{ frames: string[], next_cursor: number, session_id: string }`;
+     * `next_cursor === -1` means no more pages.
+     */
+    async frames(options: { cursor?: number; limit?: number } = {}): Promise<Record<string, unknown>> {
+        const { cursor = 0, limit = 100 } = options;
+        return callKiota(
+            (this._visual() as {
+                frames: { get: (b: unknown, cfg: unknown) => Promise<unknown> };
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            }).frames.get(makeBody({}), { queryParameters: { cursor, limit } }),
+        );
+    }
+
+    /**
+     * Start recording and yield frame references as they are produced — a
+     * convenience over `start` + repeated `frames` polling. Stops the recording
+     * when iteration ends. Streaming is async:
+     *
+     * ```typescript
+     * for await (const frameRef of client.recordings.visual(sessionId).watch()) {
+     *   console.log(frameRef);
+     * }
+     * ```
+     */
+    async *watch(options: { intervalMs?: number; maxFrames?: number; autoStart?: boolean; autoStop?: boolean } = {}): AsyncGenerator<string> {
+        const { intervalMs = 1000, maxFrames, autoStart = true, autoStop = true } = options;
+        if (autoStart) await this.start();
+        let seen = 0;
+        let cursor = 0;
+        try {
+            for (;;) {
+                const page = await this.frames({ cursor });
+                const refs = (page.frames as string[] | undefined) ?? [];
+                for (const ref of refs) {
+                    yield ref;
+                    seen += 1;
+                    if (maxFrames !== undefined && seen >= maxFrames) return;
+                }
+                const nextCursor = page.next_cursor as number | undefined;
+                if (typeof nextCursor === "number" && nextCursor >= 0) {
+                    cursor = nextCursor;
+                } else {
+                    await new Promise((r) => setTimeout(r, intervalMs));
+                }
+            }
+        } finally {
+            if (autoStop) await this.stop();
+        }
+    }
+
+    /** Alias for {@link watch} — the live-view frame stream. */
+    liveView(options: { intervalMs?: number; maxFrames?: number; autoStart?: boolean; autoStop?: boolean } = {}): AsyncGenerator<string> {
+        return this.watch(options);
+    }
+}
+
 /** Manage session recordings — /v1/recordings */
 export class RecordingsClient {
     constructor(private readonly _v1: V1Builder) {}
@@ -769,6 +1440,24 @@ export class RecordingsClient {
     async delete(recordingId: string): Promise<Record<string, unknown>> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return callKiota(this._v1.recordings.byRecording_Id(recordingId).delete());
+    }
+
+    /** Live visual-recording surface for `sessionId` (start/stop/frames/watch). */
+    visual(sessionId: string): VisualRecordingClient {
+        return new VisualRecordingClient(this._v1, sessionId);
+    }
+
+    /**
+     * Convenience: start a live visual recording for `sessionId` and stream frame
+     * references (see {@link VisualRecordingClient.watch}).
+     */
+    watch(sessionId: string, options: { intervalMs?: number; maxFrames?: number; autoStart?: boolean; autoStop?: boolean } = {}): AsyncGenerator<string> {
+        return this.visual(sessionId).watch(options);
+    }
+
+    /** Alias for {@link watch} — the live-view frame stream for `sessionId`. */
+    liveView(sessionId: string, options: { intervalMs?: number; maxFrames?: number; autoStart?: boolean; autoStop?: boolean } = {}): AsyncGenerator<string> {
+        return this.visual(sessionId).watch(options);
     }
 }
 
@@ -801,6 +1490,12 @@ export interface GhostCrawlClientOptions {
     token?: string;
     /** Override the API base URL. Defaults to https://api.ghostcrawl.io. */
     baseUrl?: string;
+    /**
+     * Per-request timeout (milliseconds) for the raw-HTTP escape-hatch paths
+     * (pdf/screenshot/content/search-wait/request). Defaults to 60000. A stalled
+     * server aborts with a `GhostCrawlTimeoutError` instead of hanging the call.
+     */
+    timeoutMs?: number;
 }
 
 /**
@@ -823,6 +1518,8 @@ export class GhostCrawlClient {
     /** Bearer token + base URL retained for the generic raw request() escape hatch. */
     private readonly _token: string;
     private readonly _baseUrl: string;
+    /** Per-request timeout (ms) for the raw-`fetch` escape-hatch paths. */
+    private readonly _timeoutMs: number;
 
     private _crawlRuns?: CrawlRunsClient;
     private _sessions?: SessionsClient;
@@ -832,20 +1529,32 @@ export class GhostCrawlClient {
     private _datasets?: DatasetsClient;
     private _recordings?: RecordingsClient;
     private _kv?: KVClient;
+    private _cdp?: CdpClient;
+    private _page?: PageClient;
+    private _downloads?: DownloadsClient;
+    private _storageStates?: StorageStatesClient;
 
     constructor(options: GhostCrawlClientOptions = {}) {
-        const token = options.token ?? (typeof process !== "undefined" ? process.env.GHOSTCRAWL_API_KEY : undefined);
+        const token =
+            options.token ??
+            (typeof process !== "undefined" ? process.env.GHOSTCRAWL_API_KEY : undefined) ??
+            readConfigValue("api_key");
         if (!token) {
-            throw new Error("token is required (or set GHOSTCRAWL_API_KEY). Get your key at https://ghostcrawl.io.");
+            throw new Error(
+                "token is required (or set GHOSTCRAWL_API_KEY, or run `ghostcrawl init`). " +
+                    "Get your key at https://ghostcrawl.io.",
+            );
         }
         const baseUrl = (
             options.baseUrl ??
             (typeof process !== "undefined" ? process.env.GHOSTCRAWL_BASE_URL : undefined) ??
+            readConfigValue("base_url") ??
             DEFAULT_BASE_URL
         ).replace(/\/$/, "");
 
         this._token = token;
         this._baseUrl = baseUrl;
+        this._timeoutMs = options.timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
         this._v1 = buildV1Core(token, baseUrl);
     }
 
@@ -857,7 +1566,10 @@ export class GhostCrawlClient {
         ));
     }
     get sessions(): SessionsClient {
-        return (this._sessions ??= new SessionsClient(this._v1));
+        return (this._sessions ??= new SessionsClient(
+            this._v1,
+            (method, path, body) => this.request(method, path, body),
+        ));
     }
     get profiles(): ProfilesClient {
         return (this._profiles ??= new ProfilesClient(this._v1));
@@ -880,6 +1592,27 @@ export class GhostCrawlClient {
     get kv(): KVClient {
         return (this._kv ??= new KVClient(this._v1));
     }
+    /** Low-level CDP primitives for a live session — /v1/cdp (first-class). */
+    get cdp(): CdpClient {
+        return (this._cdp ??= new CdpClient(
+            this._v1,
+            (method, path, body) => this.request(method, path, body),
+        ));
+    }
+    /** High-level page primitives for a live session — /v1/page (first-class). */
+    get page(): PageClient {
+        return (this._page ??= new PageClient(this._v1));
+    }
+    /** Manage captured file downloads — /v1/downloads. */
+    get downloads(): DownloadsClient {
+        return (this._downloads ??= new DownloadsClient(
+            (method, path, body) => this.request(method, path, body),
+        ));
+    }
+    /** Manage reusable storage states (cookies/localStorage) — /v1/storage-states. */
+    get storageStates(): StorageStatesClient {
+        return (this._storageStates ??= new StorageStatesClient(this._v1));
+    }
 
     /**
      * Scrape a single URL and return the rendered content.
@@ -892,7 +1625,7 @@ export class GhostCrawlClient {
         javascript?: boolean;
         extractSchema?: Record<string, unknown>;
         [key: string]: unknown;
-    }): Promise<Record<string, unknown>> {
+    }): Promise<ScrapeResult> {
         const { url, format = "markdown", engine = "auto", javascript = true, extractSchema, ...rest } = options;
         const fields: Record<string, unknown> = {
             url,
@@ -904,7 +1637,7 @@ export class GhostCrawlClient {
         if (extractSchema) fields.extract_schema = extractSchema;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const result = await callKiota(this._v1.scrape.post(makeBody(fields)));
-        return normalizeScrapeContent(result);
+        return normalizeScrapeContent(result) as ScrapeResult;
     }
 
     /**
@@ -921,14 +1654,73 @@ export class GhostCrawlClient {
         engine?: "google" | "bing" | "duckduckgo";
         limit?: number;
         providerKey?: string;
+        /**
+         * When true, block until the search job is terminal via an SDK-owned
+         * BOUNDED client-side poll — you write zero poll code. A warm
+         * rotation returns immediately (server `200`); a cold rotation returns
+         * `202 running` with a `poll_url`, which this polls (honoring
+         * `Retry-After` / the server `deadline`) to a terminal result. Default
+         * false (back-compat: the raw single-shot response is returned).
+         *
+         * NOTE: `search` wait is a CLIENT-side bounded poll (the search-job
+         * contract has no server `?wait=true`); `crawl` wait is a SERVER-side
+         * long-poll. Same `wait` DX, different mechanism under the hood.
+         */
+        wait?: boolean;
+        /** Overall client-side wait budget in seconds (`wait: true` only). */
+        timeout?: number;
         [key: string]: unknown;
-    }): Promise<Record<string, unknown>> {
-        const { query, engine = "google", limit = 10, providerKey, ...rest } = options;
-        const config = providerKey
-            ? { headers: { "X-Provider-Authorization": `Bearer ${providerKey}` } }
-            : undefined;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        return callKiota(this._v1.search.post(makeBody({ query, engine, limit, ...rest }), config));
+    }): Promise<SearchResult> {
+        const { query, engine = "google", limit = 10, providerKey, wait = false, timeout, ...rest } = options;
+
+        if (!wait) {
+            // Back-compat single-shot path through the generated core.
+            const config = providerKey
+                ? { headers: { "X-Provider-Authorization": `Bearer ${providerKey}` } }
+                : undefined;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            return finalizeSearch(await callKiota(this._v1.search.post(makeBody({ query, engine, limit, ...rest }), config)), query, engine);
+        }
+
+        // wait path: talk raw HTTP so we can read the 202 status + poll handle +
+        // Retry-After the generated core hides. Warm 200 returns immediately.
+        const headers: Record<string, string> = {
+            Authorization: `Bearer ${this._token}`,
+            "User-Agent": uaString(),
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        };
+        if (providerKey) headers["X-Provider-Authorization"] = `Bearer ${providerKey}`;
+
+        const res = await fetchWithTimeout(
+            `${this._baseUrl}/v1/search`,
+            {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ query, engine, limit, ...rest }),
+            },
+            this._timeoutMs,
+        );
+        if (res.status === 200) {
+            return finalizeSearch(await parseJsonResponse<SearchResult>(res), query, engine);
+        }
+        if (res.status !== 202) {
+            throw await httpErrorFromResponse(res);
+        }
+        // Cold path: 202 running with a poll handle.
+        let job: Record<string, unknown> = {};
+        try {
+            job = (await res.json()) as Record<string, unknown>;
+        } catch {
+            job = {};
+        }
+        const terminal = await pollSearchJob(this._baseUrl, job, {
+            headers,
+            timeout,
+            initialRetry: parseRetryAfter(res.headers.get("Retry-After")),
+            errorFactory: httpErrorFromResponse,
+        });
+        return finalizeSearch(terminal, query, engine);
     }
 
     /**
@@ -953,10 +1745,10 @@ export class GhostCrawlClient {
         maxDepth?: number;
         maxPages?: number;
         [key: string]: unknown;
-    }): Promise<Record<string, unknown>> {
+    }): Promise<CrawlRun> {
         const { url, maxDepth = 2, maxPages = 100, ...rest } = options;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        return callKiota(this._v1.crawl.deep.post(makeBody({ seed_urls: [url], max_depth: maxDepth, max_urls: maxPages, ...rest })));
+        return (await callKiota(this._v1.crawl.deep.post(makeBody({ seed_urls: [url], max_depth: maxDepth, max_urls: maxPages, ...rest })))) as CrawlRun;
     }
 
     /**
@@ -1004,33 +1796,22 @@ export class GhostCrawlClient {
     }): Promise<Uint8Array> {
         const { url, paperFormat = "a4", landscape = false, engine = "auto", ...rest } = options;
         const body = { url, paper_format: paperFormat, landscape, engine, ...rest };
-        const res = await fetch(`${this._baseUrl}/v1/pdf`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${this._token}`,
-                "User-Agent": uaString(),
-                "Content-Type": "application/json",
-                Accept: "application/pdf",
+        const res = await fetchWithTimeout(
+            `${this._baseUrl}/v1/pdf`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${this._token}`,
+                    "User-Agent": uaString(),
+                    "Content-Type": "application/json",
+                    Accept: "application/pdf",
+                },
+                body: JSON.stringify(body),
             },
-            body: JSON.stringify(body),
-        });
+            this._timeoutMs,
+        );
         if (!res.ok) {
-            const text = await res.text();
-            let parsed: unknown = text;
-            if (text) {
-                try {
-                    parsed = JSON.parse(text);
-                } catch {
-                    /* leave as raw text */
-                }
-            }
-            const err = new Error(
-                `Status code: ${res.status}` +
-                    (typeof parsed === "string" ? `\nBody: ${parsed}` : `\nBody: ${JSON.stringify(parsed)}`),
-            ) as Error & { statusCode: number; body?: unknown };
-            err.statusCode = res.status;
-            if (typeof parsed !== "string") err.body = parsed;
-            throw err;
+            throw await httpErrorFromResponse(res);
         }
         return new Uint8Array(await res.arrayBuffer());
     }
@@ -1061,33 +1842,22 @@ export class GhostCrawlClient {
         engine?: string;
         [key: string]: unknown;
     }): Promise<Uint8Array> {
-        const res = await fetch(`${this._baseUrl}/v1/screenshot`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${this._token}`,
-                "User-Agent": uaString(),
-                "Content-Type": "application/json",
-                Accept: "image/png",
+        const res = await fetchWithTimeout(
+            `${this._baseUrl}/v1/screenshot`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${this._token}`,
+                    "User-Agent": uaString(),
+                    "Content-Type": "application/json",
+                    Accept: "image/png",
+                },
+                body: JSON.stringify(options),
             },
-            body: JSON.stringify(options),
-        });
+            this._timeoutMs,
+        );
         if (!res.ok) {
-            const text = await res.text();
-            let parsed: unknown = text;
-            if (text) {
-                try {
-                    parsed = JSON.parse(text);
-                } catch {
-                    /* leave as raw text */
-                }
-            }
-            const err = new Error(
-                `Status code: ${res.status}` +
-                    (typeof parsed === "string" ? `\nBody: ${parsed}` : `\nBody: ${JSON.stringify(parsed)}`),
-            ) as Error & { statusCode: number; body?: unknown };
-            err.statusCode = res.status;
-            if (typeof parsed !== "string") err.body = parsed;
-            throw err;
+            throw await httpErrorFromResponse(res);
         }
         return new Uint8Array(await res.arrayBuffer());
     }
@@ -1103,36 +1873,104 @@ export class GhostCrawlClient {
         url: string;
         engine?: string;
         [key: string]: unknown;
-    }): Promise<Record<string, unknown>> {
-        const res = await fetch(`${this._baseUrl}/v1/content`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${this._token}`,
-                "User-Agent": uaString(),
-                "Content-Type": "application/json",
-                Accept: "application/json",
+    }): Promise<ScrapeResult> {
+        const res = await fetchWithTimeout(
+            `${this._baseUrl}/v1/content`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${this._token}`,
+                    "User-Agent": uaString(),
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify(options),
             },
-            body: JSON.stringify(options),
-        });
+            this._timeoutMs,
+        );
         if (!res.ok) {
-            const text = await res.text();
-            let parsed: unknown = text;
-            if (text) {
-                try {
-                    parsed = JSON.parse(text);
-                } catch {
-                    /* leave as raw text */
-                }
-            }
-            const err = new Error(
-                `Status code: ${res.status}` +
-                    (typeof parsed === "string" ? `\nBody: ${parsed}` : `\nBody: ${JSON.stringify(parsed)}`),
-            ) as Error & { statusCode: number; body?: unknown };
-            err.statusCode = res.status;
-            if (typeof parsed !== "string") err.body = parsed;
-            throw err;
+            throw await httpErrorFromResponse(res);
         }
-        return (await res.json()) as Record<string, unknown>;
+        return await parseJsonResponse<ScrapeResult>(res);
+    }
+
+    /**
+     * Scrape many URLs in one request — POST /v1/scrape/batch.
+     * Delegates to the generated `v1.scrape.batch` builder. `urls` is the list of
+     * URLs; any extra fields (format, engine, javascript_enabled, …) are shared
+     * across the batch.
+     */
+    async scrapeBatch(urls: string[], fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.scrape.batch.post(makeBody({ urls, ...fields })));
+    }
+
+    /**
+     * Poll a queued async search job to its terminal state —
+     * GET /v1/search/jobs/{job_id}. The generated core has no `search.jobs`
+     * builder (the route is absent from the customer-facing OpenAPI), so this is
+     * routed through the shared authenticated `request()` transport — no
+     * hand-rolled HTTP client (matches me()/usage()). Prefer `search({ wait: true })`
+     * for the fully managed poll.
+     */
+    async searchJob(jobId: string): Promise<SearchResult> {
+        // Same stable-shape normalization as search() — the terminal job payload
+        // carries hits under `items`; without this `.results` is undefined. No
+        // caller query is known here, so only `results` is guaranteed non-null.
+        return finalizeSearch(await this.request("GET", `/v1/search/jobs/${encodeURIComponent(jobId)}`));
+    }
+
+    /**
+     * Get the current status of a deep-crawl run — GET /v1/crawl/deep/{run_id}.
+     * Delegates to the generated `v1.crawl.deep.byRun_id` builder. Returns the run
+     * record (status + progress + results when terminal).
+     */
+    async crawlStatus(runId: string): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.crawl.deep.byRun_id(runId).get());
+    }
+
+    /**
+     * Return the caller's account profile — GET /v1/me.
+     *
+     * The identity behind your API key: user, primary team, and tier. Routed
+     * through the same authenticated `request()` path the other typed methods use
+     * (Bearer token + base URL + branded User-Agent). The route is real and
+     * in-schema but pruned from the published spec, so it has no generated builder.
+     */
+    async me(): Promise<Record<string, unknown>> {
+        return (await this.request("GET", "/v1/me")) as Record<string, unknown>;
+    }
+
+    /**
+     * Return the caller's usage + quota report — GET /v1/me/usage.
+     *
+     * The quota-visibility surface: cost/usage for the current billing window plus
+     * the prepaid wallet balance, scoped to your team. `period` is one of `"day"`
+     * (server default), `"week"`, or `"month"`.
+     */
+    async usage(options: { period?: "day" | "week" | "month" } = {}): Promise<Record<string, unknown>> {
+        const path = options.period
+            ? `/v1/me/usage?period=${encodeURIComponent(options.period)}`
+            : "/v1/me/usage";
+        return (await this.request("GET", path)) as Record<string, unknown>;
+    }
+
+    /**
+     * Return the customer-safe persona for a running session — GET
+     * /v1/me/identities/{session_id}/persona.
+     *
+     * Who a given session *is*, shaped for display: a whitelist of `device_class`
+     * / `os_class` / `browser_class` / `locale` only — never a raw user-agent or
+     * any internal detail. Session-scoped, so each session reports its own persona
+     * distinct from the account-level entitlements on `me()`. An unknown session
+     * raises a not-found error (same anti-enumeration shape as the rest of /v1/me).
+     */
+    async sessionPersona(sessionId: string): Promise<Record<string, unknown>> {
+        return (await this.request(
+            "GET",
+            `/v1/me/identities/${encodeURIComponent(sessionId)}/persona`,
+        )) as Record<string, unknown>;
     }
 
     /**
@@ -1166,28 +2004,22 @@ export class GhostCrawlClient {
             headers["Content-Type"] = "application/json";
             init.body = JSON.stringify(body);
         }
-        const res = await fetch(url, init);
-        const text = await res.text();
-        let parsed: unknown = text;
-        if (text) {
-            try {
-                parsed = JSON.parse(text);
-            } catch {
-                /* leave as raw text */
-            }
-        }
+        const res = await fetchWithTimeout(url, init, this._timeoutMs);
         if (!res.ok) {
-            const err = new Error(
-                `Status code: ${res.status}` +
-                    (typeof parsed === "string"
-                        ? `\nBody: ${parsed}`
-                        : `\nBody: ${JSON.stringify(parsed)}`),
-            ) as Error & { statusCode: number; body?: unknown };
-            err.statusCode = res.status;
-            if (typeof parsed !== "string") err.body = parsed;
-            throw err;
+            throw await httpErrorFromResponse(res);
         }
-        return parsed;
+        const text = await res.text();
+        if (!text) return undefined;
+        try {
+            return JSON.parse(text) as unknown;
+        } catch (err) {
+            throw new GhostCrawlError({
+                message: `GhostCrawl returned a response body that could not be parsed as JSON (HTTP ${res.status.toString()}).`,
+                statusCode: res.status,
+                body: text,
+                cause: err,
+            });
+        }
     }
 }
 
@@ -1221,12 +2053,17 @@ export function createGhostCrawlClient(options: GhostCrawlClientOptions = {}): G
  * falls back to `GHOSTCRAWL_BASE_URL`, then the canonical SaaS endpoint.
  */
 export function createClient(apiKey?: string, opts?: { baseUrl?: string }): GhostCrawlClient {
-    const key = apiKey ?? (typeof process !== "undefined" ? process.env.GHOSTCRAWL_API_KEY : undefined);
+    const key =
+        apiKey ??
+        (typeof process !== "undefined" ? process.env.GHOSTCRAWL_API_KEY : undefined) ??
+        readConfigValue("api_key");
     if (!key) {
-        throw new Error("api_key is required (or set GHOSTCRAWL_API_KEY).");
+        throw new Error("api_key is required (or set GHOSTCRAWL_API_KEY, or run `ghostcrawl init`).");
     }
     const baseUrl =
-        opts?.baseUrl ?? (typeof process !== "undefined" ? process.env.GHOSTCRAWL_BASE_URL : undefined);
+        opts?.baseUrl ??
+        (typeof process !== "undefined" ? process.env.GHOSTCRAWL_BASE_URL : undefined) ??
+        readConfigValue("base_url");
     return new GhostCrawlClient({ token: key, ...(baseUrl ? { baseUrl } : {}) });
 }
 

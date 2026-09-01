@@ -6,14 +6,13 @@ drift is handled by updating the schema below.
 
 Run with:
 
-    GHOSTCRAWL_API_KEY=gck_live_... python examples/amazon-review-scraper.py
+    GHOSTCRAWL_API_KEY=gck_live_YOUR_KEY python examples/amazon-review-scraper.py
 """
 from __future__ import annotations
-import asyncio
 import json
 import os
 import sys
-from ghostcrawl import GhostCrawlClient, InvalidRequestError
+from ghostcrawl import GhostCrawl, InvalidRequestError
 
 
 REVIEW_SCHEMA = {
@@ -32,23 +31,23 @@ REVIEW_SCHEMA = {
 }
 
 
-async def main(url: str | None = None) -> int:
-    api_key = os.environ.get("GHOSTCRAWL_API_KEY", "")
-    if not api_key:
+def main(url: str | None = None) -> int:
+    token = os.environ.get("GHOSTCRAWL_API_KEY", "")
+    if not token:
         print("Error: GHOSTCRAWL_API_KEY environment variable required", file=sys.stderr)
         return 1
     target = url or "https://www.amazon.com/dp/B08N5WRWNW"
-    async with GhostCrawlClient(token=api_key) as gc:
-        try:
-            result = await gc.extract(url=target, schema=REVIEW_SCHEMA)
-        except InvalidRequestError as exc:
-            print(f"Extraction did not satisfy the schema (HTTP {exc.status_code}).")
-            if exc.body:
-                print(exc.body)
-            return 0
+    gc = GhostCrawl(token=token)
+    try:
+        result = gc.extract(url=target, schema=REVIEW_SCHEMA)
+    except InvalidRequestError as exc:
+        print(f"Extraction did not satisfy the schema (HTTP {exc.status_code}).")
+        if exc.body:
+            print(exc.body)
+        return 0
     print(json.dumps(result, indent=2, default=str))
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(asyncio.run(main(sys.argv[1] if len(sys.argv) > 1 else None)))
+    sys.exit(main(sys.argv[1] if len(sys.argv) > 1 else None))

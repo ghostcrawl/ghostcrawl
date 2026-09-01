@@ -43,14 +43,24 @@
     "@microsoft/kiota-serialization-form": "^1.0.0-preview.103",
     "@microsoft/kiota-serialization-json": "^1.0.0-preview.103",
     "@microsoft/kiota-serialization-multipart": "^1.0.0-preview.103",
-    "@microsoft/kiota-serialization-text": "^1.0.0-preview.103",
+    "@microsoft/kiota-serialization-text": "^1.0.0-preview.103"
+  },
+  "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0"
   },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/node": "^22.0.0",
+    "eslint": "^9.39.5",
     "msw": "^2.14.6",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.6"
   },
   "overrides": {

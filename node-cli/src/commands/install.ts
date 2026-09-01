@@ -24,6 +24,25 @@ interface InstallOpts {
   installDir: string;
 }
 
+/**
+ * Detect the hosted-API (cloud) user (parity with the Python CLI's
+ * `_is_cloud_mode`). Cloud = the base URL is the hosted API AND there is no
+ * self-host signal (no `--license-token`, no `GHOSTCRAWL_BINARY_URL`, no
+ * `GHOSTCRAWL_LICENSE_KEY`). Any of those present means a self-host /
+ * local-engine setup, which reaches the download path. Cloud users must never
+ * hit the `GHOSTCRAWL_BINARY_URL` wall.
+ */
+function _isCloudMode(licenseToken?: string): boolean {
+  const baseUrl = (process.env["GHOSTCRAWL_BASE_URL"] ?? "").trim() || "https://api.ghostcrawl.io";
+  const isHostedApi = baseUrl.includes("api.ghostcrawl.io");
+  const hasSelfhostSignal = Boolean(
+    licenseToken ||
+      (process.env["GHOSTCRAWL_BINARY_URL"] ?? "").trim() ||
+      (process.env["GHOSTCRAWL_LICENSE_KEY"] ?? "").trim(),
+  );
+  return isHostedApi && !hasSelfhostSignal;
+}
+
 export function installCommand(): Command {
   return new Command("install")
     .description("Download the GhostCrawl native binaries and/or write a license token")
@@ -31,6 +50,15 @@ export function installCommand(): Command {
     .option("--license-token <path>", "Path to a license token file (written 0600 to install-dir)")
     .option("--install-dir <path>", "Target install directory", path.join(os.homedir(), ".ghostcrawl"))
     .action(async (opts: InstallOpts) => {
+      // ---- Cloud users need no local engine — friendly exit before any wall ----
+      if (_isCloudMode(opts.licenseToken)) {
+        process.stdout.write(
+          "You're using the hosted GhostCrawl API — `install` is only for " +
+            "self-host / local-engine deployments. Nothing to install.\n",
+        );
+        return;
+      }
+
       // ---- license token write (atomic, mode 0600) ----
       if (opts.licenseToken) {
         if (!fs.existsSync(opts.licenseToken)) {

@@ -13,12 +13,22 @@ expose that argument explicitly; all other parameters flow through ``**kwargs``.
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any
 
 import httpx
-from mcp import ClientSession
-from mcp.client.streamable_http import streamable_http_client  # current name; old alias is deprecated
+
+try:
+    from mcp import ClientSession
+    from mcp.client.streamable_http import (
+        streamable_http_client,  # current name; old alias is deprecated
+    )
+except ModuleNotFoundError as exc:  # pragma: no cover - trivial guard
+    raise ModuleNotFoundError(
+        "The GhostCrawl MCP client wrapper requires the optional 'mcp' dependency. "
+        "Install it with:  pip install ghostcrawl[mcp]"
+    ) from exc
 
 
 # ----------------------------------------------------------------------------

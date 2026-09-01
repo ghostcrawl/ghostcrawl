@@ -19,9 +19,9 @@ Two channels (see :data:`CHANNELS`):
 
 from __future__ import annotations
 
-from typing import Dict, NamedTuple
+from typing import NamedTuple
 
-CHANNELS: Dict[str, str] = {
+CHANNELS: dict[str, str] = {
     "problem": "OUR failure -> non-2xx application/problem+json",
     "result": "TARGET failure -> HTTP 200 + result_error{code,retryable}",
 }
@@ -39,7 +39,7 @@ class ErrorCode(NamedTuple):
 
 
 # --- Generated from ghostcrawl/errors/codes.json (do not hand-diverge) -------
-ERROR_CODES: Dict[str, ErrorCode] = {
+ERROR_CODES: dict[str, ErrorCode] = {
     "bad_request": ErrorCode("bad_request", 400, False, "problem", "Malformed request", None),
     "unauthorized": ErrorCode("unauthorized", 401, False, "problem", "Authentication required", None),
     "forbidden": ErrorCode("forbidden", 403, False, "problem", "Insufficient permissions", None),

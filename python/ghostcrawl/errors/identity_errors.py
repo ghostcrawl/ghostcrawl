@@ -27,7 +27,7 @@ and response body (which never contains the api_key) are surfaced.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 
 class GhostCrawlError(Exception):
@@ -46,7 +46,7 @@ class GhostCrawlError(Exception):
     def __init__(
         self,
         message: str,
-        status_code: Optional[int] = None,
+        status_code: int | None = None,
         body: Any = None,
     ) -> None:
         super().__init__(message)
@@ -100,7 +100,7 @@ class APIError(GhostCrawlError):
     def __init__(
         self,
         message: str = "Server error. Retry the request or contact support.",
-        status_code: Optional[int] = None,
+        status_code: int | None = None,
         body: Any = None,
     ) -> None:
         super().__init__(message=message, status_code=status_code, body=body)
