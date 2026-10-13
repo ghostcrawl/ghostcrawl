@@ -14,8 +14,8 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 from warnings import warn
 
 if TYPE_CHECKING:
+    from ....models.ghostcrawl__api__routes__profiles__profile_update_request import Ghostcrawl__api__routes__profiles__ProfileUpdateRequest
     from ....models.problem_details import ProblemDetails
-    from ....models.profile_update_request import ProfileUpdateRequest
 
 class WithNameItemRequestBuilder(BaseRequestBuilder):
     """
@@ -66,9 +66,9 @@ class WithNameItemRequestBuilder(BaseRequestBuilder):
             raise Exception("Http core is null") 
         return await self.request_adapter.send_primitive_async(request_info, "bytes", error_mapping)
     
-    async def put(self,body: ProfileUpdateRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
+    async def put(self,body: Ghostcrawl__api__routes__profiles__ProfileUpdateRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the fingerprint and break multi-accounting coherence). 404 if absent; 409 on rename collision.
+        rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the browser identity and break multi-accounting coherence). 404 if absent; 409 on rename collision.
         param body: PUT /v1/profiles/{name} body, rename and/or rebind storage_state.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -109,9 +109,9 @@ class WithNameItemRequestBuilder(BaseRequestBuilder):
         request_info.headers.try_add("Accept", "application/json")
         return request_info
     
-    def to_put_request_information(self,body: ProfileUpdateRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
+    def to_put_request_information(self,body: Ghostcrawl__api__routes__profiles__ProfileUpdateRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the fingerprint and break multi-accounting coherence). 404 if absent; 409 on rename collision.
+        rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the browser identity and break multi-accounting coherence). 404 if absent; 409 on rename collision.
         param body: PUT /v1/profiles/{name} body, rename and/or rebind storage_state.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

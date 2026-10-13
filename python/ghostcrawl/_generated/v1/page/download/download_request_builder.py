@@ -32,7 +32,7 @@ class DownloadRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: DownloadBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Trigger and capture a download
+        Trigger and capture a download on a live session. Clicks the trigger, captures the resulting file and returns its bytes as base64 (inline cap 10 MB; a larger file returns 403 ``too_large``). The captured file is also saved to your Downloads.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -53,7 +53,7 @@ class DownloadRequestBuilder(BaseRequestBuilder):
     
     def to_post_request_information(self,body: DownloadBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Trigger and capture a download
+        Trigger and capture a download on a live session. Clicks the trigger, captures the resulting file and returns its bytes as base64 (inline cap 10 MB; a larger file returns 403 ``too_large``). The captured file is also saved to your Downloads.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

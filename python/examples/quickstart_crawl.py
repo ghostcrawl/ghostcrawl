@@ -12,7 +12,7 @@ import time
 
 from ghostcrawl import GhostCrawl, APIError
 
-# Gateway statuses that mean "try again" — the crawl worker can cold-start.
+# Gateway statuses that mean "try again" — the crawl service can cold-start.
 _RETRYABLE = {502, 503, 504}
 
 
@@ -28,7 +28,7 @@ def main() -> None:
     # the server blocks until the run is terminal (completed/failed/
     # cancelled) or wait_timeout elapses — there is NO client poll loop.
     # The transient-error retry below is still legitimate: it rides through
-    # a cold-starting worker before the run even begins.
+    # a cold-starting crawl service before the run even begins.
     run = None
     max_attempts = 12
     for attempt in range(max_attempts):

@@ -51,7 +51,7 @@ from kiota_http.middleware.options import RetryHandlerOption
 
 # _generated/ lives at sdks/python/_generated/ (sibling to ghostcrawl/).
 # Include _generated* in pyproject.toml packages.find so it ships with the SDK.
-from ghostcrawl._generated.ghostcrawl_client import (
+from ghostcrawl._generated.ghost_crawl_client import (
     GhostCrawlClient as _KiotaClient,  # type: ignore[import]
 )
 
@@ -1053,6 +1053,7 @@ class SessionsClient:
         *,
         profile_name: str | None = None,
         engine: str | None = None,
+        humanize: bool = False,
         **kwargs: typing.Any,
     ) -> dict:
         """Create a new browser session.
@@ -1070,6 +1071,9 @@ class SessionsClient:
           the zero-setup path — a brand-new key with no profiles can open a session.
 
         Passing both is a validation error server-side; pass exactly one.
+
+        ``humanize`` (default ``False``) opts the session into human-like
+        interaction timing/motion.
         """
         from ghostcrawl._generated.models.session_create_request import SessionCreateRequest
 
@@ -1090,7 +1094,7 @@ class SessionsClient:
             )
 
             body.engine = SessionCreateRequest_engine(engine or "auto")
-        body.additional_data = kwargs
+        body.additional_data = {"humanize": humanize, **kwargs}
         return await _resolve_response(self._core.v1.sessions.create.post(body))
 
     async def extend(self, session_id: str, *, duration_seconds: int = 300) -> dict:
@@ -1335,8 +1339,10 @@ class PageClient:
         """Evaluate an expression in the live page context (POST /v1/page/eval)."""
         from ghostcrawl._generated.models.eval_body import EvalBody
 
+        # The /v1/page/eval body field is ``script`` (the ergonomic SDK param is
+        # ``expression``); send it under the wire name the API validates on.
         body = EvalBody()
-        body.additional_data = {"expression": expression, **kwargs}
+        body.additional_data = {"script": expression, **kwargs}
         return await _resolve_response(self._core.v1.page.eval.post(body))
 
     async def har(self, **kwargs: typing.Any) -> dict:
@@ -1354,6 +1360,34 @@ class PageClient:
         body = ScrollBody()
         body.additional_data = dict(kwargs)
         return await _resolve_response(self._core.v1.page.scroll.post(body))
+
+    async def mouse(self, ops: list, **kwargs: typing.Any) -> dict:
+        """Replay a mouse op-stream on the live page (POST /v1/page/mouse).
+
+        ``ops`` is an ordered list of {"kind":"move|down|up|wheel|dwell", ...} driven natively
+        on the live page as real pointer input."""
+        from ghostcrawl._generated.models.mouse_body import MouseBody
+
+        body = MouseBody()
+        body.additional_data = {"ops": ops, **kwargs}
+        return await _resolve_response(self._core.v1.page.mouse.post(body))
+
+    async def arrival(
+        self, dest_url: str, source_url: str, *,
+        referrer_shape: str = "origin", source_title: str = "", **kwargs: typing.Any,
+    ) -> dict:
+        """Arrive at ``dest_url`` through a native link click (POST /v1/page/arrival).
+
+        The click starts from ``source_url``, so the live page's document.referrer, Referer and
+        Sec-Fetch-* headers are produced natively by the click."""
+        from ghostcrawl._generated.models.arrival_body import ArrivalBody
+
+        body = ArrivalBody()
+        body.additional_data = {
+            "dest_url": dest_url, "source_url": source_url,
+            "referrer_shape": referrer_shape, "source_title": source_title, **kwargs,
+        }
+        return await _resolve_response(self._core.v1.page.arrival.post(body))
 
     async def upload(self, **kwargs: typing.Any) -> dict:
         """Attach a file to a file input on the live page (POST /v1/page/upload)."""
@@ -1478,7 +1512,9 @@ class ProfilesClient:
 
     async def update(self, name: str, **config: typing.Any) -> dict:
         """Update a profile."""
-        from ghostcrawl._generated.models.profile_update_request import ProfileUpdateRequest
+        from ghostcrawl._generated.models.ghostcrawl__api__routes__profiles__profile_update_request import (
+            Ghostcrawl__api__routes__profiles__ProfileUpdateRequest as ProfileUpdateRequest,
+        )
 
         body = ProfileUpdateRequest()
         body.additional_data = config
@@ -1634,20 +1670,6 @@ class DatasetsClient:
         )
 
 
-def _auth_context_body() -> typing.Any:
-    """An empty request body for the visual-recording builders.
-
-    The generated ``visual.start`` / ``visual.stop`` / ``visual.frames`` builders
-    require a non-null body (the spec models the tenant ``AuthContext`` there), but
-    the live routes ignore it — the tenant is resolved from the Bearer token. This
-    returns an empty ``AuthContext`` that serialises to ``{}`` so the generated
-    builder's not-null guard is satisfied while sending no meaningful payload.
-    """
-    from ghostcrawl._generated.models.auth_context import AuthContext
-
-    return AuthContext()
-
-
 class VisualRecordingClient:
     """Live visual-recording lifecycle for one session — ``recordings.visual``.
 
@@ -1665,15 +1687,15 @@ class VisualRecordingClient:
 
     async def start(self) -> dict:
         """Start a visual recording for the live session (POST .../visual/start)."""
-        return await _resolve_response(self._visual().start.post(_auth_context_body()))
+        return await _resolve_response(self._visual().start.post())
 
     async def stop(self) -> dict:
         """Stop the visual recording and finalise it (POST .../visual/stop)."""
-        return await _resolve_response(self._visual().stop.post(_auth_context_body()))
+        return await _resolve_response(self._visual().stop.post())
 
     async def manifest(self) -> dict:
         """Get the recording manifest pointer (GET .../visual)."""
-        return await _resolve_response(self._visual().get(_auth_context_body()))
+        return await _resolve_response(self._visual().get())
 
     async def frames(self, *, cursor: int = 0, limit: int = 100) -> dict:
         """List a page of frame references (GET .../visual/frames).
@@ -1693,7 +1715,7 @@ class VisualRecordingClient:
         config: RequestConfiguration = RequestConfiguration()
         config.query_parameters = qp
         return await _resolve_response(
-            self._visual().frames.get(_auth_context_body(), config)
+            self._visual().frames.get(config)
         )
 
     async def watch(
@@ -2064,6 +2086,7 @@ class GhostCrawlClient:
         engine: str = "auto",
         javascript: bool = True,
         extract_schema: dict | None = None,
+        humanize: bool = False,
         **kwargs: typing.Any,
     ) -> dict:
         """Scrape a single URL and return the rendered content.
@@ -2083,6 +2106,9 @@ class GhostCrawlClient:
             Enable JavaScript rendering. Default ``True``.
         extract_schema : dict, optional
             JSON Schema for structured data extraction alongside the scrape.
+        humanize : bool
+            Opt into human-like interaction timing/motion for this request.
+            Default ``False``.
 
         Returns
         -------
@@ -2114,6 +2140,7 @@ class GhostCrawlClient:
         body.format = ScrapeRequest_format(format)
         body.additional_data = {
             "javascript_enabled": javascript,
+            "humanize": humanize,
             **kwargs,
         }
         if extract_schema is not None:
@@ -2511,6 +2538,7 @@ class GhostCrawlClient:
         url: str | None = None,
         steps: list | None = None,
         task: dict | None = None,
+        humanize: bool = False,
         **kwargs: typing.Any,
     ) -> dict:
         """Execute an agent task via ``POST /v1/agent``.
@@ -2536,6 +2564,9 @@ class GhostCrawlClient:
             Explicit step list for ``task.steps``.
         task : dict, optional
             Full task dict (used directly, overriding the assembled fields).
+        humanize : bool
+            Opt into human-like interaction timing/motion for this task.
+            Default ``False``.
         **kwargs
             Additional top-level body fields (e.g. ``engine="webkit"``).
 
@@ -2557,7 +2588,7 @@ class GhostCrawlClient:
             if steps is not None:
                 built_task["steps"] = steps
 
-        body: dict = {"task": built_task}
+        body: dict = {"task": built_task, "humanize": humanize}
         body.update(kwargs)
         if self._provider_config is not None:
             body["provider_config"] = self._provider_config

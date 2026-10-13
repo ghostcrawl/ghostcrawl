@@ -11,7 +11,7 @@ import { createUntypedNodeFromDiscriminatorValue, type BaseRequestBuilder, type 
  */
 export interface EvalRequestBuilder extends BaseRequestBuilder<EvalRequestBuilder> {
     /**
-     * Run caller-supplied JS in the pinned page context. Gate-disabled, runaway-killed, result-cap, and result-PII paths are allaudit-logged. Uses a DUAL-ROW pattern: a ``started`` row pre-watchdog soa Playwright-crash mid-evaluate is still traceable, plus a paired``{success|failure|denied}`` row post-watchdog. Both rows carry thesame ``eval_id`` correlation key (Pitfall 9). Result body is NEVER written into ``audit_log.metadata``, only the``result_sha256`` + ``result_bytes``.
+     * Run caller-supplied JavaScript in the pinned page context. All execution paths (disabled, timeout-killed, result-capped, PII-filtered) are audit-logged. A pre-execution audit record is written before the watchdog fires so interrupted evaluations remain traceable, paired with a final success/failure/denied record sharing the same ``eval_id`` correlation key. The result payload is never written to the audit log, only its size and hash.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<UntypedNode>}
@@ -19,7 +19,7 @@ export interface EvalRequestBuilder extends BaseRequestBuilder<EvalRequestBuilde
      */
      post(body: EvalBody, requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<UntypedNode | undefined>;
     /**
-     * Run caller-supplied JS in the pinned page context. Gate-disabled, runaway-killed, result-cap, and result-PII paths are allaudit-logged. Uses a DUAL-ROW pattern: a ``started`` row pre-watchdog soa Playwright-crash mid-evaluate is still traceable, plus a paired``{success|failure|denied}`` row post-watchdog. Both rows carry thesame ``eval_id`` correlation key (Pitfall 9). Result body is NEVER written into ``audit_log.metadata``, only the``result_sha256`` + ``result_bytes``.
+     * Run caller-supplied JavaScript in the pinned page context. All execution paths (disabled, timeout-killed, result-capped, PII-filtered) are audit-logged. A pre-execution audit record is written before the watchdog fires so interrupted evaluations remain traceable, paired with a final success/failure/denied record sharing the same ``eval_id`` correlation key. The result payload is never written to the audit log, only its size and hash.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}

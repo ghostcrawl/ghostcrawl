@@ -55,7 +55,7 @@ def _run(value: Any) -> Any:
 # Top-level app
 # ---------------------------------------------------------------------------
 
-__version__ = "2.3.6"  # keep in sync with sdks/python/pyproject.toml (test_version_matches_pyproject guards drift)
+__version__ = "2.3.7"  # keep in sync with sdks/python/pyproject.toml (test_version_matches_pyproject guards drift)
 
 
 def _version_callback(value: bool) -> None:
@@ -67,9 +67,9 @@ def _version_callback(value: bool) -> None:
 
 app = typer.Typer(
     name="ghostcrawl",
-    # Version banner MUST track __version__ (2.3.6) — check_version_stamp.sh gates
+    # Version banner MUST track __version__ (2.3.7) — check_version_stamp.sh gates
     # this exact line so a stale literal (the old v0.5.0 drift) cannot linger.
-    help="GhostCrawl command-line interface (v2.3.6).",
+    help="GhostCrawl command-line interface (v2.3.7).",
     no_args_is_help=True,
     add_completion=False,
 )

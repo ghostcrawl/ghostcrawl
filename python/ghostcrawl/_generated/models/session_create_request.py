@@ -6,6 +6,7 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .session_create_request_engine import SessionCreateRequest_engine
+    from .session_create_request_identity_country import SessionCreateRequest_identity_country
     from .session_create_request_profile import SessionCreateRequest_profile
 
 @dataclass
@@ -17,7 +18,9 @@ class SessionCreateRequest(AdditionalDataHolder, Parsable):
 
     # The engine property
     engine: Optional[SessionCreateRequest_engine] = SessionCreateRequest_engine("chrome")
-    # Rehydrates the saved identity bundle for this session, same deterministic fingerprint as /v1/scrape with profile=<name>.
+    # Geo-pin for the residential exit (ISO country, e.g. 'US'). The session's timezone/geolocation follow the drawn exit's country (geo-coherence).
+    identity_country: Optional[SessionCreateRequest_identity_country] = None
+    # Named persistent profile. Rehydrates the saved identity bundle for this session, the same browser identity as /v1/scrape with profile=<name>.
     profile: Optional[SessionCreateRequest_profile] = None
     
     @staticmethod
@@ -37,13 +40,16 @@ class SessionCreateRequest(AdditionalDataHolder, Parsable):
         Returns: dict[str, Callable[[ParseNode], None]]
         """
         from .session_create_request_engine import SessionCreateRequest_engine
+        from .session_create_request_identity_country import SessionCreateRequest_identity_country
         from .session_create_request_profile import SessionCreateRequest_profile
 
         from .session_create_request_engine import SessionCreateRequest_engine
+        from .session_create_request_identity_country import SessionCreateRequest_identity_country
         from .session_create_request_profile import SessionCreateRequest_profile
 
         fields: dict[str, Callable[[Any], None]] = {
             "engine": lambda n : setattr(self, 'engine', n.get_enum_value(SessionCreateRequest_engine)),
+            "identity_country": lambda n : setattr(self, 'identity_country', n.get_object_value(SessionCreateRequest_identity_country)),
             "profile": lambda n : setattr(self, 'profile', n.get_object_value(SessionCreateRequest_profile)),
         }
         return fields
@@ -57,6 +63,7 @@ class SessionCreateRequest(AdditionalDataHolder, Parsable):
         if writer is None:
             raise TypeError("writer cannot be null.")
         writer.write_enum_value("engine", self.engine)
+        writer.write_object_value("identity_country", self.identity_country)
         writer.write_object_value("profile", self.profile)
         writer.write_additional_data_value(self.additional_data)
     

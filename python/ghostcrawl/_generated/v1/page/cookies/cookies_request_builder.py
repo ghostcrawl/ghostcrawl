@@ -33,7 +33,7 @@ class CookiesRequestBuilder(BaseRequestBuilder):
     
     async def delete(self,body: CookiesDeleteBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Delete cookies
+        Delete cookies from the browser context of a live cloud session. With a name/domain/path filter only the matching cookies are removed; without a filter every cookie in the session is cleared.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -54,7 +54,7 @@ class CookiesRequestBuilder(BaseRequestBuilder):
     
     async def get(self,request_configuration: Optional[RequestConfiguration[CookiesRequestBuilderGetQueryParameters]] = None) -> Optional[bytes]:
         """
-        Get cookies
+        Read cookies from the browser context of a live cloud session. Optionally filter by cookie ``name`` and/or ``domain``.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
         """
@@ -72,7 +72,7 @@ class CookiesRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: CookiesSetBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Set cookies
+        Add cookies to the browser context of a live cloud session.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -93,7 +93,7 @@ class CookiesRequestBuilder(BaseRequestBuilder):
     
     def to_delete_request_information(self,body: CookiesDeleteBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Delete cookies
+        Delete cookies from the browser context of a live cloud session. With a name/domain/path filter only the matching cookies are removed; without a filter every cookie in the session is cleared.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
@@ -108,18 +108,18 @@ class CookiesRequestBuilder(BaseRequestBuilder):
     
     def to_get_request_information(self,request_configuration: Optional[RequestConfiguration[CookiesRequestBuilderGetQueryParameters]] = None) -> RequestInformation:
         """
-        Get cookies
+        Read cookies from the browser context of a live cloud session. Optionally filter by cookie ``name`` and/or ``domain``.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
         """
-        request_info = RequestInformation(Method.GET, '{+baseurl}/v1/page/cookies?profile_id={profile_id}{&domain*,name*}', self.path_parameters)
+        request_info = RequestInformation(Method.GET, '{+baseurl}/v1/page/cookies?session_id={session_id}{&domain*,name*}', self.path_parameters)
         request_info.configure(request_configuration)
         request_info.headers.try_add("Accept", "application/json")
         return request_info
     
     def to_post_request_information(self,body: CookiesSetBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Set cookies
+        Add cookies to the browser context of a live cloud session.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
@@ -152,13 +152,13 @@ class CookiesRequestBuilder(BaseRequestBuilder):
     @dataclass
     class CookiesRequestBuilderGetQueryParameters():
         """
-        Get cookies
+        Read cookies from the browser context of a live cloud session. Optionally filter by cookie ``name`` and/or ``domain``.
         """
         domain: Optional[str] = None
 
         name: Optional[str] = None
 
-        profile_id: Optional[str] = None
+        session_id: Optional[str] = None
 
     
     @dataclass

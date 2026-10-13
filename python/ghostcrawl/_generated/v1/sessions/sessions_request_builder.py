@@ -47,7 +47,7 @@ class SessionsRequestBuilder(BaseRequestBuilder):
     
     async def get(self,request_configuration: Optional[RequestConfiguration[SessionsRequestBuilderGetQueryParameters]] = None) -> Optional[bytes]:
         """
-        cursor-paginated listing of active sessions. Sessions created by scrape workers and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
+        cursor-paginated listing of active sessions. Sessions opened by scrape jobs and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
         """
@@ -65,7 +65,7 @@ class SessionsRequestBuilder(BaseRequestBuilder):
     
     def to_get_request_information(self,request_configuration: Optional[RequestConfiguration[SessionsRequestBuilderGetQueryParameters]] = None) -> RequestInformation:
         """
-        cursor-paginated listing of active sessions. Sessions created by scrape workers and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
+        cursor-paginated listing of active sessions. Sessions opened by scrape jobs and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
         """
@@ -96,7 +96,7 @@ class SessionsRequestBuilder(BaseRequestBuilder):
     @dataclass
     class SessionsRequestBuilderGetQueryParameters():
         """
-        cursor-paginated listing of active sessions. Sessions created by scrape workers and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
+        cursor-paginated listing of active sessions. Sessions opened by scrape jobs and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
         """
         created_at_from: Optional[str] = None
 

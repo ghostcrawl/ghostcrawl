@@ -7,6 +7,7 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .frame.frame_request_builder import FrameRequestBuilder
+    from .input.input_request_builder import InputRequestBuilder
     from .url.url_request_builder import UrlRequestBuilder
 
 class CdpRequestBuilder(BaseRequestBuilder):
@@ -30,6 +31,15 @@ class CdpRequestBuilder(BaseRequestBuilder):
         from .frame.frame_request_builder import FrameRequestBuilder
 
         return FrameRequestBuilder(self.request_adapter, self.path_parameters)
+    
+    @property
+    def input(self) -> InputRequestBuilder:
+        """
+        The input property
+        """
+        from .input.input_request_builder import InputRequestBuilder
+
+        return InputRequestBuilder(self.request_adapter, self.path_parameters)
     
     @property
     def url(self) -> UrlRequestBuilder:

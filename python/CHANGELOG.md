@@ -5,6 +5,37 @@ All notable changes to the GhostCrawl Python client are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this
 project follows semantic versioning.
 
+## [Unreleased] — 2.3.6 rebuild (2026-09-24)
+
+### Fixed
+
+- `page.eval` sent the expression under the wrong wire field name; the API
+  validates on `script`. The expression now goes out under the name the API
+  checks — callers no longer need to pass an extra `script=` kwarg alongside
+  the positional parameter.
+- Internal decision-ID references scrubbed from source comments (hygiene).
+
+### Added
+
+- **Engine-agnostic in-page actions** — `page.mouse(ops)` replays a mouse
+  op-stream (move/down/up/wheel/dwell) natively on the live page;
+  `page.arrival(dest_url, source_url, ...)` arrives at a page through a native
+  link click (document.referrer + Referer + Sec-Fetch-* are native).
+- Kiota core regenerated against the current customer spec (was built from a
+  pre-2.3.x spec — the core now carries the full customer surface incl. the
+  in-page action routes; those facade methods previously raised ModuleNotFoundError
+  at call time because the generated body models were never emitted).
+
+### Notes
+
+- This SDK does NOT provide an AI/LLM backend — model/key passthrough only
+  (bring your own). These surfaces are browser primitives, no model.
+- Cross-lang parity: the in-page actions ship Python-first. Node's Kiota 1.32.2 TypeScript
+  writer truncates on this spec ("Namespace not found for return type") and
+  Ruby's regen truncates on 86 files — both logged as owed; go/csharp/java/php
+  carry the surfaces (go: builders + facade; csharp: builders + facade; java:
+  builders + facade; php: builders + facade).
+
 ## [2.3.6] - 2026-08-22
 
 ### Added

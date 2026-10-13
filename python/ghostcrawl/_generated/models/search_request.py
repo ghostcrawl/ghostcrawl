@@ -22,7 +22,7 @@ class SearchRequest(AdditionalDataHolder, Parsable):
     limit: Optional[int] = 10
     # Optional 2-letter ISO country code for geo-filter. Tavily v1 ignores this silently.
     country: Optional[SearchRequest_country] = None
-    # Search engine to use: 'brave', 'tavily', 'google', 'bing', or 'yandex'. May also be passed via X-GhostCrawl-Search-Engine header.
+    # Search engine to use: 'brave', 'tavily', 'google', 'bing', or 'yandex'. May also be passed via X-Ghostcrawl-Search-Engine header.
     engine: Optional[SearchRequest_engine] = None
     # Optional freshness filter (adapter-specific; Brave: 'pd'/'pw'/'pm'/'py' for day/week/month/year).
     freshness: Optional[SearchRequest_freshness] = None

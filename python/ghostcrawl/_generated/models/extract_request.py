@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 @dataclass
 class ExtractRequest(AdditionalDataHolder, Parsable):
     """
-    POST /v1/extract request body, schema-driven extraction (deterministic) + bring-your-own-model extraction. Two extraction modes: - Deterministic (default, model_provider absent): CSS/regex/keyword extraction. Requires 'schema'. Returns {"url","data","token_estimate"}. - Bring-your-own-model (model_provider present): GhostCrawl fetches and prepares clean Markdown; your connected model performs the semantic extraction (you are not billed for model inference here, only the request quota). Returns {"urls","data","token_estimate"}. Security notes: - The 'schema' field is validated before any fetch (fail-fast input guard). - URLs are validated against private, loopback, and metadata targets before any fetch. - Error responses never echo the schema body, fetched content, or model credentials. - model_provider.api_key is request-scoped only: never persisted, logged, or returned in any response body or error message.
+    POST /v1/extract request body, schema-driven extraction (deterministic) + bring-your-own-model extraction. Two extraction modes: - Deterministic (default, model_provider absent): native structured-data extraction, reads the schema.org JSON-LD / microdata / Open Graph a page already embeds and fills the schema (no model, no third party); returns whole priced product grids. Requires 'schema'. Returns {"url","data","token_estimate"}. - Bring-your-own-model (model_provider present): GhostCrawl fetches and prepares clean Markdown; your connected model performs the semantic extraction (you are not billed for model inference here, only the request quota). Returns {"urls","data","token_estimate"}. Security notes: - The 'schema' field is validated before any fetch (fail-fast input guard). - URLs are validated against private, loopback, and metadata targets before any fetch. - Error responses never echo the schema body, fetched content, or model credentials. - model_provider.api_key is request-scoped only: never persisted, logged, or returned in any response body or error message.
     """
     # Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.
     additional_data: dict[str, Any] = field(default_factory=dict)
@@ -25,13 +25,15 @@ class ExtractRequest(AdditionalDataHolder, Parsable):
 
     # Engine override: auto (default) | chrome | firefox | webkit.
     engine: Optional[ExtractRequest_engine] = ExtractRequest_engine("auto")
+    # Override geo-coherence: use `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. Requires a pinned `identity_country` (and the geo_select tier). Off by default, the default is IP-coherent geo (the browser identity follows the exit). Forcing may create an IP<->timezone mismatch that some sites cross-check; opt-in at your own risk.
+    geo_force: Optional[bool] = False
     # BYO behavior: trusted-input actions replayed on the loaded page instead of the built-in human session. Sanitized + bounded server-side (max 256 actions). Available on every tier.
     behavior_actions: Optional[ExtractRequest_behavior_actions] = None
     # Optional two-letter country code to pin (geo-filters the exit and derives timezone; tier-gated). Omitted = timezone follows the exit.
     identity_country: Optional[ExtractRequest_identity_country] = None
     # Optional browser language tag (e.g. 'en-US','es-ES'). Sets the identity's locale and language headers coherently, independent of the exit country. Available on every tier.
     language: Optional[ExtractRequest_language] = None
-    # Free-form extraction instruction for BYO-LLM mode. Allowed without a schema (schema-less prose extraction). Ignored in deterministic mode (model_provider absent).
+    # Free-form extraction instruction. Requires a connected model: pass it WITH model_provider to run semantic extraction on your own AI/LLM. Sent WITHOUT model_provider it returns 422 model_provider_required (connect your AI/LLM). Allowed without a schema (schema-less prose extraction). GhostCrawl prepares the content; your model does the extraction.
     prompt: Optional[ExtractRequest_prompt] = None
     # URL to fetch and extract from (single-URL mode). Required when 'urls' is not provided.
     url: Optional[ExtractRequest_url] = None
@@ -73,6 +75,7 @@ class ExtractRequest(AdditionalDataHolder, Parsable):
         fields: dict[str, Callable[[Any], None]] = {
             "behavior_actions": lambda n : setattr(self, 'behavior_actions', n.get_object_value(ExtractRequest_behavior_actions)),
             "engine": lambda n : setattr(self, 'engine', n.get_enum_value(ExtractRequest_engine)),
+            "geo_force": lambda n : setattr(self, 'geo_force', n.get_bool_value()),
             "identity_country": lambda n : setattr(self, 'identity_country', n.get_object_value(ExtractRequest_identity_country)),
             "language": lambda n : setattr(self, 'language', n.get_object_value(ExtractRequest_language)),
             "prompt": lambda n : setattr(self, 'prompt', n.get_object_value(ExtractRequest_prompt)),
@@ -91,6 +94,7 @@ class ExtractRequest(AdditionalDataHolder, Parsable):
             raise TypeError("writer cannot be null.")
         writer.write_object_value("behavior_actions", self.behavior_actions)
         writer.write_enum_value("engine", self.engine)
+        writer.write_bool_value("geo_force", self.geo_force)
         writer.write_object_value("identity_country", self.identity_country)
         writer.write_object_value("language", self.language)
         writer.write_object_value("prompt", self.prompt)

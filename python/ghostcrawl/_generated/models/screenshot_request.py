@@ -27,6 +27,8 @@ class ScreenshotRequest(AdditionalDataHolder, Parsable):
     engine: Optional[ScreenshotRequest_engine] = ScreenshotRequest_engine("auto")
     # Capture the FULL document height instead of just the viewport.
     full_page: Optional[bool] = False
+    # Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).
+    geo_force: Optional[bool] = False
     # Re-use a persisted identity.
     identity: Optional[ScreenshotRequest_identity] = None
     # Two-letter country code to pin the exit country.
@@ -77,6 +79,7 @@ class ScreenshotRequest(AdditionalDataHolder, Parsable):
         fields: dict[str, Callable[[Any], None]] = {
             "engine": lambda n : setattr(self, 'engine', n.get_enum_value(ScreenshotRequest_engine)),
             "full_page": lambda n : setattr(self, 'full_page', n.get_bool_value()),
+            "geo_force": lambda n : setattr(self, 'geo_force', n.get_bool_value()),
             "identity": lambda n : setattr(self, 'identity', n.get_object_value(ScreenshotRequest_identity)),
             "identity_country": lambda n : setattr(self, 'identity_country', n.get_object_value(ScreenshotRequest_identity_country)),
             "language": lambda n : setattr(self, 'language', n.get_object_value(ScreenshotRequest_language)),
@@ -97,6 +100,7 @@ class ScreenshotRequest(AdditionalDataHolder, Parsable):
             raise TypeError("writer cannot be null.")
         writer.write_enum_value("engine", self.engine)
         writer.write_bool_value("full_page", self.full_page)
+        writer.write_bool_value("geo_force", self.geo_force)
         writer.write_object_value("identity", self.identity)
         writer.write_object_value("identity_country", self.identity_country)
         writer.write_object_value("language", self.language)

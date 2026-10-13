@@ -5,34 +5,34 @@ from kiota_abstractions.serialization import ComposedTypeWrapper, Parsable, Pars
 from typing import Any, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
-    from .profile_update_request_name_member1 import ProfileUpdateRequest_nameMember1
+    from .scroll_body_profile_id_member1 import ScrollBody_profile_idMember1
 
 @dataclass
-class ProfileUpdateRequest_name(ComposedTypeWrapper, Parsable):
+class ScrollBody_profile_id(ComposedTypeWrapper, Parsable):
     """
-    Composed type wrapper for classes ProfileUpdateRequest_nameMember1, str
+    Composed type wrapper for classes ScrollBody_profile_idMember1, str
     """
-    # Composed type representation for type ProfileUpdateRequest_nameMember1
-    profile_update_request_name_member1: Optional[ProfileUpdateRequest_nameMember1] = None
+    # Composed type representation for type ScrollBody_profile_idMember1
+    scroll_body_profile_id_member1: Optional[ScrollBody_profile_idMember1] = None
     # Composed type representation for type str
     string: Optional[str] = None
     
     @staticmethod
-    def create_from_discriminator_value(parse_node: ParseNode) -> ProfileUpdateRequest_name:
+    def create_from_discriminator_value(parse_node: ParseNode) -> ScrollBody_profile_id:
         """
         Creates a new instance of the appropriate class based on discriminator value
         param parse_node: The parse node to use to read the discriminator value and create the object
-        Returns: ProfileUpdateRequest_name
+        Returns: ScrollBody_profile_id
         """
         if parse_node is None:
             raise TypeError("parse_node cannot be null.")
-        result = ProfileUpdateRequest_name()
+        result = ScrollBody_profile_id()
         if string_value := parse_node.get_str_value():
             result.string = string_value
         else:
-            from .profile_update_request_name_member1 import ProfileUpdateRequest_nameMember1
+            from .scroll_body_profile_id_member1 import ScrollBody_profile_idMember1
 
-            result.profile_update_request_name_member1 = ProfileUpdateRequest_nameMember1()
+            result.scroll_body_profile_id_member1 = ScrollBody_profile_idMember1()
         return result
     
     def get_field_deserializers(self,) -> dict[str, Callable[[ParseNode], None]]:
@@ -40,10 +40,10 @@ class ProfileUpdateRequest_name(ComposedTypeWrapper, Parsable):
         The deserialization information for the current model
         Returns: dict[str, Callable[[ParseNode], None]]
         """
-        from .profile_update_request_name_member1 import ProfileUpdateRequest_nameMember1
+        from .scroll_body_profile_id_member1 import ScrollBody_profile_idMember1
 
-        if self.profile_update_request_name_member1:
-            return ParseNodeHelper.merge_deserializers_for_intersection_wrapper(self.profile_update_request_name_member1)
+        if self.scroll_body_profile_id_member1:
+            return ParseNodeHelper.merge_deserializers_for_intersection_wrapper(self.scroll_body_profile_id_member1)
         return {}
     
     def serialize(self,writer: SerializationWriter) -> None:
@@ -57,6 +57,6 @@ class ProfileUpdateRequest_name(ComposedTypeWrapper, Parsable):
         if self.string:
             writer.write_str_value(None, self.string)
         else:
-            writer.write_object_value(None, self.profile_update_request_name_member1)
+            writer.write_object_value(None, self.scroll_body_profile_id_member1)
     
 

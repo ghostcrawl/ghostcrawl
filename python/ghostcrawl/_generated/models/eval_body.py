@@ -4,15 +4,21 @@ from dataclasses import dataclass, field
 from kiota_abstractions.serialization import AdditionalDataHolder, Parsable, ParseNode, SerializationWriter
 from typing import Any, Optional, TYPE_CHECKING, Union
 
+if TYPE_CHECKING:
+    from .eval_body_profile_id import EvalBody_profile_id
+    from .eval_body_session_id import EvalBody_session_id
+
 @dataclass
 class EvalBody(AdditionalDataHolder, Parsable):
     # Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.
     additional_data: dict[str, Any] = field(default_factory=dict)
 
     # The profile_id property
-    profile_id: Optional[str] = None
+    profile_id: Optional[EvalBody_profile_id] = None
     # The script property
     script: Optional[str] = None
+    # The session_id property
+    session_id: Optional[EvalBody_session_id] = None
     
     @staticmethod
     def create_from_discriminator_value(parse_node: ParseNode) -> EvalBody:
@@ -30,9 +36,16 @@ class EvalBody(AdditionalDataHolder, Parsable):
         The deserialization information for the current model
         Returns: dict[str, Callable[[ParseNode], None]]
         """
+        from .eval_body_profile_id import EvalBody_profile_id
+        from .eval_body_session_id import EvalBody_session_id
+
+        from .eval_body_profile_id import EvalBody_profile_id
+        from .eval_body_session_id import EvalBody_session_id
+
         fields: dict[str, Callable[[Any], None]] = {
-            "profile_id": lambda n : setattr(self, 'profile_id', n.get_str_value()),
+            "profile_id": lambda n : setattr(self, 'profile_id', n.get_object_value(EvalBody_profile_id)),
             "script": lambda n : setattr(self, 'script', n.get_str_value()),
+            "session_id": lambda n : setattr(self, 'session_id', n.get_object_value(EvalBody_session_id)),
         }
         return fields
     
@@ -44,8 +57,9 @@ class EvalBody(AdditionalDataHolder, Parsable):
         """
         if writer is None:
             raise TypeError("writer cannot be null.")
-        writer.write_str_value("profile_id", self.profile_id)
+        writer.write_object_value("profile_id", self.profile_id)
         writer.write_str_value("script", self.script)
+        writer.write_object_value("session_id", self.session_id)
         writer.write_additional_data_value(self.additional_data)
     
 

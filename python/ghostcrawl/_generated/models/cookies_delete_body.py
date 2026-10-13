@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from .cookies_delete_body_domain import CookiesDeleteBody_domain
     from .cookies_delete_body_name import CookiesDeleteBody_name
     from .cookies_delete_body_path import CookiesDeleteBody_path
+    from .cookies_delete_body_profile_id import CookiesDeleteBody_profile_id
 
 @dataclass
 class CookiesDeleteBody(AdditionalDataHolder, Parsable):
@@ -21,7 +22,9 @@ class CookiesDeleteBody(AdditionalDataHolder, Parsable):
     # The path property
     path: Optional[CookiesDeleteBody_path] = None
     # The profile_id property
-    profile_id: Optional[str] = None
+    profile_id: Optional[CookiesDeleteBody_profile_id] = None
+    # The session_id property
+    session_id: Optional[str] = None
     
     @staticmethod
     def create_from_discriminator_value(parse_node: ParseNode) -> CookiesDeleteBody:
@@ -42,16 +45,19 @@ class CookiesDeleteBody(AdditionalDataHolder, Parsable):
         from .cookies_delete_body_domain import CookiesDeleteBody_domain
         from .cookies_delete_body_name import CookiesDeleteBody_name
         from .cookies_delete_body_path import CookiesDeleteBody_path
+        from .cookies_delete_body_profile_id import CookiesDeleteBody_profile_id
 
         from .cookies_delete_body_domain import CookiesDeleteBody_domain
         from .cookies_delete_body_name import CookiesDeleteBody_name
         from .cookies_delete_body_path import CookiesDeleteBody_path
+        from .cookies_delete_body_profile_id import CookiesDeleteBody_profile_id
 
         fields: dict[str, Callable[[Any], None]] = {
             "domain": lambda n : setattr(self, 'domain', n.get_object_value(CookiesDeleteBody_domain)),
             "name": lambda n : setattr(self, 'name', n.get_object_value(CookiesDeleteBody_name)),
             "path": lambda n : setattr(self, 'path', n.get_object_value(CookiesDeleteBody_path)),
-            "profile_id": lambda n : setattr(self, 'profile_id', n.get_str_value()),
+            "profile_id": lambda n : setattr(self, 'profile_id', n.get_object_value(CookiesDeleteBody_profile_id)),
+            "session_id": lambda n : setattr(self, 'session_id', n.get_str_value()),
         }
         return fields
     
@@ -66,7 +72,8 @@ class CookiesDeleteBody(AdditionalDataHolder, Parsable):
         writer.write_object_value("domain", self.domain)
         writer.write_object_value("name", self.name)
         writer.write_object_value("path", self.path)
-        writer.write_str_value("profile_id", self.profile_id)
+        writer.write_object_value("profile_id", self.profile_id)
+        writer.write_str_value("session_id", self.session_id)
         writer.write_additional_data_value(self.additional_data)
     
 

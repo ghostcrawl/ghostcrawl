@@ -25,7 +25,7 @@ export interface WithNameItemRequestBuilder extends BaseRequestBuilder<WithNameI
      */
      get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<UntypedNode | undefined>;
     /**
-     * rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the fingerprintand break multi-accounting coherence). 404 if absent; 409 on rename collision.
+     * rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the browser identity and break multi-accounting coherence). 404 if absent; 409 on rename collision.
      * @param body PUT /v1/profiles/{name} body, rename and/or rebind storage_state.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<UntypedNode>}
@@ -45,7 +45,7 @@ export interface WithNameItemRequestBuilder extends BaseRequestBuilder<WithNameI
      */
      toGetRequestInformation(requestConfiguration?: RequestConfiguration<object> | undefined) : RequestInformation;
     /**
-     * rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the fingerprintand break multi-accounting coherence). 404 if absent; 409 on rename collision.
+     * rename and/or rebind storage_state. The identity_id is IMMUTABLE (changing it would silently change the browser identity and break multi-accounting coherence). 404 if absent; 409 on rename collision.
      * @param body PUT /v1/profiles/{name} body, rename and/or rebind storage_state.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}

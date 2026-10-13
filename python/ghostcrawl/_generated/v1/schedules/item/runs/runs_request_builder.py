@@ -31,7 +31,7 @@ class RunsRequestBuilder(BaseRequestBuilder):
     
     async def get(self,request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        synthetic run history from last_run_at. Returns a list of run summary objects derived from the schedule's stored last_run_at + last_result_hash. A schedule that has never fired returns an empty list. One that has fired returns a single summary with status='completed'. Status values: 'completed' (ran and produced a hash), 'pending' (never ran). This endpoint allows callers to poll for schedule execution without a separate run-history table, the writes last_run_at on every successful fire.
+        run history derived from last_run_at. Returns a list of run summary objects derived from the schedule's stored last_run_at + last_result_hash. A schedule that has never fired returns an empty list. One that has fired returns a single summary with status='completed'. Status values: 'completed' (ran and produced a hash), 'pending' (never ran). This endpoint allows callers to poll for schedule execution without a separate run-history table, the writes last_run_at on every successful fire.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
         """
@@ -49,7 +49,7 @@ class RunsRequestBuilder(BaseRequestBuilder):
     
     def to_get_request_information(self,request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        synthetic run history from last_run_at. Returns a list of run summary objects derived from the schedule's stored last_run_at + last_result_hash. A schedule that has never fired returns an empty list. One that has fired returns a single summary with status='completed'. Status values: 'completed' (ran and produced a hash), 'pending' (never ran). This endpoint allows callers to poll for schedule execution without a separate run-history table, the writes last_run_at on every successful fire.
+        run history derived from last_run_at. Returns a list of run summary objects derived from the schedule's stored last_run_at + last_result_hash. A schedule that has never fired returns an empty list. One that has fired returns a single summary with status='completed'. Status values: 'completed' (ran and produced a hash), 'pending' (never ran). This endpoint allows callers to poll for schedule execution without a separate run-history table, the writes last_run_at on every successful fire.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
         """

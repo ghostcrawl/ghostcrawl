@@ -33,7 +33,7 @@ class AgentRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: AgentRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Start agent lane request
+        BETA / opt-in. The REST agent lane is disabled by default and returns 404 until enabled for your account/deployment, see the 404 response below. The agent capability is generally available via the MCP `ghostcrawl_agent` tool; this REST surface is still stabilising. Contact support to enable it.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -57,7 +57,7 @@ class AgentRequestBuilder(BaseRequestBuilder):
     
     def to_post_request_information(self,body: AgentRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Start agent lane request
+        BETA / opt-in. The REST agent lane is disabled by default and returns 404 until enabled for your account/deployment, see the 404 response below. The agent capability is generally available via the MCP `ghostcrawl_agent` tool; this REST surface is still stabilising. Contact support to enable it.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

@@ -4,6 +4,9 @@ from dataclasses import dataclass, field
 from kiota_abstractions.serialization import AdditionalDataHolder, Parsable, ParseNode, SerializationWriter
 from typing import Any, Optional, TYPE_CHECKING, Union
 
+if TYPE_CHECKING:
+    from .upload_body_profile_id import UploadBody_profile_id
+
 @dataclass
 class UploadBody(AdditionalDataHolder, Parsable):
     # Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.
@@ -16,9 +19,11 @@ class UploadBody(AdditionalDataHolder, Parsable):
     # The mime property
     mime: Optional[str] = None
     # The profile_id property
-    profile_id: Optional[str] = None
+    profile_id: Optional[UploadBody_profile_id] = None
     # The selector property
     selector: Optional[str] = None
+    # The session_id property
+    session_id: Optional[str] = None
     
     @staticmethod
     def create_from_discriminator_value(parse_node: ParseNode) -> UploadBody:
@@ -36,12 +41,17 @@ class UploadBody(AdditionalDataHolder, Parsable):
         The deserialization information for the current model
         Returns: dict[str, Callable[[ParseNode], None]]
         """
+        from .upload_body_profile_id import UploadBody_profile_id
+
+        from .upload_body_profile_id import UploadBody_profile_id
+
         fields: dict[str, Callable[[Any], None]] = {
             "content_base64": lambda n : setattr(self, 'content_base64', n.get_str_value()),
             "filename": lambda n : setattr(self, 'filename', n.get_str_value()),
             "mime": lambda n : setattr(self, 'mime', n.get_str_value()),
-            "profile_id": lambda n : setattr(self, 'profile_id', n.get_str_value()),
+            "profile_id": lambda n : setattr(self, 'profile_id', n.get_object_value(UploadBody_profile_id)),
             "selector": lambda n : setattr(self, 'selector', n.get_str_value()),
+            "session_id": lambda n : setattr(self, 'session_id', n.get_str_value()),
         }
         return fields
     
@@ -56,8 +66,9 @@ class UploadBody(AdditionalDataHolder, Parsable):
         writer.write_str_value("content_base64", self.content_base64)
         writer.write_str_value("filename", self.filename)
         writer.write_str_value("mime", self.mime)
-        writer.write_str_value("profile_id", self.profile_id)
+        writer.write_object_value("profile_id", self.profile_id)
         writer.write_str_value("selector", self.selector)
+        writer.write_str_value("session_id", self.session_id)
         writer.write_additional_data_value(self.additional_data)
     
 

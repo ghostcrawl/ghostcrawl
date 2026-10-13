@@ -49,7 +49,7 @@ class WithDownload_ItemRequestBuilder(BaseRequestBuilder):
     
     async def get(self,request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        GET /v1/downloads/{id} → the download's signed retrieval link / metadata. we do not confirm existence of another tenant's artifact).
+        GET /v1/downloads/{id} → the captured artifact bytes (or its metadata). When the capture banked its bytes (the producer path), stream them as an ``application/octet-stream`` attachment so the dashboard's blob download and the SDK both retrieve a real file. Falls back to the metadata JSON for a metadata-only capture. we do not confirm existence of another tenant's artifact).
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
         """
@@ -77,7 +77,7 @@ class WithDownload_ItemRequestBuilder(BaseRequestBuilder):
     
     def to_get_request_information(self,request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        GET /v1/downloads/{id} → the download's signed retrieval link / metadata. we do not confirm existence of another tenant's artifact).
+        GET /v1/downloads/{id} → the captured artifact bytes (or its metadata). When the capture banked its bytes (the producer path), stream them as an ``application/octet-stream`` attachment so the dashboard's blob download and the SDK both retrieve a real file. Falls back to the metadata JSON for a metadata-only capture. we do not confirm existence of another tenant's artifact).
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
         """

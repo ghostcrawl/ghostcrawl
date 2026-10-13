@@ -64,7 +64,7 @@ export interface StorageStatesRequestBuilder extends BaseRequestBuilder<StorageS
      */
      get(requestConfiguration?: RequestConfiguration<StorageStatesRequestBuilderGetQueryParameters> | undefined) : Promise<UntypedNode | undefined>;
     /**
-     * snapshot Playwright storage state + Fernet-encrypt. Must-haves:- scope gate: storage:write- body validated manually (to emit storage_state_name_invalid)- live page lookup: get_live_page(org_id, profile_id) → no_active_session on miss- encrypt: fernet_store.encrypt(json.dumps(state).encode)- 5MB cap: StorageStateTooLarge → storage_state_too_large envelope- save-vs-update: pre-upsert check → storage_state.saved vs.updated audit- returns StorageStateMetadata (NO blob_ciphertext; Pitfall 7)
+     * snapshot browser storage state from a live session. Captures the current cookies, localStorage, and session storage from the named active profile and saves it encrypted under the given name. Returns storage state metadata on success (credentials are never returned). Storage blobs over 5 MB return storage_state_too_large (400). Pass ``session_id`` to capture from a live cloud session; on a self-hosted deployment ``profile_id`` alone captures from the local active page.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<UntypedNode>}
@@ -78,7 +78,7 @@ export interface StorageStatesRequestBuilder extends BaseRequestBuilder<StorageS
      */
      toGetRequestInformation(requestConfiguration?: RequestConfiguration<StorageStatesRequestBuilderGetQueryParameters> | undefined) : RequestInformation;
     /**
-     * snapshot Playwright storage state + Fernet-encrypt. Must-haves:- scope gate: storage:write- body validated manually (to emit storage_state_name_invalid)- live page lookup: get_live_page(org_id, profile_id) → no_active_session on miss- encrypt: fernet_store.encrypt(json.dumps(state).encode)- 5MB cap: StorageStateTooLarge → storage_state_too_large envelope- save-vs-update: pre-upsert check → storage_state.saved vs.updated audit- returns StorageStateMetadata (NO blob_ciphertext; Pitfall 7)
+     * snapshot browser storage state from a live session. Captures the current cookies, localStorage, and session storage from the named active profile and saves it encrypted under the given name. Returns storage state metadata on success (credentials are never returned). Storage blobs over 5 MB return storage_state_too_large (400). Pass ``session_id`` to capture from a live cloud session; on a self-hosted deployment ``profile_id`` alone captures from the local active page.
      * @param body The request body
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}

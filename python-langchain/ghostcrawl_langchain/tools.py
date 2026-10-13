@@ -460,11 +460,11 @@ class _EmptyInput(BaseModel):
 # ---------------------------------------------------------------------------
 
 class GhostCrawlScrapeTool(BaseTool):
-    """LangChain tool: scrape a single URL via GhostCrawl's managed browser fleet."""
+    """LangChain tool: scrape a single URL via GhostCrawl's managed browsers."""
 
     name: str = "ghostcrawl_scrape"
     description: str = (
-        "Scrape a webpage using GhostCrawl's managed browser fleet and return the content "
+        "Scrape a webpage using GhostCrawl's managed browsers and return the content "
         "as HTML or Markdown. Suitable for news articles, landing pages, product pages, "
         "and any publicly accessible URL. "
         "SUPPORTED: render_js (bool — execute JavaScript before extraction), "
@@ -818,7 +818,7 @@ class GhostCrawlExtractTool(BaseTool):
     name: str = "ghostcrawl_extract"
     description: str = (
         "Extract structured data from a URL by providing a JSON Schema. "
-        "GhostCrawl fetches the page through its managed browser fleet, then uses the schema "
+        "GhostCrawl fetches the page through its managed browsers, then uses the schema "
         "to identify and return matching fields as a structured JSON object. "
         "SUPPORTED: url (the target page), schema (JSON Schema object describing the fields "
         "to extract — e.g. product title, price, reviews), render_js (bool), "
@@ -886,7 +886,7 @@ class GhostCrawlContentTool(BaseTool):
 
     name: str = "ghostcrawl_content"
     description: str = (
-        "Fetch a webpage's rendered content through ghostcrawl's managed browser fleet. "
+        "Fetch a webpage's rendered content through ghostcrawl's managed browsers. "
         "SUPPORTED: url (the target page), engine (browser engine), format (content format). "
         "Returns: the rendered content plus metadata (url, status, status_code, bytes). "
         "Use this when you need the page body itself (not structured extraction). "
@@ -958,7 +958,7 @@ class GhostCrawlCrawlTool(BaseTool):
     name: str = "ghostcrawl_crawl"
     description: str = (
         "Crawl a website starting from a seed URL and return content from multiple pages. "
-        "GhostCrawl follows links using its managed browser fleet, respecting same-origin and "
+        "GhostCrawl follows links using its managed browsers, respecting same-origin and "
         "max_pages bounds to avoid unbounded crawls. "
         "SUPPORTED: url (seed URL), max_pages (1–500, default 10), same_origin (bool — "
         "restrict to same scheme+host+port, default true), render_js (bool for JS-heavy sites). "

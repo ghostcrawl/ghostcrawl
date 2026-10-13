@@ -37,7 +37,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
     chunk_tokens: Optional[int] = 8192
     from .scrape_request_engine import ScrapeRequest_engine
 
-    # Engine override. 'auto' (default): the identity's fingerprint decides the engine. 'chrome'|'firefox'|'webkit': force that engine, enforced only if coherent with the identity (e.g. iOS identities are always webkit); incoherent picks are rejected, never coerced to a hybrid.
+    # Engine override. 'auto' (default): the identity's browser decides the engine. 'chrome'|'firefox'|'webkit': force that engine, enforced only if coherent with the identity (e.g. iOS identities are always webkit); incoherent picks are rejected, never coerced to a hybrid.
     engine: Optional[ScrapeRequest_engine] = ScrapeRequest_engine("auto")
     from .scrape_request_format import ScrapeRequest_format
 
@@ -45,6 +45,8 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
     format: Optional[ScrapeRequest_format] = ScrapeRequest_format("html")
     # When screenshot=true, capture the FULL document height instead of just the visible viewport. Ignored when screenshot_selector is set.
     full_page: Optional[bool] = False
+    # Override geo-coherence: use `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. Requires a pinned `identity_country` (and the geo_select tier). Off by default, the default is IP-coherent geo (the browser identity follows the exit). Forcing may create an IP<->timezone mismatch that some sites cross-check; opt-in at your own risk.
+    geo_force: Optional[bool] = False
     # When format=markdown, include deduplicated citation list {url, anchor_text} from the scraped page.
     include_citations: Optional[bool] = True
     from .scrape_request_routing_mode import ScrapeRequest_routing_mode
@@ -63,7 +65,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
     identity_country: Optional[ScrapeRequest_identity_country] = None
     # Optional browser language tag (e.g. 'en-US','es-ES','de-DE'). Sets the identity's locale and language headers coherently, independent of the exit country. When omitted, the identity's default locale is used. Available on every tier.
     language: Optional[ScrapeRequest_language] = None
-    # Named persistent profile (multi-accounting). Resolves to a durable identity_id (→ same deterministic fingerprint) + optional saved storage_state (→ cookies/localStorage) for the calling org. Reuses the exact identity+cookies on every request, with no 30-minute sticky-session expiry. 404 if the named profile does not exist for the org.
+    # Named persistent profile (multi-accounting). Resolves to a durable identity_id (→ the same browser identity every time) + optional saved storage_state (→ cookies/localStorage) for the calling org. Reuses the exact identity+cookies on every request, with no 30-minute sticky-session expiry. 404 if the named profile does not exist for the org.
     profile: Optional[ScrapeRequest_profile] = None
     # Bring-your-own proxy URL. Schemes: socks5, socks5h, http, https. Any credentials in the URL are redacted from logs. Example: socks5://user:pass@host:1080.
     proxy: Optional[ScrapeRequest_proxy] = None
@@ -133,6 +135,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
             "engine": lambda n : setattr(self, 'engine', n.get_enum_value(ScrapeRequest_engine)),
             "format": lambda n : setattr(self, 'format', n.get_enum_value(ScrapeRequest_format)),
             "full_page": lambda n : setattr(self, 'full_page', n.get_bool_value()),
+            "geo_force": lambda n : setattr(self, 'geo_force', n.get_bool_value()),
             "identity": lambda n : setattr(self, 'identity', n.get_object_value(ScrapeRequest_identity)),
             "identity_country": lambda n : setattr(self, 'identity_country', n.get_object_value(ScrapeRequest_identity_country)),
             "include_citations": lambda n : setattr(self, 'include_citations', n.get_bool_value()),
@@ -164,6 +167,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
         writer.write_enum_value("engine", self.engine)
         writer.write_enum_value("format", self.format)
         writer.write_bool_value("full_page", self.full_page)
+        writer.write_bool_value("geo_force", self.geo_force)
         writer.write_object_value("identity", self.identity)
         writer.write_object_value("identity_country", self.identity_country)
         writer.write_bool_value("include_citations", self.include_citations)

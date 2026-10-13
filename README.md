@@ -86,7 +86,7 @@ Protocol surface, so any agent can drive it directly.
 | **Sessions** | Sticky, reusable browser sessions with consistent identity. |
 | **Identity profiles** | Persistent, coherent browser identities that survive across runs. |
 | **Storage** | Datasets, screenshots, and recordings, managed for you. |
-| **Authentic browser fingerprint** | Every session presents a coherent, authentic browser identity. |
+| **Authentic browser identity** | Every session presents a coherent, authentic browser identity. |
 
 ---
 

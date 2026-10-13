@@ -24,6 +24,8 @@ class PdfRequest(AdditionalDataHolder, Parsable):
 
     # Engine override. PDF is chrome-only; 'firefox' or 'webkit' returns 400 pdf_engine_unsupported immediately (before dispatch).
     engine: Optional[PdfRequest_engine] = PdfRequest_engine("auto")
+    # Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).
+    geo_force: Optional[bool] = False
     # Re-use a persisted identity.
     identity: Optional[PdfRequest_identity] = None
     # Two-letter country code to pin the exit country.
@@ -69,6 +71,7 @@ class PdfRequest(AdditionalDataHolder, Parsable):
 
         fields: dict[str, Callable[[Any], None]] = {
             "engine": lambda n : setattr(self, 'engine', n.get_enum_value(PdfRequest_engine)),
+            "geo_force": lambda n : setattr(self, 'geo_force', n.get_bool_value()),
             "identity": lambda n : setattr(self, 'identity', n.get_object_value(PdfRequest_identity)),
             "identity_country": lambda n : setattr(self, 'identity_country', n.get_object_value(PdfRequest_identity_country)),
             "language": lambda n : setattr(self, 'language', n.get_object_value(PdfRequest_language)),
@@ -87,6 +90,7 @@ class PdfRequest(AdditionalDataHolder, Parsable):
         if writer is None:
             raise TypeError("writer cannot be null.")
         writer.write_enum_value("engine", self.engine)
+        writer.write_bool_value("geo_force", self.geo_force)
         writer.write_object_value("identity", self.identity)
         writer.write_object_value("identity_country", self.identity_country)
         writer.write_object_value("language", self.language)

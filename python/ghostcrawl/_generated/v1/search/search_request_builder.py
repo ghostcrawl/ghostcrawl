@@ -33,7 +33,7 @@ class SearchRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: SearchRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        multi-backend search. Engine selection: ``engine`` body field or ``X-GhostCrawl-Search-Engine`` header. Auth: tenant bearer + customer's search API key via ``X-Provider-Authorization: Bearer <key>`` (never persisted).
+        multi-backend search. Engine selection: ``engine`` body field or ``X-Ghostcrawl-Search-Engine`` header. Auth: tenant bearer + customer's search API key via ``X-Provider-Authorization: Bearer <key>`` (never persisted).
         param body: POST /v1/search request body.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -61,7 +61,7 @@ class SearchRequestBuilder(BaseRequestBuilder):
     
     def to_post_request_information(self,body: SearchRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        multi-backend search. Engine selection: ``engine`` body field or ``X-GhostCrawl-Search-Engine`` header. Auth: tenant bearer + customer's search API key via ``X-Provider-Authorization: Bearer <key>`` (never persisted).
+        multi-backend search. Engine selection: ``engine`` body field or ``X-Ghostcrawl-Search-Engine`` header. Auth: tenant bearer + customer's search API key via ``X-Provider-Authorization: Bearer <key>`` (never persisted).
         param body: POST /v1/search request body.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

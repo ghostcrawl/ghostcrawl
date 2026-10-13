@@ -5,34 +5,34 @@ from kiota_abstractions.serialization import ComposedTypeWrapper, Parsable, Pars
 from typing import Any, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
-    from .profile_update_request_storage_state_id_member1 import ProfileUpdateRequest_storage_state_idMember1
+    from .tab_visit_body_session_id_member1 import TabVisitBody_session_idMember1
 
 @dataclass
-class ProfileUpdateRequest_storage_state_id(ComposedTypeWrapper, Parsable):
+class TabVisitBody_session_id(ComposedTypeWrapper, Parsable):
     """
-    Composed type wrapper for classes ProfileUpdateRequest_storage_state_idMember1, str
+    Composed type wrapper for classes str, TabVisitBody_session_idMember1
     """
-    # Composed type representation for type ProfileUpdateRequest_storage_state_idMember1
-    profile_update_request_storage_state_id_member1: Optional[ProfileUpdateRequest_storage_state_idMember1] = None
     # Composed type representation for type str
     string: Optional[str] = None
+    # Composed type representation for type TabVisitBody_session_idMember1
+    tab_visit_body_session_id_member1: Optional[TabVisitBody_session_idMember1] = None
     
     @staticmethod
-    def create_from_discriminator_value(parse_node: ParseNode) -> ProfileUpdateRequest_storage_state_id:
+    def create_from_discriminator_value(parse_node: ParseNode) -> TabVisitBody_session_id:
         """
         Creates a new instance of the appropriate class based on discriminator value
         param parse_node: The parse node to use to read the discriminator value and create the object
-        Returns: ProfileUpdateRequest_storage_state_id
+        Returns: TabVisitBody_session_id
         """
         if parse_node is None:
             raise TypeError("parse_node cannot be null.")
-        result = ProfileUpdateRequest_storage_state_id()
+        result = TabVisitBody_session_id()
         if string_value := parse_node.get_str_value():
             result.string = string_value
         else:
-            from .profile_update_request_storage_state_id_member1 import ProfileUpdateRequest_storage_state_idMember1
+            from .tab_visit_body_session_id_member1 import TabVisitBody_session_idMember1
 
-            result.profile_update_request_storage_state_id_member1 = ProfileUpdateRequest_storage_state_idMember1()
+            result.tab_visit_body_session_id_member1 = TabVisitBody_session_idMember1()
         return result
     
     def get_field_deserializers(self,) -> dict[str, Callable[[ParseNode], None]]:
@@ -40,10 +40,10 @@ class ProfileUpdateRequest_storage_state_id(ComposedTypeWrapper, Parsable):
         The deserialization information for the current model
         Returns: dict[str, Callable[[ParseNode], None]]
         """
-        from .profile_update_request_storage_state_id_member1 import ProfileUpdateRequest_storage_state_idMember1
+        from .tab_visit_body_session_id_member1 import TabVisitBody_session_idMember1
 
-        if self.profile_update_request_storage_state_id_member1:
-            return ParseNodeHelper.merge_deserializers_for_intersection_wrapper(self.profile_update_request_storage_state_id_member1)
+        if self.tab_visit_body_session_id_member1:
+            return ParseNodeHelper.merge_deserializers_for_intersection_wrapper(self.tab_visit_body_session_id_member1)
         return {}
     
     def serialize(self,writer: SerializationWriter) -> None:
@@ -57,6 +57,6 @@ class ProfileUpdateRequest_storage_state_id(ComposedTypeWrapper, Parsable):
         if self.string:
             writer.write_str_value(None, self.string)
         else:
-            writer.write_object_value(None, self.profile_update_request_storage_state_id_member1)
+            writer.write_object_value(None, self.tab_visit_body_session_id_member1)
     
 

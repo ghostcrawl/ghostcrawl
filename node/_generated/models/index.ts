@@ -5251,5 +5251,199 @@ export interface TeamResponse extends AdditionalDataHolder, Parsable {
 // WebhookListResponse/WebhookPublic interfaces defined above (in the completions section).
 export function deserializeIntoWebhookListResponse(x: Partial<WebhookListResponse> | undefined = {}): Record<string, (node: ParseNode) => void> { return {}; }
 export function deserializeIntoWebhookPublic(x: Partial<WebhookPublic> | undefined = {}): Record<string, (node: ParseNode) => void> { return {}; }
+
+// ---------------------------------------------------------------------------
+// Page actions: mouse / arrival / tab-visit / close-popups / touch request bodies.
+// Same completion convention as the bodies above: the facade sends every field via
+// additionalData (makeBody), so serialize* writes additionalData only.
+// ---------------------------------------------------------------------------
+export const ArrivalBody_referrer_shapeObject = { Origin: "origin", Full: "full" } as const;
+export type ArrivalBody_referrer_shape = (typeof ArrivalBody_referrer_shapeObject)[keyof typeof ArrivalBody_referrer_shapeObject];
+export type MouseBody_ops = AdditionalDataHolder & Parsable & { additionalData?: Record<string, unknown> };
+export type TouchBody_ops = AdditionalDataHolder & Parsable & { additionalData?: Record<string, unknown> };
+export function createMouseBody_opsFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoMouseBody_ops;
+}
+export function deserializeIntoMouseBody_ops(x: Partial<MouseBody_ops> | undefined = {}): Record<string, (node: ParseNode) => void> { return {}; }
+export function serializeMouseBody_ops(writer: SerializationWriter, m: Partial<MouseBody_ops> | undefined | null = {}, _derived = false): void {
+    if (!m || _derived) { return; }
+    writer.writeAdditionalData(m.additionalData);
+}
+export function createTouchBody_opsFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoTouchBody_ops;
+}
+export function deserializeIntoTouchBody_ops(x: Partial<TouchBody_ops> | undefined = {}): Record<string, (node: ParseNode) => void> { return {}; }
+export function serializeTouchBody_ops(writer: SerializationWriter, m: Partial<TouchBody_ops> | undefined | null = {}, _derived = false): void {
+    if (!m || _derived) { return; }
+    writer.writeAdditionalData(m.additionalData);
+}
+export interface ArrivalBody extends AdditionalDataHolder, Parsable {
+    additionalData?: Record<string, unknown>;
+    destUrl?: string | null;
+    profileId?: string | null;
+    referrerShape?: ArrivalBody_referrer_shape | null;
+    sessionId?: string | null;
+    sourceTitle?: string | null;
+    sourceUrl?: string | null;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {ArrivalBody}
+ */
+// @ts-ignore
+export function createArrivalBodyFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoArrivalBody;
+}
+/**
+ * The deserialization information for the current model
+ * @param ArrivalBody The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoArrivalBody(arrivalBody: Partial<ArrivalBody> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "dest_url": n => { arrivalBody.destUrl = n.getStringValue(); },
+        "profile_id": n => { arrivalBody.profileId = n.getStringValue(); },
+        "referrer_shape": n => { arrivalBody.referrerShape = n.getEnumValue<ArrivalBody_referrer_shape>(ArrivalBody_referrer_shapeObject); },
+        "session_id": n => { arrivalBody.sessionId = n.getStringValue(); },
+        "source_title": n => { arrivalBody.sourceTitle = n.getStringValue(); },
+        "source_url": n => { arrivalBody.sourceUrl = n.getStringValue(); },
+    }
+}
+export function serializeArrivalBody(writer: SerializationWriter, m: Partial<ArrivalBody> | undefined | null = {}, _derived = false): void {
+    if (!m || _derived) { return; }
+    writer.writeAdditionalData(m.additionalData);
+}
+export interface ClosePopupsBody extends AdditionalDataHolder, Parsable {
+    additionalData?: Record<string, unknown>;
+    keepHost?: string | null;
+    profileId?: string | null;
+    sessionId?: string | null;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {ClosePopupsBody}
+ */
+// @ts-ignore
+export function createClosePopupsBodyFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoClosePopupsBody;
+}
+/**
+ * The deserialization information for the current model
+ * @param ClosePopupsBody The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoClosePopupsBody(closePopupsBody: Partial<ClosePopupsBody> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "keep_host": n => { closePopupsBody.keepHost = n.getStringValue(); },
+        "profile_id": n => { closePopupsBody.profileId = n.getStringValue(); },
+        "session_id": n => { closePopupsBody.sessionId = n.getStringValue(); },
+    }
+}
+export function serializeClosePopupsBody(writer: SerializationWriter, m: Partial<ClosePopupsBody> | undefined | null = {}, _derived = false): void {
+    if (!m || _derived) { return; }
+    writer.writeAdditionalData(m.additionalData);
+}
+export interface MouseBody extends AdditionalDataHolder, Parsable {
+    additionalData?: Record<string, unknown>;
+    ops?: MouseBody_ops[] | null;
+    profileId?: string | null;
+    sessionId?: string | null;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {MouseBody}
+ */
+// @ts-ignore
+export function createMouseBodyFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoMouseBody;
+}
+/**
+ * The deserialization information for the current model
+ * @param MouseBody The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoMouseBody(mouseBody: Partial<MouseBody> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "ops": n => { mouseBody.ops = n.getCollectionOfObjectValues<MouseBody_ops>(createMouseBody_opsFromDiscriminatorValue); },
+        "profile_id": n => { mouseBody.profileId = n.getStringValue(); },
+        "session_id": n => { mouseBody.sessionId = n.getStringValue(); },
+    }
+}
+export function serializeMouseBody(writer: SerializationWriter, m: Partial<MouseBody> | undefined | null = {}, _derived = false): void {
+    if (!m || _derived) { return; }
+    writer.writeAdditionalData(m.additionalData);
+}
+export interface TabVisitBody extends AdditionalDataHolder, Parsable {
+    additionalData?: Record<string, unknown>;
+    dwellS?: number | null;
+    profileId?: string | null;
+    sessionId?: string | null;
+    url?: string | null;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {TabVisitBody}
+ */
+// @ts-ignore
+export function createTabVisitBodyFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoTabVisitBody;
+}
+/**
+ * The deserialization information for the current model
+ * @param TabVisitBody The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoTabVisitBody(tabVisitBody: Partial<TabVisitBody> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "dwell_s": n => { tabVisitBody.dwellS = n.getNumberValue(); },
+        "profile_id": n => { tabVisitBody.profileId = n.getStringValue(); },
+        "session_id": n => { tabVisitBody.sessionId = n.getStringValue(); },
+        "url": n => { tabVisitBody.url = n.getStringValue(); },
+    }
+}
+export function serializeTabVisitBody(writer: SerializationWriter, m: Partial<TabVisitBody> | undefined | null = {}, _derived = false): void {
+    if (!m || _derived) { return; }
+    writer.writeAdditionalData(m.additionalData);
+}
+export interface TouchBody extends AdditionalDataHolder, Parsable {
+    additionalData?: Record<string, unknown>;
+    ops?: TouchBody_ops[] | null;
+    profileId?: string | null;
+    sessionId?: string | null;
+}
+/**
+ * Creates a new instance of the appropriate class based on discriminator value
+ * @param parseNode The parse node to use to read the discriminator value and create the object
+ * @returns {TouchBody}
+ */
+// @ts-ignore
+export function createTouchBodyFromDiscriminatorValue(parseNode: ParseNode | undefined) : ((instance?: Parsable) => Record<string, (node: ParseNode) => void>) {
+    return deserializeIntoTouchBody;
+}
+/**
+ * The deserialization information for the current model
+ * @param TouchBody The instance to deserialize into.
+ * @returns {Record<string, (node: ParseNode) => void>}
+ */
+// @ts-ignore
+export function deserializeIntoTouchBody(touchBody: Partial<TouchBody> | undefined = {}) : Record<string, (node: ParseNode) => void> {
+    return {
+        "ops": n => { touchBody.ops = n.getCollectionOfObjectValues<TouchBody_ops>(createTouchBody_opsFromDiscriminatorValue); },
+        "profile_id": n => { touchBody.profileId = n.getStringValue(); },
+        "session_id": n => { touchBody.sessionId = n.getStringValue(); },
+    }
+}
+export function serializeTouchBody(writer: SerializationWriter, m: Partial<TouchBody> | undefined | null = {}, _derived = false): void {
+    if (!m || _derived) { return; }
+    writer.writeAdditionalData(m.additionalData);
+}
 /* tslint:enable */
 /* eslint-enable */

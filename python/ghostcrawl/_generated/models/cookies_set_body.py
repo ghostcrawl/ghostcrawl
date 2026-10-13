@@ -5,6 +5,7 @@ from kiota_abstractions.serialization import AdditionalDataHolder, Parsable, Par
 from typing import Any, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
+    from .cookies_set_body_profile_id import CookiesSetBody_profile_id
     from .cookie_dict import CookieDict
 
 @dataclass
@@ -15,7 +16,9 @@ class CookiesSetBody(AdditionalDataHolder, Parsable):
     # The cookies property
     cookies: Optional[list[CookieDict]] = None
     # The profile_id property
-    profile_id: Optional[str] = None
+    profile_id: Optional[CookiesSetBody_profile_id] = None
+    # The session_id property
+    session_id: Optional[str] = None
     
     @staticmethod
     def create_from_discriminator_value(parse_node: ParseNode) -> CookiesSetBody:
@@ -33,13 +36,16 @@ class CookiesSetBody(AdditionalDataHolder, Parsable):
         The deserialization information for the current model
         Returns: dict[str, Callable[[ParseNode], None]]
         """
+        from .cookies_set_body_profile_id import CookiesSetBody_profile_id
         from .cookie_dict import CookieDict
 
+        from .cookies_set_body_profile_id import CookiesSetBody_profile_id
         from .cookie_dict import CookieDict
 
         fields: dict[str, Callable[[Any], None]] = {
             "cookies": lambda n : setattr(self, 'cookies', n.get_collection_of_object_values(CookieDict)),
-            "profile_id": lambda n : setattr(self, 'profile_id', n.get_str_value()),
+            "profile_id": lambda n : setattr(self, 'profile_id', n.get_object_value(CookiesSetBody_profile_id)),
+            "session_id": lambda n : setattr(self, 'session_id', n.get_str_value()),
         }
         return fields
     
@@ -52,7 +58,8 @@ class CookiesSetBody(AdditionalDataHolder, Parsable):
         if writer is None:
             raise TypeError("writer cannot be null.")
         writer.write_collection_of_object_values("cookies", self.cookies)
-        writer.write_str_value("profile_id", self.profile_id)
+        writer.write_object_value("profile_id", self.profile_id)
+        writer.write_str_value("session_id", self.session_id)
         writer.write_additional_data_value(self.additional_data)
     
 

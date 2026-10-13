@@ -32,7 +32,7 @@ class UploadRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: UploadBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Upload a file to a file input
+        Set a file <input> on the page of a live session to caller-supplied bytes. The base64-decoded file is size-capped before it is applied to the input.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -53,7 +53,7 @@ class UploadRequestBuilder(BaseRequestBuilder):
     
     def to_post_request_information(self,body: UploadBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Upload a file to a file input
+        Set a file <input> on the page of a live session to caller-supplied bytes. The base64-decoded file is size-capped before it is applied to the input.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

@@ -48,6 +48,7 @@ ERROR_CODES: dict[str, ErrorCode] = {
     "conflict": ErrorCode("conflict", 409, False, "problem", "Resource conflict", None),
     "byo_proxy_invalid": ErrorCode("byo_proxy_invalid", 422, False, "problem", "BYO proxy URL invalid", None),
     "tier_unavailable": ErrorCode("tier_unavailable", 400, False, "problem", "Requested proxy tier unavailable", None),
+    "routing_mode_incoherent_claim_os": ErrorCode("routing_mode_incoherent_claim_os", 400, False, "problem", "routing_mode is not valid for this request", None),
     "rate_limited": ErrorCode("rate_limited", 429, True, "problem", "Rate limit exceeded", 5),
     "quota_backend_unavailable": ErrorCode("quota_backend_unavailable", 503, True, "problem", "Rate-limit service unavailable", 5),
     "pool_exhausted": ErrorCode("pool_exhausted", 503, True, "problem", "Proxy pool exhausted", 10),
@@ -60,7 +61,7 @@ ERROR_CODES: dict[str, ErrorCode] = {
     "internal_error": ErrorCode("internal_error", 500, True, "problem", "Internal server error", None),
     "target_http_error": ErrorCode("target_http_error", 200, False, "result", "Target returned an HTTP error", None),
     "navigation_failed": ErrorCode("navigation_failed", 200, False, "result", "Could not reach the target", None),
-    "blocked": ErrorCode("blocked", 200, True, "result", "Blocked by the target's anti-bot protection", None),
+    "blocked": ErrorCode("blocked", 200, True, "result", "The target site blocked the request.", None),
     "captcha_required": ErrorCode("captcha_required", 200, True, "result", "The target presented a CAPTCHA", None),
     "empty_content": ErrorCode("empty_content", 200, False, "result", "No extractable content", None),
 }

@@ -5,6 +5,7 @@ from kiota_abstractions.serialization import AdditionalDataHolder, Parsable, Par
 from typing import Any, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
+    from .wait_body_profile_id import WaitBody_profile_id
     from .wait_body_selector import WaitBody_selector
 
 @dataclass
@@ -15,9 +16,11 @@ class WaitBody(AdditionalDataHolder, Parsable):
     # The timeout_ms property
     timeout_ms: Optional[int] = 30000
     # The profile_id property
-    profile_id: Optional[str] = None
+    profile_id: Optional[WaitBody_profile_id] = None
     # The selector property
     selector: Optional[WaitBody_selector] = None
+    # The session_id property
+    session_id: Optional[str] = None
     
     @staticmethod
     def create_from_discriminator_value(parse_node: ParseNode) -> WaitBody:
@@ -35,13 +38,16 @@ class WaitBody(AdditionalDataHolder, Parsable):
         The deserialization information for the current model
         Returns: dict[str, Callable[[ParseNode], None]]
         """
+        from .wait_body_profile_id import WaitBody_profile_id
         from .wait_body_selector import WaitBody_selector
 
+        from .wait_body_profile_id import WaitBody_profile_id
         from .wait_body_selector import WaitBody_selector
 
         fields: dict[str, Callable[[Any], None]] = {
-            "profile_id": lambda n : setattr(self, 'profile_id', n.get_str_value()),
+            "profile_id": lambda n : setattr(self, 'profile_id', n.get_object_value(WaitBody_profile_id)),
             "selector": lambda n : setattr(self, 'selector', n.get_object_value(WaitBody_selector)),
+            "session_id": lambda n : setattr(self, 'session_id', n.get_str_value()),
             "timeout_ms": lambda n : setattr(self, 'timeout_ms', n.get_int_value()),
         }
         return fields
@@ -54,8 +60,9 @@ class WaitBody(AdditionalDataHolder, Parsable):
         """
         if writer is None:
             raise TypeError("writer cannot be null.")
-        writer.write_str_value("profile_id", self.profile_id)
+        writer.write_object_value("profile_id", self.profile_id)
         writer.write_object_value("selector", self.selector)
+        writer.write_str_value("session_id", self.session_id)
         writer.write_int_value("timeout_ms", self.timeout_ms)
         writer.write_additional_data_value(self.additional_data)
     

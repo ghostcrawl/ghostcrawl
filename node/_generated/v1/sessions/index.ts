@@ -25,21 +25,21 @@ export interface SessionsRequestBuilder extends BaseRequestBuilder<SessionsReque
      */
      byProfile_Id(profile_Id: string) : Profile_ItemRequestBuilder;
     /**
-     * cursor-paginated listing of active sessions. Sessions created by scrape workers and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
+     * cursor-paginated listing of active sessions. Sessions opened by scrape jobs and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<UntypedNode>}
      * @throws {HTTPValidationError} error when the service returns a 422 status code
      */
      get(requestConfiguration?: RequestConfiguration<SessionsRequestBuilderGetQueryParameters> | undefined) : Promise<UntypedNode | undefined>;
     /**
-     * cursor-paginated listing of active sessions. Sessions created by scrape workers and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
+     * cursor-paginated listing of active sessions. Sessions opened by scrape jobs and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */
      toGetRequestInformation(requestConfiguration?: RequestConfiguration<SessionsRequestBuilderGetQueryParameters> | undefined) : RequestInformation;
 }
 /**
- * cursor-paginated listing of active sessions. Sessions created by scrape workers and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
+ * cursor-paginated listing of active sessions. Sessions opened by scrape jobs and via the API are unified in the same listing, all sessions for your organisation are visible. Results are strictly; no cross-organisation sessions are returned.
  */
 export interface SessionsRequestBuilderGetQueryParameters {
     createdAtFrom?: string;

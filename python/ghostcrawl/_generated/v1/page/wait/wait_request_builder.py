@@ -32,7 +32,7 @@ class WaitRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: WaitBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Wait for selector / timeout
+        Wait for a selector (or a timed wait) on the page of a live cloud session. A selector that never appears returns 404 ``selector_not_found``; a plain timed wait returns ``state:"timeout"``.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -53,7 +53,7 @@ class WaitRequestBuilder(BaseRequestBuilder):
     
     def to_post_request_information(self,body: WaitBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Wait for selector / timeout
+        Wait for a selector (or a timed wait) on the page of a live cloud session. A selector that never appears returns 404 ``selector_not_found``; a plain timed wait returns ``state:"timeout"``.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

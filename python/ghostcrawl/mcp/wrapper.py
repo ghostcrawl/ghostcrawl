@@ -147,13 +147,21 @@ class GhostCrawlMCPClient:
     # Browser / navigation tools
     # ------------------------------------------------------------------
 
-    async def navigate(self, url: str, **kwargs: Any) -> Any:
-        """Navigate the current browser context to *url*."""
-        return await self._call("navigate", {"url": url, **kwargs})
+    async def navigate(self, url: str, *, humanize: bool = False, **kwargs: Any) -> Any:
+        """Navigate the current browser context to *url*.
 
-    async def act(self, goal: str, **kwargs: Any) -> Any:
-        """Perform a high-level browser action described by *goal*."""
-        return await self._call("act", {"goal": goal, **kwargs})
+        ``humanize`` (default ``False``) opts into human-like interaction
+        timing/motion for this call.
+        """
+        return await self._call("navigate", {"url": url, "humanize": humanize, **kwargs})
+
+    async def act(self, goal: str, *, humanize: bool = False, **kwargs: Any) -> Any:
+        """Perform a high-level browser action described by *goal*.
+
+        ``humanize`` (default ``False``) opts into human-like interaction
+        timing/motion for this call.
+        """
+        return await self._call("act", {"goal": goal, "humanize": humanize, **kwargs})
 
     async def observe(self, **kwargs: Any) -> Any:
         """Return an observation of the current browser state."""
@@ -202,6 +210,14 @@ class GhostCrawlMCPClient:
     async def eval(self, **kwargs: Any) -> Any:
         """Evaluate arbitrary JavaScript in the current page context."""
         return await self._call("eval", kwargs)
+
+    async def page_mouse(self, ops: list, **kwargs: Any) -> Any:
+        """Replay a mouse op-stream (move/down/up/wheel/dwell) as real pointer input on the live page."""
+        return await self._call("page_mouse", {"ops": ops, **kwargs})
+
+    async def page_arrival(self, dest_url: str, source_url: str, **kwargs: Any) -> Any:
+        """Arrive at a URL through a native link click (native document.referrer + Sec-Fetch headers)."""
+        return await self._call("page_arrival", {"dest_url": dest_url, "source_url": source_url, **kwargs})
 
     async def run_script(self, **kwargs: Any) -> Any:
         """Run a pre-defined browser script by name."""
@@ -372,7 +388,7 @@ class GhostCrawlMCPClient:
     # ------------------------------------------------------------------
 
     async def unblock(self, url: str, **kwargs: Any) -> Any:
-        """Retrieve *url* reliably through the managed browser fleet."""
+        """Retrieve *url* reliably through managed browsers."""
         return await self._call("unblock", {"url": url, **kwargs})
 
     # ------------------------------------------------------------------

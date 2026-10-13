@@ -66,7 +66,7 @@ class StorageStatesRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: StorageStatesPostRequestBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        snapshot browser storage state from a live session. Captures the current cookies, localStorage, and session storage from the named active profile and saves it encrypted under the given name. Returns storage state metadata on success (credentials are never returned). Storage blobs over 5 MB return storage_state_too_large (400).
+        snapshot browser storage state from a live session. Captures the current cookies, localStorage, and session storage from the named active profile and saves it encrypted under the given name. Returns storage state metadata on success (credentials are never returned). Storage blobs over 5 MB return storage_state_too_large (400). Pass ``session_id`` to capture from a live cloud session; on a self-hosted deployment ``profile_id`` alone captures from the local active page.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -98,7 +98,7 @@ class StorageStatesRequestBuilder(BaseRequestBuilder):
     
     def to_post_request_information(self,body: StorageStatesPostRequestBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        snapshot browser storage state from a live session. Captures the current cookies, localStorage, and session storage from the named active profile and saves it encrypted under the given name. Returns storage state metadata on success (credentials are never returned). Storage blobs over 5 MB return storage_state_too_large (400).
+        snapshot browser storage state from a live session. Captures the current cookies, localStorage, and session storage from the named active profile and saves it encrypted under the given name. Returns storage state metadata on success (credentials are never returned). Storage blobs over 5 MB return storage_state_too_large (400). Pass ``session_id`` to capture from a live cloud session; on a self-hosted deployment ``profile_id`` alone captures from the local active page.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

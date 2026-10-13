@@ -32,7 +32,7 @@ class ScrollRequestBuilder(BaseRequestBuilder):
     
     async def post(self,body: ScrollBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        Scroll page
+        Scroll the page of a live cloud session. Tier and ownership checks mirror /v1/cdp/input.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -53,7 +53,7 @@ class ScrollRequestBuilder(BaseRequestBuilder):
     
     def to_post_request_information(self,body: ScrollBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        Scroll page
+        Scroll the page of a live cloud session. Tier and ownership checks mirror /v1/cdp/input.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation

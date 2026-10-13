@@ -1023,8 +1023,11 @@ export class PageClient {
 
     /** Evaluate an expression in the live page context — POST /v1/page/eval. */
     async eval(expression: string, fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // §0.6 facade-drift fix: the API EvalBody field is `script`, NOT `expression`
+        // (parity/sdk_surface_contract.json / page_routes.py EvalBody). The method arg
+        // stays `expression` for ergonomics but the wire body must send `script`.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        return callKiota(this._v1.page.eval.post(makeBody({ expression, ...fields })));
+        return callKiota(this._v1.page.eval.post(makeBody({ script: expression, ...fields })));
     }
 
     /** Capture the live page's network HAR log — POST /v1/page/har. */
@@ -1052,6 +1055,39 @@ export class PageClient {
     async wait(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return callKiota(this._v1.page.wait.post(makeBody(fields)));
+    }
+
+    /**
+     * Replay a mouse op-stream on the live page — POST /v1/page/mouse.
+     * `ops` is an ordered list of `{ kind: "move" | "down" | "up" | "wheel" | "dwell", ... }`
+     * driven natively on the live page (engine-agnostic: the same trusted trajectory +
+     * settled click on every engine). Extra fields (e.g. `session_id`) pass through.
+     */
+    async mouse(ops: Array<Record<string, unknown>>, fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.mouse.post(makeBody({ ops, ...fields })));
+    }
+
+    /**
+     * Arrive at `destUrl` through a native link click from `sourceUrl` — POST /v1/page/arrival.
+     * The live page's `document.referrer`, `Referer` and `Sec-Fetch-*` are produced natively
+     * by the click (engine-agnostic). Optional fields: `referrer_shape` ("origin" | "full",
+     * default "origin"), `source_title`, `session_id`.
+     */
+    async arrival(destUrl: string, sourceUrl: string, fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.arrival.post(makeBody({ dest_url: destUrl, source_url: sourceUrl, ...fields })));
+    }
+
+    /**
+     * Visit a URL in a real new tab of the session's context, read it briefly, then close it
+     * (the session continues on its original tab) — POST /v1/page/tab-visit.
+     * e.g. `{ url, dwell_s: 3, session_id }`. Chrome engine only; other engines report
+     * `unsupported`.
+     */
+    async tabVisit(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.tabVisit.post(makeBody(fields)));
     }
 }
 

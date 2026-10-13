@@ -37,6 +37,7 @@ export const ERROR_CODES: Record<string, ErrorCodeMeta> = {
     conflict: { code: "conflict", http: 409, retryable: false, channel: "problem", title: "Resource conflict", retryAfter: null },
     byo_proxy_invalid: { code: "byo_proxy_invalid", http: 422, retryable: false, channel: "problem", title: "BYO proxy URL invalid", retryAfter: null },
     tier_unavailable: { code: "tier_unavailable", http: 400, retryable: false, channel: "problem", title: "Requested proxy tier unavailable", retryAfter: null },
+    routing_mode_incoherent_claim_os: { code: "routing_mode_incoherent_claim_os", http: 400, retryable: false, channel: "problem", title: "routing_mode is not valid for this request", retryAfter: null },
     rate_limited: { code: "rate_limited", http: 429, retryable: true, channel: "problem", title: "Rate limit exceeded", retryAfter: 5 },
     quota_backend_unavailable: { code: "quota_backend_unavailable", http: 503, retryable: true, channel: "problem", title: "Rate-limit service unavailable", retryAfter: 5 },
     pool_exhausted: { code: "pool_exhausted", http: 503, retryable: true, channel: "problem", title: "Proxy pool exhausted", retryAfter: 10 },
@@ -49,7 +50,7 @@ export const ERROR_CODES: Record<string, ErrorCodeMeta> = {
     internal_error: { code: "internal_error", http: 500, retryable: true, channel: "problem", title: "Internal server error", retryAfter: null },
     target_http_error: { code: "target_http_error", http: 200, retryable: false, channel: "result", title: "Target returned an HTTP error", retryAfter: null },
     navigation_failed: { code: "navigation_failed", http: 200, retryable: false, channel: "result", title: "Could not reach the target", retryAfter: null },
-    blocked: { code: "blocked", http: 200, retryable: true, channel: "result", title: "Blocked by the target's anti-bot protection", retryAfter: null },
+    blocked: { code: "blocked", http: 200, retryable: true, channel: "result", title: "The target site blocked the request.", retryAfter: null },
     captcha_required: { code: "captcha_required", http: 200, retryable: true, channel: "result", title: "The target presented a CAPTCHA", retryAfter: null },
     empty_content: { code: "empty_content", http: 200, retryable: false, channel: "result", title: "No extractable content", retryAfter: null },
 };

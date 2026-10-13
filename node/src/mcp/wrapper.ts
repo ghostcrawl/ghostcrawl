@@ -389,7 +389,7 @@ export class GhostCrawlMCPClient {
 
   // ─── Unblock Tool ─────────────────────────────────────────────
 
-  /** Retrieve a URL reliably through the managed browser fleet. Required: url. */
+  /** Retrieve a URL reliably through managed browsers. Required: url. */
   async unblock(params: { url: string; [key: string]: unknown }): Promise<unknown> {
     return this.callTool("unblock", params);
   }

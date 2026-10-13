@@ -9,6 +9,7 @@ class ErrorCode(str, Enum):
     Conflict = "conflict",
     Byo_proxy_invalid = "byo_proxy_invalid",
     Tier_unavailable = "tier_unavailable",
+    Routing_mode_incoherent_claim_os = "routing_mode_incoherent_claim_os",
     Rate_limited = "rate_limited",
     Quota_backend_unavailable = "quota_backend_unavailable",
     Pool_exhausted = "pool_exhausted",

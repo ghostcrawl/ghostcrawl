@@ -167,8 +167,8 @@ details.
 This document covers ghostcrawl's model provider configuration surface. A few
 clarifications on scope:
 
-- **Not proxy configuration**: residential proxy selection and exit routing is
-  an operator-deploy concern. See the operator deployment guide for proxy
+- **Not proxy configuration**: proxy/egress configuration is managed
+  server-side. See the operator deployment guide for proxy
   configuration.
 - **Not a request-level override per step**: `provider_config` is per-instance
   (SDK) or per-process (env var). Per-step LLM routing is not supported.

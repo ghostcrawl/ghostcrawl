@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ghostcrawl"
-version = "2.3.6"
+version = "2.3.7"
 description = "Official Python SDK for the GhostCrawl local orchestration API."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -76,7 +76,25 @@ where = ["."]
 # would silently drop ghostcrawl/_generated from the wheel. This also survives kiota
 # regeneration, which never emits __init__.py.
 include = ["ghostcrawl*"]
-exclude = ["tests*", "examples*", "ghostcrawl.tests*"]
+# Explicit moat excludes (defense-in-depth): build_internal_wheel.sh injects
+# operator-internal subpackages (notably ghostcrawl/human/) into THIS same source
+# tree at build time to produce the vendored operator wheel. An interrupted or
+# misinvoked public build must NEVER be able to ship those to PyPI, so each
+# operator-internal subpackage is named here as a hard exclude in addition to the
+# `include` allowlist. ghostcrawl.agent.raw* is listed pre-emptively (no such
+# package exists in the public tree today) so a future operator raw-agent surface
+# cannot leak through the generic `ghostcrawl*` include.
+exclude = [
+  "tests*",
+  "examples*",
+  "ghostcrawl.tests*",
+  
+  "ghostcrawl.human*",
+  "ghostcrawl.fleet*",
+  "ghostcrawl.behavior*",
+  "ghostcrawl.soul*",
+  "ghostcrawl.agent.raw*",
+]
 namespaces = true
 
 [tool.ruff]
