@@ -24,8 +24,9 @@ ghostcrawl search "best web scraping api"
 ghostcrawl me
 ```
 
-The same `ghostcrawl` command also drives the self-host image (`init`, `install`,
-`start`, `stop`, `status`, `updates`, `upgrade`, `uninstall`) — see the
-[self-host guide](../../docs/usage-selfhost.md).
+Point the same CLI at a local self-host by setting `base_url` /
+`GHOSTCRAWL_BASE_URL` to `http://localhost:47700` and using the per-boot token
+from `LOCAL_ADMIN_READY` — see the [self-host guide](../../docs/usage-selfhost.md).
+Container lifecycle is Docker (`docker run` / Compose), not separate CLI verbs.
 
 Run `ghostcrawl --help` for the full command list.

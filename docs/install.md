@@ -1,12 +1,11 @@
 # Install
 
-ghostcrawl ships two ways to install: the SDKs (for talking to the managed
-cloud) and the CLI-driven self-host image (for running locally). Both come from
-the same packages.
+GhostCrawl ships SDKs (talk to the managed cloud or a local self-host) and a
+self-host Docker image (run the engines on your machine).
 
 ---
 
-## SDKs (cloud)
+## SDKs (cloud or local API)
 
 **Python:**
 
@@ -14,7 +13,8 @@ the same packages.
 pip install ghostcrawl
 ```
 
-Requires Python 3.10+.
+Requires Python 3.10+. Also installs the `ghostcrawl` CLI for API commands
+(`scrape`, `crawl`, `extract`, …).
 
 **Node:**
 
@@ -24,54 +24,41 @@ npm install @ghostcrawl/sdk
 
 Requires Node.js 18+.
 
-The Python package also installs the `ghostcrawl` CLI used for self-hosting.
+Store a cloud key once:
+
+```bash
+ghostcrawl init   # prompts for gck_live_… ; writes ./ghostcrawl.toml
+```
 
 ---
 
 ## Self-host (Docker)
 
-The self-host install is an 8-verb flow. Each verb maps 1:1 to a CLI subcommand.
-
-| Verb | What it does |
-|------|--------------|
-| `init` | Prompt for your API key; store it in your OS keychain. |
-| `install` | Exchange the key for a pull token; pull and verify the image. |
-| `start` | Launch the container with a local API, MCP, and dashboard. |
-| `stop` | Stop and remove the container. |
-| `status` | Show container state, API health, and your tier/quota. |
-| `updates` | Check the cloud for a newer image tag (non-blocking). |
-| `upgrade` | Stop, install the new tag, and start. |
-| `uninstall` | Remove the container, image, and local config. |
-
-### First run
+Canonical path — pull and run the image:
 
 ```bash
-ghostcrawl init        # stores your API key in the OS keychain
-ghostcrawl install     # pulls + verifies the container image
-ghostcrawl start       # launches locally
-ghostcrawl status      # confirms it is healthy
+docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
 ```
+
+Full flags (EULA, key, tmpfs, health, first scrape):
+[Self-host usage](usage-selfhost.md) and
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
+
+Compose template: [`docker-compose.yml.template`](../docker-compose.yml.template)
+(requires a host tmpfs with `exec` — see the comments in that file).
 
 ### Requirements
 
 - A container runtime (Docker or Podman).
-- A valid API key. Sign up to obtain one — the key gates the image, and the
-  self-host runtime validates it online every time it starts.
-- Outbound network access to the ghostcrawl API for the start-time license
-  check (there is no offline mode).
+- An API key from your [account](https://app.ghostcrawl.io) (or a license key).
+- Outbound access to GhostCrawl for the start-time license check.
+- ~2 GB RAM for `/run/gc`.
 
-### Getting a key
-
-Create an account, verify your email, log in, and mint an API key from your
-dashboard. That key is what `ghostcrawl init` stores.
-
----
-
-## Verifying
+### Verifying
 
 ```bash
-ghostcrawl status
+curl http://localhost:47700/healthz
+# {"status":"ok"}
 ```
 
-A healthy instance reports the container as running, the local API as reachable,
-and your current tier and quota usage.
+Open the dashboard: `http://localhost:47700/dashboard`.

@@ -9,8 +9,12 @@ export GHOSTCRAWL_API_KEY="YOUR_API_KEY"
 
 Get a key from your dashboard at [ghostcrawl.io](https://ghostcrawl.io). All
 examples target the managed cloud at `https://api.ghostcrawl.io`. To run them
-against a self-hosted instance, point the SDK at `http://localhost:8000` (see the
+against a self-hosted instance, point the SDK at `http://localhost:47700` (see the
 [self-host guide](../docs/usage-selfhost.md)).
+
+Want to see the shape of a response before writing code? Open the live
+[playground](https://ghostcrawl.io/#playground) — scrape, extract, screenshot,
+crawl, and more, with copy-paste SDK snippets.
 
 | Directory | Surface |
 |-----------|---------|

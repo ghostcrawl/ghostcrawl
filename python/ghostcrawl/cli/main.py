@@ -340,82 +340,80 @@ def _validate_key(api_key: str, base_url: str) -> None:
 # ---------------------------------------------------------------------------
 
 # Customer-safe image tag — never expose engine codenames or internal mechanics
-# on this surface (self-host ships as ghostcrawl:2.3.6).
-_SELF_HOST_IMAGE = "ghostcrawl:2.3.6"
-_SELF_HOST_BASE_URL = "http://localhost:8080"
+# on this surface (self-host ships as ghostcrawl:2.3.7 on get.ghostcrawl.io).
+_SELF_HOST_IMAGE = "get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7"
+_SELF_HOST_BASE_URL = "http://localhost:47700"
 
 _SELF_HOST_CONFIG_TEMPLATE = f"""# GhostCrawl self-host configuration.
-# The SDK/CLI talks to your local GhostCrawl container — no cloud key required.
-# Point base_url at wherever you expose the container (default below).
+# Point base_url at your local container (default 47700).
 base_url = "{_SELF_HOST_BASE_URL}"
 
-# A self-host deployment does not need a cloud API key. If your deployment is
-# configured to require one, uncomment and set it here (kept out of version control):
-# api_key = "your-self-host-key"
+# After the container prints LOCAL_ADMIN_READY, put that per-boot token here
+# (or export GHOSTCRAWL_API_KEY) so `ghostcrawl scrape` hits localhost:
+# api_key = "YOUR_LOCAL_TOKEN"  # pragma: allowlist secret
 """
 
 _SELF_HOST_ENV_TEMPLATE = """# GhostCrawl self-host environment.
-# Copy/edit as needed, then `docker compose up -d`.
+# See https://docs.ghostcrawl.io/self-host
 
-# Host port the API is published on (matches base_url in ghostcrawl.toml).
-HOST_PORT=8080
-
-# License key for your self-host deployment (obtain from your account portal).
-GHOSTCRAWL_LICENSE_KEY=
+GHOSTCRAWL_EULA_ACCEPTED=1
+# Prefer your account API key (gck_live_…) — exchanged for an engine license at boot:
+GHOSTCRAWL_API_KEY=
+# Or set a license JWT directly instead:
+# GHOSTCRAWL_LICENSE_KEY=
 """
 
 _SELF_HOST_COMPOSE_TEMPLATE = f"""# GhostCrawl self-host stack.
-# Start with:  docker compose up -d
-# Then point the SDK/CLI at http://localhost:8080 (see ghostcrawl.toml).
+# Compose cannot use an exec-capable tmpfs via `tmpfs:` — bind a host tmpfs first:
+#   sudo mkdir -p /mnt/gc-onefile
+#   sudo mount -t tmpfs -o size=2g,mode=1777,exec gc-onefile /mnt/gc-onefile
+# Prefer the simpler `docker run --tmpfs …,exec` recipe in docs.ghostcrawl.io/self-host.
+# Start:  docker compose up -d
+# Then:   docker compose logs -f | grep LOCAL_ADMIN_READY
 services:
   ghostcrawl:
     image: {_SELF_HOST_IMAGE}
     restart: unless-stopped
     ports:
-      - "${{HOST_PORT:-8080}}:8080"
+      - "47700:47700"
     environment:
+      GHOSTCRAWL_EULA_ACCEPTED: "${{GHOSTCRAWL_EULA_ACCEPTED:-1}}"
+      GHOSTCRAWL_API_KEY: "${{GHOSTCRAWL_API_KEY:-}}"
       GHOSTCRAWL_LICENSE_KEY: "${{GHOSTCRAWL_LICENSE_KEY:-}}"
-    # The onefile extracts to an exec-capable tmpfs at runtime.
-    tmpfs:
-      - /run/gc:mode=1777,exec
-    healthcheck:
-      test: ["CMD", "python3", "/healthz"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
+      GHOSTCRAWL_LOCAL_PORT: "47700"
+    volumes:
+      - /mnt/gc-onefile:/run/gc
+      - gc-data:/data
+volumes:
+  gc-data:
 """
 
 _SELF_HOST_README_TEMPLATE = f"""# GhostCrawl self-host kit
 
-This directory contains everything you need to run GhostCrawl locally and point
-the SDK/CLI at it — no cloud account required.
+Run the local image and point the SDK/CLI at `{_SELF_HOST_BASE_URL}`.
 
 ## Files
 
-- `docker-compose.yml` — the {_SELF_HOST_IMAGE} service.
-- `.env` — host port and license key.
-- `ghostcrawl.toml` — SDK/CLI config with `base_url` pointed at your local instance.
+- `docker-compose.yml` — `{_SELF_HOST_IMAGE}` (needs host tmpfs bind — see file comments).
+- `.env` — EULA + API key (or license key).
+- `ghostcrawl.toml` — SDK/CLI `base_url` for localhost.
 
-## Run it
+## Easiest run (recommended)
 
 ```bash
-# 1. Set your license key (and any options) in .env
-#    GHOSTCRAWL_LICENSE_KEY=...
-
-# 2. Start the stack
-docker compose up -d
-
-# 3. Verify it is healthy
-docker compose ps
-
-# 4. Use the SDK/CLI against your local instance (reads ./ghostcrawl.toml)
-ghostcrawl scrape https://example.com
+docker run --rm -d --name ghostcrawl \\
+  -p 47700:47700 \\
+  --tmpfs /run/gc:size=2g,mode=1777,exec \\
+  -v gc-data:/data \\
+  -e GHOSTCRAWL_EULA_ACCEPTED=1 \\
+  -e GHOSTCRAWL_API_KEY=gck_live_YOUR_KEY \\  # pragma: allowlist secret
+  {_SELF_HOST_IMAGE}
 ```
 
-The SDK resolves configuration with the precedence
-`GHOSTCRAWL_API_KEY` env > `./ghostcrawl.toml` (this file) > `~/.config`.
-Because `base_url` here points at `{_SELF_HOST_BASE_URL}`, every request stays
-on your machine.
+Then `docker logs ghostcrawl | grep LOCAL_ADMIN_READY`, put that token in
+`ghostcrawl.toml` / `GHOSTCRAWL_API_KEY`, and `ghostcrawl scrape https://example.com`.
+
+Full guide: https://docs.ghostcrawl.io/self-host
 """
 
 
@@ -482,8 +480,11 @@ def init(
         for path in written:
             typer.echo(f"  {path}")
         typer.echo(
-            "Next: set GHOSTCRAWL_LICENSE_KEY in .env, run `docker compose up -d`, "
-            "then `ghostcrawl scrape https://example.com`."
+            "Next: set GHOSTCRAWL_API_KEY (or LICENSE_KEY) in .env, prefer "
+            "`docker run --tmpfs /run/gc:size=2g,mode=1777,exec …` from "
+            "https://docs.ghostcrawl.io/self-host (Compose needs a host tmpfs "
+            "bind), then put the LOCAL_ADMIN_READY token in ghostcrawl.toml and "
+            "`ghostcrawl scrape https://example.com`."
         )
         return
 

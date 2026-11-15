@@ -21,7 +21,9 @@ scrapers get reliable page results without managing a single browser, queue, or 
 [![Engines](https://img.shields.io/badge/engines-Chrome%20%C2%B7%20Firefox%20%C2%B7%20WebKit-0f172a.svg)](#capabilities)
 
 [Website](https://ghostcrawl.io) ·
-[Documentation](https://ghostcrawl.io) ·
+[Docs](https://docs.ghostcrawl.io) ·
+[Try it](https://ghostcrawl.io/#playground) ·
+[Ghostopia](https://ghostcrawl.io/ghostopia) ·
 [API](https://api.ghostcrawl.io) ·
 [MCP](https://mcp.ghostcrawl.io) ·
 [Examples](examples/)
@@ -118,7 +120,7 @@ pip install ghostcrawl
 ```python
 from ghostcrawl import GhostCrawl
 
-client = GhostCrawl(token="gck_live_YOUR_KEY")
+client = GhostCrawl(token="gck_live_YOUR_KEY")  # or api_key=…
 result = client.scrape(url="https://example.com", format="markdown")
 print(result)
 ```
@@ -164,6 +166,23 @@ Every engine accepts an `engine` of `chrome`, `firefox`, or `webkit`, or `auto`
 to let GhostCrawl choose. Runnable versions of every snippet, plus crawl,
 extract, agent, and MCP examples, live in [`examples/`](examples/).
 
+Prefer clicking first? The site playground at
+[ghostcrawl.io/#playground](https://ghostcrawl.io/#playground) shows real
+scrape / extract / screenshot / crawl responses (cached engine output) with
+copy-paste SDK snippets — no key required to look.
+
+---
+
+## Ghostopia — see the workforce
+
+[Ghostopia](https://github.com/ghostcrawl/ghostopia) is a visual scraping
+workforce powered by GhostCrawl: a pixel-art town where every ghost is a real
+browser session. Type a product name, watch exact-match offers come back, export
+CSV/JSON.
+
+- Marketing preview: [ghostcrawl.io/ghostopia](https://ghostcrawl.io/ghostopia)
+- Run locally: clone → set your key → `make run` → http://localhost:8000
+
 ---
 
 ## Use it from an agent (MCP)
@@ -195,30 +214,39 @@ more, the same managed browsers behind the REST API. See
 Run GhostCrawl on your own machine. Your compute, your IP, your data.
 
 ```bash
-pip install ghostcrawl        # ships the CLI
-ghostcrawl init               # store your API key
-ghostcrawl install            # pull + verify the image
-ghostcrawl start              # launch locally
-ghostcrawl status             # confirm it's healthy
+docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
+
+docker run --rm -d --name ghostcrawl \
+  -p 47700:47700 \
+  --tmpfs /run/gc:size=2g,mode=1777,exec \
+  -v gc-data:/data \
+  -e GHOSTCRAWL_EULA_ACCEPTED=1 \
+  -e GHOSTCRAWL_API_KEY="gck_live_YOUR_KEY" \  # pragma: allowlist secret
+  get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
 ```
 
-A self-hosted instance exposes its own local API, MCP, and dashboard so you can
-drive and watch live sessions on your own hardware. The image validates your API
-key online each time it starts.
+Then open `http://localhost:47700/dashboard` and grab the per-boot API token from
+`docker logs ghostcrawl | grep LOCAL_ADMIN_READY`. Full guide:
+[docs/usage-selfhost.md](docs/usage-selfhost.md) ·
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
 
-Prefer Compose? See [`docker-compose.yml.template`](docker-compose.yml.template)
-and the [self-host guide](docs/usage-selfhost.md).
+Compose: [`docker-compose.yml.template`](docker-compose.yml.template) (needs a
+host tmpfs with `exec`).
+
+Free tier = **one browser per engine** + stock Windows Chrome / Windows Firefox /
+Mac Safari. **Self-host Plus ($9/mo)** or any paid plan unlocks more seats and
+premium routing / identities / behavior (buy in the cloud dashboard).
 
 > Managed exit routing is a cloud-only feature. Self-host requests egress from
-> your own machine's network.
+> your own machine's network unless you enable premium routing.
 
 ---
 
 ## Pricing
 
-The self-host image is free forever. On free self-host you can add **Self-host Plus
-($9/mo)** for premium routing, identities, and behavior — those are included free on
-every paid cloud plan.
+The self-host image is free forever (with the seat limits above). Add **Self-host
+Plus ($9/mo)** for more seats plus premium routing, identities, and behavior —
+those are included free on every paid cloud plan.
 
 Cloud plans are metered in **credits**. A request spends credits based on how much
 **data** it pulls and how hard the target is to reach, so cost scales with the work:
