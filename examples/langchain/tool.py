@@ -8,9 +8,9 @@ The tools read your key from the GHOSTCRAWL_API_KEY environment variable and
 default to https://api.ghostcrawl.io.
 """
 
-from ghostcrawl_langchain import GhostcrawlScrapeTool
+from ghostcrawl_langchain import GhostCrawlScrapeTool
 
-scrape = GhostcrawlScrapeTool()
+scrape = GhostCrawlScrapeTool()
 
 # Returns the page content (Markdown by default) plus metadata.
 print(scrape.invoke({"url": "https://example.com"}))

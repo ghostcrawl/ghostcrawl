@@ -45,7 +45,7 @@ A running instance serves everything on a single local port (`47700`):
 Point an SDK at your local instance by overriding the base URL:
 
 ```python
-client = GhostcrawlClient(api_key="YOUR_API_KEY", base_url="http://localhost:47700")
+client = GhostCrawl(api_key="YOUR_API_KEY", base_url="http://localhost:47700")
 ```
 
 Live browser viewing and control are available locally — it is your own

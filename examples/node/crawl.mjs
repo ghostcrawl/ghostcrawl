@@ -4,9 +4,9 @@
 //   export GHOSTCRAWL_API_KEY=YOUR_API_KEY
 //   node crawl.mjs
 
-import { GhostcrawlClient } from '@ghostcrawl/sdk';
+import { GhostCrawlClient } from '@ghostcrawl/sdk';
 
-const client = new GhostcrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY });
+const client = new GhostCrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY });
 
 // Start the crawl and wait for it in one call. This is event-driven: the server
 // blocks until the run is terminal (completed/failed/cancelled) or the timeout

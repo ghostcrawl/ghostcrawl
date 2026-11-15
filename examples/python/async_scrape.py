@@ -8,7 +8,7 @@
 import asyncio
 import os
 
-from ghostcrawl import AsyncGhostcrawlClient
+from ghostcrawl import AsyncGhostCrawl
 
 URLS = [
     "https://example.com",
@@ -18,9 +18,9 @@ URLS = [
 
 
 async def main() -> None:
-    async with AsyncGhostcrawlClient(api_key=os.environ["GHOSTCRAWL_API_KEY"]) as client:
+    async with AsyncGhostCrawl(api_key=os.environ["GHOSTCRAWL_API_KEY"]) as client:
         results = await asyncio.gather(
-            *(client.page.scrape(url=url, engine="auto") for url in URLS)
+            *(client.scrape(url=url, engine="auto") for url in URLS)
         )
         for url, result in zip(URLS, results):
             print(url, "->", result)

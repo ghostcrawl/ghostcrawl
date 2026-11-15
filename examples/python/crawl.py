@@ -8,11 +8,11 @@
 import asyncio
 import os
 
-from ghostcrawl import GhostcrawlClient
+from ghostcrawl import AsyncGhostCrawl
 
 
 async def main() -> None:
-    async with GhostcrawlClient(api_key=os.environ["GHOSTCRAWL_API_KEY"]) as client:
+    async with AsyncGhostCrawl(api_key=os.environ["GHOSTCRAWL_API_KEY"]) as client:
         # Start the crawl and wait for it in one call. This is event-driven:
         # the server blocks until the run is terminal (completed/failed/
         # cancelled) or the timeout elapses — there is no client poll loop.

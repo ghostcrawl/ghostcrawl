@@ -4,9 +4,9 @@
 //   export GHOSTCRAWL_API_KEY=YOUR_API_KEY
 //   node scrape.mjs
 
-import { GhostcrawlClient } from '@ghostcrawl/sdk';
+import { GhostCrawlClient } from '@ghostcrawl/sdk';
 
-const client = new GhostcrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY });
+const client = new GhostCrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY });
 
-const result = await client.page.scrape({ url: 'https://example.com', engine: 'chrome' });
+const result = await client.scrape({ url: 'https://example.com', engine: 'chrome' });
 console.log(result);

@@ -12,7 +12,7 @@ tool-calling agent.
 
 from ghostcrawl_langchain import (
     GhostcrawlExtractTool,
-    GhostcrawlScrapeTool,
+    GhostCrawlScrapeTool,
     GhostcrawlSearchTool,
 )
 from langchain.agents import AgentExecutor, create_tool_calling_agent
@@ -20,7 +20,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
 tools = [
-    GhostcrawlScrapeTool(),
+    GhostCrawlScrapeTool(),
     GhostcrawlSearchTool(),
     GhostcrawlExtractTool(),
 ]

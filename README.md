@@ -116,9 +116,9 @@ pip install ghostcrawl
 ```
 
 ```python
-from ghostcrawl import GhostcrawlClient
+from ghostcrawl import GhostCrawl
 
-client = GhostcrawlClient(token="gck_live_YOUR_KEY")
+client = GhostCrawl(token="gck_live_YOUR_KEY")
 result = client.scrape(url="https://example.com", format="markdown")
 print(result)
 ```
@@ -130,9 +130,9 @@ npm install @ghostcrawl/sdk
 ```
 
 ```typescript
-import { GhostcrawlClient } from '@ghostcrawl/sdk';
+import { GhostCrawlClient } from '@ghostcrawl/sdk';
 
-const client = new GhostcrawlClient({ token: 'gck_live_YOUR_KEY' });
+const client = new GhostCrawlClient({ token: 'gck_live_YOUR_KEY' });
 const result = await client.scrape({ url: 'https://example.com', format: 'markdown' });
 console.log(result);
 ```
@@ -154,9 +154,9 @@ pip install ghostcrawl-langchain
 import os
 os.environ["GHOSTCRAWL_API_KEY"] = "YOUR_API_KEY"
 
-from ghostcrawl_langchain import GhostcrawlScrapeTool
+from ghostcrawl_langchain import GhostCrawlScrapeTool
 
-tool = GhostcrawlScrapeTool()
+tool = GhostCrawlScrapeTool()
 print(tool.invoke({"url": "https://example.com"}))
 ```
 

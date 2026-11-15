@@ -4,9 +4,9 @@
 //   export GHOSTCRAWL_API_KEY=YOUR_API_KEY
 //   node extract.mjs
 
-import { GhostcrawlClient } from '@ghostcrawl/sdk';
+import { GhostCrawlClient } from '@ghostcrawl/sdk';
 
-const client = new GhostcrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY });
+const client = new GhostCrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY });
 
 const result = await client.page.extract({
   url: 'https://example.com',

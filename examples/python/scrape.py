@@ -7,9 +7,9 @@
 
 import os
 
-from ghostcrawl import GhostcrawlClient
+from ghostcrawl import GhostCrawl
 
-client = GhostcrawlClient(api_key=os.environ["GHOSTCRAWL_API_KEY"])
+client = GhostCrawl(api_key=os.environ["GHOSTCRAWL_API_KEY"])
 
-result = client.page.scrape(url="https://example.com", engine="chrome")
+result = client.scrape(url="https://example.com", engine="chrome")
 print(result)

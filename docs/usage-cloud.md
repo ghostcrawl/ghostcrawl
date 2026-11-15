@@ -12,15 +12,15 @@ Every request sends your API key as a bearer token. Get a key by signing up,
 verifying your email, logging in, and minting one from your dashboard.
 
 ```python
-from ghostcrawl import GhostcrawlClient
+from ghostcrawl import GhostCrawl
 
-client = GhostcrawlClient(api_key="YOUR_API_KEY")
+client = GhostCrawl(api_key="YOUR_API_KEY")
 ```
 
 ```typescript
-import { GhostcrawlClient } from '@ghostcrawl/sdk';
+import { GhostCrawlClient } from '@ghostcrawl/sdk';
 
-const client = new GhostcrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY! });
+const client = new GhostCrawlClient({ apiKey: process.env.GHOSTCRAWL_API_KEY! });
 ```
 
 The default base URL is the managed API. You only override it when pointing the
@@ -31,12 +31,12 @@ SDK at a self-hosted instance.
 ## Scrape a page
 
 ```python
-result = client.page.scrape(url="https://example.com", engine="chrome")
+result = client.scrape(url="https://example.com", engine="chrome")
 print(result)
 ```
 
 ```typescript
-const result = await client.page.scrape({ url: 'https://example.com', engine: 'chrome' });
+const result = await client.scrape({ url: 'https://example.com', engine: 'chrome' });
 console.log(result);
 ```
 
@@ -48,7 +48,7 @@ The public engine set is `chrome`, `firefox`, and `webkit`. Use `auto` to let
 the orchestrator choose the best engine for the request.
 
 ```python
-result = client.page.scrape(url="https://example.com", engine="auto")
+result = client.scrape(url="https://example.com", engine="auto")
 ```
 
 ---
@@ -58,9 +58,9 @@ result = client.page.scrape(url="https://example.com", engine="auto")
 Point any agent at `mcp.ghostcrawl.io` with your API key and start crawling.
 
 ```python
-from ghostcrawl.mcp import GhostcrawlMCPClient
+from ghostcrawl.mcp import GhostCrawlMCPClient
 
-mcp = GhostcrawlMCPClient(mcp_url="https://mcp.ghostcrawl.io", api_key="YOUR_API_KEY")
+mcp = GhostCrawlMCPClient(mcp_url="https://mcp.ghostcrawl.io", api_key="YOUR_API_KEY")
 await mcp.connect()
 await mcp.navigate(url="https://example.com")
 await mcp.act(goal="Find the contact email")
