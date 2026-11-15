@@ -243,10 +243,10 @@ pip install ghostcrawl-langchain
 ```
 
 ```python
-from ghostcrawl_langchain import GhostCrawlScrape, GhostCrawlSearch
+from ghostcrawl_langchain import GhostCrawlScrapeTool, GhostCrawlSearchTool
 
-scrape_tool = GhostCrawlScrape()
-search_tool = GhostCrawlSearch()
+scrape_tool = GhostCrawlScrapeTool()
+search_tool = GhostCrawlSearchTool()
 ```
 
 ## Self-hosted

@@ -1089,6 +1089,25 @@ export class PageClient {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return callKiota(this._v1.page.tabVisit.post(makeBody(fields)));
     }
+
+    /**
+     * Dismiss overlay popups on the live page — POST /v1/page/close-popups.
+     * Optional fields: `keep_host`, `session_id`, `profile_id`.
+     */
+    async closePopups(fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.closePopups.post(makeBody(fields)));
+    }
+
+    /**
+     * Replay a touch op-stream on the live page — POST /v1/page/touch.
+     * `ops` is an ordered list of native tap/gesture ops (engine-agnostic). Extra fields
+     * (e.g. `session_id`) pass through.
+     */
+    async touch(ops: Array<Record<string, unknown>>, fields: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        return callKiota(this._v1.page.touch.post(makeBody({ ops, ...fields })));
+    }
 }
 
 /**

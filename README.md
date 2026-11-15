@@ -216,14 +216,15 @@ and the [self-host guide](docs/usage-selfhost.md).
 
 ## Pricing
 
-The self-host image is free forever. Cloud plans are metered in **credits**. A request spends
-credits based on how much **data** it pulls and how hard the target is to reach, so cost scales
-with the work: light pages on standard targets use the fewest credits, while large or
-media-heavy pages and protected (premium) targets use more, all from one balance.
-You're only charged for what your jobs actually use, so a month of light crawling stretches much
-further than the same run of heavy, protected jobs. Every paid cloud plan routes the hard targets
-through our premium network automatically, with nothing to buy and nothing to wire. Top up anytime;
-top-ups never expire.
+The self-host image is free forever. On free self-host you can add **Self-host Plus
+($9/mo)** for premium routing, identities, and behavior — those are included free on
+every paid cloud plan.
+
+Cloud plans are metered in **credits**. A request spends credits based on how much
+**data** it pulls and how hard the target is to reach, so cost scales with the work:
+light pages on standard targets use the fewest credits, while large or media-heavy
+pages and protected targets use more, all from one balance. You're only charged for
+what your jobs actually use. Top up anytime; top-ups never expire.
 
 See [ghostcrawl.io](https://ghostcrawl.io) for the full, current pricing.
 

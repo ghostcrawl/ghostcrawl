@@ -251,9 +251,8 @@ const mcp = new GhostCrawlMCPClient({
   apiKey: "gck_live_YOUR_KEY",
 });
 
-await mcp.connect();
+// Connectionless — each call opens a short MCP session; no connect()/close().
 const nav = await mcp.navigate({ url: "https://example.com" });
-await mcp.close();
 ```
 
 ## All resources

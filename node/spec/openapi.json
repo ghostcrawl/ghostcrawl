@@ -554,6 +554,16 @@
       },
       "ClosePopupsBody": {
         "properties": {
+          "detect_only": {
+            "default": false,
+            "title": "Detect Only",
+            "type": "boolean"
+          },
+          "interact": {
+            "default": false,
+            "title": "Interact",
+            "type": "boolean"
+          },
           "keep_host": {
             "anyOf": [
               {
@@ -614,7 +624,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).",
+            "description": "Operator-only: force identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Deliberately manufactures an IP<->timezone mismatch, so it is restricted to operator/admin accounts and ignored (warned) otherwise. Default off (geo follows the exit); country pinning via identity_country stays available on plans that include geo selection.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -1097,16 +1107,16 @@
             ],
             "type": "string"
           },
-          "issued_at": {
-            "type": "integer"
-          },
-          "lane": {
-            "type": "string"
-          },
           "identity_layer": {
             "enum": [
               "managed"
             ],
+            "type": "string"
+          },
+          "issued_at": {
+            "type": "integer"
+          },
+          "lane": {
             "type": "string"
           },
           "receipt_id": {
@@ -1269,7 +1279,7 @@
         "type": "object"
       },
       "ExtractRequest": {
-        "description": "POST /v1/extract request body, schema-driven extraction (deterministic) + bring-your-own-model extraction. Two extraction modes: - Deterministic (default, model_provider absent): native structured-data extraction, reads the schema.org JSON-LD / microdata / Open Graph a page already embeds and fills the schema (no model, no third party); returns whole priced product grids. Requires 'schema'. Returns {\"url\",\"data\",\"token_estimate\"}. - Bring-your-own-model (model_provider present): GhostCrawl fetches and prepares clean Markdown; your connected model performs the semantic extraction (you are not billed for model inference here, only the request quota). Returns {\"urls\",\"data\",\"token_estimate\"}. Security notes: - The 'schema' field is validated before any fetch (fail-fast input guard). - URLs are validated against private, loopback, and metadata targets before any fetch. - Error responses never echo the schema body, fetched content, or model credentials. - model_provider.api_key is request-scoped only: never persisted, logged, or returned in any response body or error message.",
+        "description": "POST /v1/extract request body, schema-driven extraction (deterministic) + connected-model extraction. Two extraction modes: - Deterministic (default, model_provider absent): native structured-data extraction, reads the schema.org JSON-LD / microdata / Open Graph a page already embeds and fills the schema (no model, no third party); returns whole priced product grids. Requires 'schema'. Returns {\"url\",\"data\",\"token_estimate\"}. - Connected model (model_provider present): GhostCrawl fetches and prepares clean Markdown; your connected model performs the semantic extraction (you are not billed for model inference here, only the request quota). Returns {\"urls\",\"data\",\"token_estimate\"}. Security notes: - The 'schema' field is validated before any fetch (fail-fast input guard). - URLs are validated against private, loopback, and metadata targets before any fetch. - Error responses never echo the schema body, fetched content, or model credentials. - model_provider.api_key is request-scoped only: never persisted, logged, or returned in any response body or error message.",
         "properties": {
           "behavior_actions": {
             "anyOf": [
@@ -1284,7 +1294,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO behavior: trusted-input actions replayed on the loaded page instead of the built-in human session. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
+            "description": "Custom page actions replayed on the loaded page instead of the built-in human session. Sanitized + bounded server-side (max 256 actions). Available on every plan.",
             "title": "Behavior Actions"
           },
           "engine": {
@@ -1301,7 +1311,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Override geo-coherence: use `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. Requires a pinned `identity_country` (and the geo_select tier). Off by default, the default is IP-coherent geo (the browser identity follows the exit). Forcing may create an IP<->timezone mismatch that some sites cross-check; opt-in at your own risk.",
+            "description": "Operator-only: force `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. This deliberately manufactures an IP<->timezone mismatch, so it is restricted to operator/admin accounts and is ignored (with a warning) for everyone else. Off by default, the default is IP-coherent geo (the browser identity follows the exit); country pinning via `identity_country` stays available on plans that include geo selection.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -1329,7 +1339,7 @@
                 "type": "null"
               }
             ],
-            "description": "Inline identity specification (Creates an ephemeral identity). Same shape as /v1/scrape: {operating system, browser, viewport|device_model}. Absent → default identity.",
+            "description": "Inline identity specification (Creates an ephemeral identity). Same shape as the /v1/scrape identity object (os class, browser, viewport or device model, see /v1/scrape for exact fields). Absent → default identity.",
             "title": "Identity Spec"
           },
           "language": {
@@ -1354,7 +1364,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO model credentials dict: {type, api_key, model, base_url?}. When present → BYO-LLM extraction path (GhostCrawl bills the request, not the inference tokens, inference runs on the user's connected model). When absent → deterministic native structured-data extraction (default): schema.org JSON-LD / microdata / Open Graph parsed into the schema, no model.",
+            "description": "Connected-model credentials: {type, api_key, model, base_url?}. When present → your model runs the semantic extraction (GhostCrawl bills the request, not inference tokens). When absent → deterministic native structured-data extraction (default): schema.org JSON-LD / microdata / Open Graph parsed into the schema, no model.",
             "title": "Model Provider"
           },
           "prompt": {
@@ -1379,7 +1389,7 @@
                 "type": "null"
               }
             ],
-            "description": "JSON Schema describing the desired extraction output. Required for deterministic extraction (model_provider absent). Optional for BYO-LLM extraction (model_provider present), when provided, the LLM is instructed to respond in JSON-mode conforming to this schema.",
+            "description": "JSON Schema describing the desired extraction output. Required for deterministic extraction (model_provider absent). Optional when using a connected model (model_provider present), when provided, the model is instructed to respond in JSON-mode conforming to this schema.",
             "title": "Schema"
           },
           "url": {
@@ -1574,7 +1584,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).",
+            "description": "Operator-only: force identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Deliberately manufactures an IP<->timezone mismatch, so it is restricted to operator/admin accounts and ignored (warned) otherwise. Default off (geo follows the exit); country pinning via identity_country stays available on plans that include geo selection.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -1786,6 +1796,54 @@
         "required": [
           "server"
         ],
+        "type": "object"
+      },
+      "RTOfferBody": {
+        "properties": {
+          "sdp": {
+            "maxLength": 131072,
+            "minLength": 1,
+            "title": "Sdp",
+            "type": "string"
+          },
+          "token": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Token",
+            "type": "string"
+          },
+          "viewport": {
+            "$ref": "#/components/schemas/RTViewportBody"
+          }
+        },
+        "required": [
+          "token",
+          "sdp",
+          "viewport"
+        ],
+        "title": "RTOfferBody",
+        "type": "object"
+      },
+      "RTViewportBody": {
+        "properties": {
+          "height": {
+            "maximum": 4096,
+            "minimum": 64,
+            "title": "Height",
+            "type": "integer"
+          },
+          "width": {
+            "maximum": 4096,
+            "minimum": 64,
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "title": "RTViewportBody",
         "type": "object"
       },
       "RetryDeliveryResponse": {
@@ -2022,7 +2080,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO behavior: a list of trusted-input actions replayed on the loaded page instead of the built-in human session. Each item is {\"kind\":\"move\",\"x\":int,\"y\":int} | {\"kind\":\"wheel\",\"x\":int,\"y\":int,\"dy\":int} | {\"kind\":\"dwell\",\"ms\":int}. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
+            "description": "Custom page actions replayed on the loaded page instead of the built-in human session. Each item is {\"kind\":\"move\",\"x\":int,\"y\":int} | {\"kind\":\"wheel\",\"x\":int,\"y\":int,\"dy\":int} | {\"kind\":\"dwell\",\"ms\":int}. Sanitized + bounded server-side (max 256 actions). Available on every plan.",
             "title": "Behavior Actions"
           },
           "chunk_tokens": {
@@ -2030,6 +2088,20 @@
             "description": "Maximum tokens per markdown chunk. Clamped server-side to [256, 32768] regardless of caller input.",
             "title": "Chunk Tokens",
             "type": "integer"
+          },
+          "device": {
+            "default": "random",
+            "description": "Device class for the population identity draw (FINDING-118). 'random' (default) = unchanged. The random_* classes restrict which real-population devices may be drawn (weights inside the class unchanged); with engine 'auto' the engine follows the drawn device (iOS -> webkit always, android -> chrome). An engine the class cannot render on -> 422 device_engine_mismatch. Not combinable with identity / profile; identity_spec's operating system must lie inside the class. For a fixed device use profile=<name>. Cloud only: where no population draw runs (self-host / direct egress) a non-random class -> 422 device_unsupported.",
+            "enum": [
+              "random",
+              "random_desktop",
+              "random_mobile",
+              "random_windows",
+              "random_android",
+              "random_ios"
+            ],
+            "title": "Device",
+            "type": "string"
           },
           "engine": {
             "default": "auto",
@@ -2062,7 +2134,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Override geo-coherence: use `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. Requires a pinned `identity_country` (and the geo_select tier). Off by default, the default is IP-coherent geo (the browser identity follows the exit). Forcing may create an IP<->timezone mismatch that some sites cross-check; opt-in at your own risk.",
+            "description": "Operator-only: force `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. This deliberately manufactures an IP<->timezone mismatch, so it is restricted to operator/admin accounts and is ignored (with a warning) for everyone else. Off by default, the default is IP-coherent geo (the browser identity follows the exit); country pinning via `identity_country` stays available on plans that include geo selection.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -2132,7 +2204,7 @@
                 "type": "null"
               }
             ],
-            "description": "Named persistent profile (multi-accounting). Resolves to a durable identity_id (→ the same browser identity every time) + optional saved storage_state (→ cookies/localStorage) for the calling org. Reuses the exact identity+cookies on every request, with no 30-minute sticky-session expiry. 404 if the named profile does not exist for the org.",
+            "description": "Named persistent profile (multi-accounting). Resolves to a durable identity_id (→ the same browser identity every time) + optional saved storage_state (→ cookies/localStorage) for the calling org. Reuses the exact identity+cookies on every request, with no short same-session token expiry. 404 if the named profile does not exist for the org.",
             "title": "Profile"
           },
           "proxy": {
@@ -2144,7 +2216,7 @@
                 "type": "null"
               }
             ],
-            "description": "Bring-your-own proxy URL. Schemes: socks5, socks5h, http, https. Any credentials in the URL are redacted from logs. Example: socks5://user:pass@host:1080.",
+            "description": "Your own proxy URL. Schemes: socks5, socks5h, http, https. Any credentials in the URL are redacted from logs. Example: socks5://host:1080. Include credentials in the URL when your provider requires them.",
             "title": "Proxy"
           },
           "routing_mode": {
@@ -2185,7 +2257,7 @@
                 "type": "null"
               }
             ],
-            "description": "Sticky-session token (paid tiers). Requests sharing a token reuse the same identity → same exit + cookies (returning-visitor coherence). Bounded TTL; opaque [A-Za-z0-9._-], max 128 chars.",
+            "description": "Same-session token (paid plans). Requests that share a token reuse the same browser identity, network exit, and cookies (returning visitor). Bounded TTL; opaque [A-Za-z0-9._-], max 128 chars.",
             "title": "Session"
           },
           "stream": {
@@ -2225,6 +2297,7 @@
                 "items": {
                   "type": "string"
                 },
+                "maxItems": 100,
                 "type": "array"
               },
               {
@@ -2358,7 +2431,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).",
+            "description": "Operator-only: force identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Deliberately manufactures an IP<->timezone mismatch, so it is restricted to operator/admin accounts and ignored (warned) otherwise. Default off (geo follows the exit); country pinning via identity_country stays available on plans that include geo selection.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -2619,6 +2692,52 @@
       },
       "SessionCreateRequest": {
         "properties": {
+          "bandwidth_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bandwidth Class"
+          },
+          "cdp": {
+            "default": false,
+            "description": "Wait for a CDP/WS endpoint before returning. Chromium always does; for firefox/webkit the create returns as soon as the browser context is ready.",
+            "title": "Cdp",
+            "type": "boolean"
+          },
+          "device": {
+            "default": "random",
+            "description": "Device class for the population identity draw (FINDING-118). 'random' (default) = the unchanged population draw for the requested engine. 'random_desktop' (windows/macos/linux), 'random_mobile' (ios/android), 'random_windows', 'random_android', 'random_ios' restrict WHICH real-population devices may be drawn; the weights inside the class stay the real OS/browser/device shares. When engine is omitted (or 'auto') the engine is routed from the drawn device: iOS -> webkit (always), android -> chrome, desktop -> chrome/firefox/webkit per the real browser share. An explicit engine the class cannot render on (e.g. random_ios + chrome) is rejected with 422 device_engine_mismatch, never re-routed. NOTE: an explicitly sent engine='chrome' counts as explicit even though it equals the default, so a client that always serializes engine must send 'auto' (or omit it) with random_ios / random_mobile. With identity_config/profile the operating system must lie inside the class (422 device_identity_mismatch). 'static' pins ONE fixed device: pass device_seed (the same seed always yields the same device and a byte-stable fingerprint), or a profile, or an identity_config carrying reuse_identity_seed (422 device_static_requires_seed otherwise).",
+            "enum": [
+              "random",
+              "random_desktop",
+              "random_mobile",
+              "random_windows",
+              "random_android",
+              "random_ios",
+              "static"
+            ],
+            "title": "Device",
+            "type": "string"
+          },
+          "device_seed": {
+            "anyOf": [
+              {
+                "maximum": 9223372036854776000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "device='static' only: a stable non-negative integer, scoped to YOUR organization (the server derives the identity from org + seed, so another org's seed 1 is a different device). Seeds the population device draw AND pins the fingerprint, so every create from this org with the same seed (and engine) is the same device. Store it to bring the same device back.",
+            "title": "Device Seed"
+          },
           "engine": {
             "default": "chrome",
             "enum": [
@@ -2630,6 +2749,11 @@
             "title": "Engine",
             "type": "string"
           },
+          "humanize": {
+            "default": false,
+            "title": "Humanize",
+            "type": "boolean"
+          },
           "identity_config": {
             "anyOf": [
               {
@@ -2640,6 +2764,7 @@
                 "type": "null"
               }
             ],
+            "description": "Explicit identity claim (IdentityRequest shape: operating system, browser, device_model, viewport, locale, timezone, reuse_identity_seed). viewport is optional: a desktop claim (windows/macos/linux) without viewport defaults to \"any\" (a prevalence-weighted real windowed size for that claim, the same draw as the population default). A mobile claim (ios/android) takes its viewport from device_model; without device_model a prevalence-weighted catalog device is drawn. Omit identity_config entirely to draw a population identity for the requested engine. reuse_identity_seed (returning visitor): send back the `reuse_identity_seed` value a previous create from YOUR org returned to get the same device again; it is scoped to your organization server-side (another org sending the same value gets an unrelated device). identity_id is NOT a replay handle; a non-integer value is ignored (fresh device).",
             "title": "Identity Config"
           },
           "identity_country": {
@@ -3389,10 +3514,95 @@
   "info": {
     "description": "The GhostCrawl web data API: scrape, crawl, search, and extract any URL with real browser engines and consistent identity profiles.",
     "title": "GhostCrawl API",
-    "version": "2.3.6"
+    "version": "2.3.7"
   },
   "openapi": "3.1.0",
   "paths": {
+    "/v1/agent": {
+      "post": {
+        "description": "BETA / opt-in. The REST agent lane is disabled by default and returns 404 until enabled for your account/deployment, see the 404 response below. The agent capability is generally available via the MCP `ghostcrawl_agent` tool; this REST surface is still stabilising. Contact support to enable it.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Task policy failed, task URL failed gateway policy, proxy failed policy, or tenant/workspace proxy constraint"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "example": "Not Found",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Returned when the agent capability is not enabled for this account or deployment. The agent lane runs server-side orchestration, the navigate / act / observe steps execute on GhostCrawl's managed browsers, and calls your bring-your-own (BYO) LLM for the reasoning step via the `X-LLM-Api-Key` / `X-LLM-Provider` request headers. While the capability is not enabled the route returns 404 (indistinguishable from a non-existent route, for; once enabled it returns the agent execution envelope. The BYO LLM is the only part you supply, the orchestration itself is hosted."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CapacityExhausted429"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AgentBudgetExceededEnvelope"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Either capacity exhausted (Retry-After header present, CapacityExhausted429 body) or per-session max_total_llm_calls budget exceeded (X-Ghostcrawl-Warning: budget-exceeded).",
+            "headers": {
+              "Retry-After": {
+                "$ref": "#/components/headers/RetryAfter"
+              },
+              "X-Ghostcrawl-Warning": {
+                "schema": {
+                  "enum": [
+                    "budget-exceeded"
+                  ],
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Startup config-preflight gate blocked request handling"
+          }
+        },
+        "summary": "Start agent lane request (beta, opt-in; 404 until enabled for your account)",
+        "x-beta": true
+      }
+    },
     "/v1/cdp/frame": {
       "post": {
         "description": "Capture a JPEG frame of a live browser session. Returns a single base64-encoded JPEG frame of a live interactive session. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {\"format\":\"jpeg\",\"data\":\"<base64>\",\"engine\",\"width\",\"height\"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.",
@@ -7440,6 +7650,257 @@
         ]
       }
     },
+    "/v1/realtime/capabilities": {
+      "get": {
+        "description": "Report whether the real-time interactive browser is usable for THIS caller. The flagship WebRTC view (`browserling-live.tsx`, self-host AND cloud) reads this before it offers, so it can render the live surface, an upsell, or a \"not configured\" panel without a failed offer round-trip. - `interactive`: the realtime-gateway is configured on this instance AND the caller is entitled (operator god-mode, or the `interactive_session` grant). The UI shows the live surface only when this is true. - `entitled`: the per-tenant grant alone (so the cloud UI can distinguish \"upgrade\" from \"not deployed here\"). - `reason`: why `interactive` is false (`gateway_unavailable` | `capability_not_granted`). - `transport`: always `webrtc` (the JPEG-poll path is retired on the customer surface). - `turn`: whether TURN/ICE relay servers are configured (cloud NAT); self-host loopback = false. - `ice_servers`: the STUN/TURN servers the browser must build its RTCPeerConnection WITH (before createOffer) so a cross-NAT viewer gathers srflx/relay candidates. Only returned to an entitled caller on a configured instance (the same creds the offer answer already echoes); empty otherwise.",
+        "operationId": "realtime_capabilities_v1_realtime_capabilities_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Realtime Capabilities V1 Realtime Capabilities Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Realtime Capabilities",
+        "tags": [
+          "realtime"
+        ]
+      }
+    },
+    "/v1/realtime/{session_id}/close": {
+      "post": {
+        "description": "Tear down the WebRTC peer for a session (best-effort, idempotent). Gate: same ownership check as the offer 404). Relays to the gateway's `/internal/close/{sid}` so the server-side peer + capture loop stop promptly, and clears the guard key so a fresh view can be opened without waiting for the token TTL. Never raises on a gateway miss, the client has already dropped its peer; this only reclaims server resources eagerly.",
+        "operationId": "realtime_close_v1_realtime__session_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Realtime Close V1 Realtime  Session Id  Close Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Realtime Close",
+        "tags": [
+          "realtime"
+        ]
+      }
+    },
+    "/v1/realtime/{session_id}/offer": {
+      "post": {
+        "description": "Begin a real-time interactive session: exchange SDP, return the gateway answer.",
+        "operationId": "realtime_offer_v1_realtime__session_id__offer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTOfferBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Realtime Offer V1 Realtime  Session Id  Offer Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Realtime Offer",
+        "tags": [
+          "realtime"
+        ]
+      }
+    },
     "/v1/recordings": {
       "get": {
         "description": "cursor pagination. items[*] shape unchanged. created_at_from > created_at_to → 400 (not 422).",
@@ -9174,7 +9635,7 @@
     },
     "/v1/selfhost/byo/proxy": {
       "put": {
-        "description": "**Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{\"proxies\": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system`` (CLAUDE.md residential-proxy rule). Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.",
+        "description": "**Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{\"proxies\": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system``. Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.",
         "operationId": "put_selfhost_byo_proxy_v1_selfhost_byo_proxy_put",
         "requestBody": {
           "content": {
@@ -9607,7 +10068,7 @@
     },
     "/v1/sessions/{session_id}": {
       "get": {
-        "description": "return the session lease record (org-owned) or 404. Reads; a missing lease OR a cross-org lease → 404). tenant_id is not echoed.",
+        "description": "return the session record (org-owned) or 404. A missing record OR a cross-org record → 404). tenant_id is not echoed.",
         "operationId": "get_session_v1_sessions__session_id__get",
         "parameters": [
           {
@@ -9677,7 +10138,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Get a session by id (lease)",
+        "summary": "Get a session by id",
         "tags": [
           "sessions"
         ]
@@ -9851,7 +10312,7 @@
     },
     "/v1/sessions/{session_id}/release": {
       "post": {
-        "description": "unpin the session and free the slot. Reads session, verifies org ownership, then writes back `pinned=False` + `released_at=<epoch>`.",
+        "description": "unpin the session and free the slot. Verifies org ownership, then marks the session unpinned (`pinned=False` + `released_at=<epoch>`). The session record is not deleted, its lifetime is managed automatically; we only unpin.",
         "operationId": "release_session_v1_sessions__session_id__release_post",
         "parameters": [
           {
@@ -9922,6 +10383,83 @@
           }
         ],
         "summary": "Release/unpin a sticky session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{session_id}/step": {
+      "post": {
+        "operationId": "session_step_v1_sessions__session_id__step_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Drive one step (navigate) on a live session",
         "tags": [
           "sessions"
         ]
@@ -10178,7 +10716,7 @@
     },
     "/v1/sessions/{session_id}/terminate": {
       "post": {
-        "description": "end the session by deleting its lease. Owner-checked against the lease (cross-org → 404,. Unlike /release (which only unpins), terminate removes the lease so the session is gone; any live browser behind it is then torn down on the next cleanup sweep. Idempotent-ish: a second terminate → 404 (already gone).",
+        "description": "end the session. Owner-checked (cross-org → 404,. Unlike /release (which only unpins), terminate removes the session record so the session is gone; any live browser behind it is then torn down on the next cleanup sweep. Idempotent-ish: a second terminate → 404 (already gone).",
         "operationId": "terminate_session_v1_sessions__session_id__terminate_post",
         "parameters": [
           {
@@ -10248,7 +10786,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Terminate a session (delete the lease)",
+        "summary": "Terminate a session",
         "tags": [
           "sessions"
         ]

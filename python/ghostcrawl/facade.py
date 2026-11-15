@@ -1389,6 +1389,33 @@ class PageClient:
         }
         return await _resolve_response(self._core.v1.page.arrival.post(body))
 
+    async def tab_visit(self, **kwargs: typing.Any) -> dict:
+        """Visit a URL in a new tab, read briefly, then close it (POST /v1/page/tab-visit)."""
+        from ghostcrawl._generated.models.tab_visit_body import TabVisitBody
+
+        body = TabVisitBody()
+        body.additional_data = dict(kwargs)
+        return await _resolve_response(self._core.v1.page.tab_visit.post(body))
+
+    async def close_popups(self, **kwargs: typing.Any) -> dict:
+        """Dismiss overlay popups on the live page (POST /v1/page/close-popups)."""
+        from ghostcrawl._generated.models.close_popups_body import ClosePopupsBody
+
+        body = ClosePopupsBody()
+        body.additional_data = dict(kwargs)
+        return await _resolve_response(self._core.v1.page.close_popups.post(body))
+
+    async def touch(self, ops: list, **kwargs: typing.Any) -> dict:
+        """Replay a touch op-stream on the live page (POST /v1/page/touch).
+
+        ``ops`` is an ordered list of tap/gesture ops driven natively on the live page
+        (engine-agnostic)."""
+        from ghostcrawl._generated.models.touch_body import TouchBody
+
+        body = TouchBody()
+        body.additional_data = {"ops": ops, **kwargs}
+        return await _resolve_response(self._core.v1.page.touch.post(body))
+
     async def upload(self, **kwargs: typing.Any) -> dict:
         """Attach a file to a file input on the live page (POST /v1/page/upload)."""
         from ghostcrawl._generated.models.upload_body import UploadBody

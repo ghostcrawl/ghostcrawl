@@ -71,6 +71,10 @@ your own compute, using your own IP. The managed cloud's automatic exit routing
 is a cloud-only feature — self-host requests egress from your machine's own
 network.
 
+Premium routing, identities, and behavior are available on self-host too. They
+are included free on every paid plan. On the free self-host tier you can add
+**Self-host Plus ($9/mo)** for the same capabilities.
+
 ---
 
 ## Updating
