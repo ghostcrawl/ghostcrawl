@@ -10,11 +10,11 @@ The Python SDK ships a typed wrapper over the MCP streamable-HTTP transport.
 import asyncio
 import os
 
-from ghostcrawl.mcp import GhostcrawlMCPClient
+from ghostcrawl.mcp import GhostCrawlMCPClient
 
 
 async def main() -> None:
-    mcp = GhostcrawlMCPClient(
+    mcp = GhostCrawlMCPClient(
         mcp_url="https://mcp.ghostcrawl.io",
         api_key=os.environ["GHOSTCRAWL_API_KEY"],
     )
