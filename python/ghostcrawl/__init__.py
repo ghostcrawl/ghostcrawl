@@ -1,7 +1,7 @@
 """GhostCrawl Python SDK — public package surface.
 
 The default client ``GhostCrawl`` is **synchronous** — it Just Works with no
-``await`` and no ``asyncio.run`` footgun, even inside Jupyter / a running event
+``await`` and no ``asyncio.run`` call, even inside Jupyter / a running event
 loop. It is a thin loop-thread bridge over the async facade
 :class:`ghostcrawl.facade.GhostCrawlClient` (exported as ``AsyncGhostCrawl``),
 which itself delegates all HTTP transport, auth, serialization, and model

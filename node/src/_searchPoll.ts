@@ -10,12 +10,11 @@
  * user writes zero poll code — same `wait: true` DX, different mechanism under
  * the hood.
  *
- * This is an INTERNAL module (never exported from the package index). It mirrors
- * the structure of the Python reference `_search_poll.py` and is unit-testable
- * in isolation from the Kiota generated core (it talks plain `fetch`).
+ * This helper is private to the package and is unit-tested in isolation (it
+ * talks plain `fetch`).
  */
 
-/** Terminal search-job states (mirrors the Python `SEARCH_TERMINAL_STATES`). */
+/** Terminal search-job states. */
 export const SEARCH_TERMINAL_STATES: ReadonlySet<string> = new Set([
     "completed",
     "done",

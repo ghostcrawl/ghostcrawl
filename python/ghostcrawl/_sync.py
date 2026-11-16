@@ -5,7 +5,7 @@ which makes ``print(client.scrape(url))`` return a bare coroutine ("was never
 awaited") — the #1 first-use DX cliff. :class:`SyncGhostCrawl` closes
 that cliff: it exposes the *same* surface synchronously so
 ``GhostCrawl(token=...).scrape(url)`` returns rendered content directly, with no
-``await`` and no ``asyncio.run`` footgun.
+``await`` and no ``asyncio.run`` call.
 
 Mechanism (the standard sync-over-async bridge used by mature async-first
 SDKs): a single long-lived event loop runs on a private **daemon** thread;
@@ -41,7 +41,7 @@ class _SyncSubClient:
     default client we wrap each coroutine-returning call through the same
     loop-thread bridge so ``client.sessions.create(...)`` returns a result
     directly — never a bare un-awaited coroutine (the sync-first contract;
-    no "coroutine was never awaited" footgun on the sub-client surface either).
+    so sub-client calls never return an un-awaited coroutine either).
     Non-coroutine attributes pass through unchanged.
     """
 
@@ -155,8 +155,8 @@ class SyncGhostCrawl:
         round-trip entirely: at interpreter shutdown the daemon loop-thread may
         already be stopping, an unbounded ``fut.result()`` there blocks forever,
         and the OS reclaims the socket on exit regardless. Skipping it kills the
-        "plain quickstart script hangs on exit" footgun (no context manager
-        in the canonical quickstart).
+        a plain quickstart script hanging on exit when no context manager is
+        used.
         """
         if self._closed:
             return

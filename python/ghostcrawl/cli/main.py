@@ -327,7 +327,7 @@ def _validate_key(api_key: str, base_url: str) -> None:
     if _probe_me_no_spend(api_key, base_url):
         return
     # Real auth path — a minimal scrape of a trivial URL via the sync client
-    # (no per-call asyncio.run; the footgun the CLI used to carry).
+    # (no per-call asyncio.run).
     client = GhostCrawl(token=api_key, base_url=base_url)
     try:
         client.scrape(url="https://example.com", render_js=False)

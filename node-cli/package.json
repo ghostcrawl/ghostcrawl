@@ -2,9 +2,27 @@
   "name": "@ghostcrawl/cli",
   "version": "2.3.7",
   "description": "GhostCrawl command-line interface",
+  "homepage": "https://github.com/ghostcrawl/ghostcrawl",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghostcrawl/ghostcrawl.git",
+    "directory": "sdks/node-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/ghostcrawl/ghostcrawl/issues"
+  },
+  "author": "GhostCrawl, LLC",
+  "keywords": [
+    "ghostcrawl",
+    "cli",
+    "scrape",
+    "crawl",
+    "extract",
+    "browser"
+  ],
   "type": "module",
   "bin": {
-    "ghostcrawl": "./dist/index.js"
+    "ghostcrawl": "dist/index.js"
   },
   "files": [
     "dist/",
@@ -13,10 +31,12 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && chmod +x dist/index.js",
-    "test": "vitest run"
+    "prepublishOnly": "npm run build && npm test",
+    "test": "vitest run",
+    "test:parity": "vitest run --config vitest.parity.config.ts"
   },
   "dependencies": {
-    "@ghostcrawl/sdk": "^2.3.1",
+    "@ghostcrawl/sdk": "^2.3.7",
     "commander": "^14.0.3"
   },
   "devDependencies": {

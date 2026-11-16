@@ -1865,7 +1865,7 @@ class GhostCrawlClient:
     Kiota-generated canonical core (``_generated/``). This facade is the shipped API.
 
     Most users want the **synchronous default** :class:`~ghostcrawl.GhostCrawl`
-    instead — it Just Works with no ``await`` and no ``asyncio.run`` footgun::
+    instead — no ``await`` and no ``asyncio.run`` needed::
 
         from ghostcrawl import GhostCrawl
         client = GhostCrawl(token="gck_live_YOUR_KEY")
@@ -2870,7 +2870,7 @@ class GhostCrawlClient:
         except _KiotaAPIError as exc:
             raise _translate_kiota_error(exc) from exc
         # ``/v1/content`` serves the same rendered-output shape as ``scrape``
-        # (parity lane ``scrape``) — wrap as a typed, dict-accessible ScrapeResult.
+        # Wrap as a typed, dict-accessible ScrapeResult.
         return wrap_scrape(_bytes_to_dict(raw))
 
     def with_retries(self, n: int) -> GhostCrawlClient:

@@ -2,7 +2,7 @@
 
 ``from ghostcrawl import GhostCrawl`` now gives a **synchronous** client
 (:class:`ghostcrawl._sync.SyncGhostCrawl`) so ``GhostCrawl(token=...).scrape(url)``
-returns rendered content directly — no ``await``, no ``asyncio.run`` footgun
+returns rendered content directly — no ``await`` and no ``asyncio.run`` call
 . ``Client`` is the same sync default.
 
 The async facade (:class:`ghostcrawl.facade.GhostCrawlClient`) remains the

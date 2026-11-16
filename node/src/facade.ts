@@ -1,23 +1,9 @@
 /**
- * GhostCrawl idiomatic facade — delegates to the Kiota-generated canonical core.
+ * GhostCrawl client facade — the idiomatic TypeScript API over the generated core.
  *
- * Architecture:
- *   _generated/ Kiota core  — spec-faithful 98-op request-builder metadata, models, auth/transport
- *   This FACADE              — thin ergonomic layer that calls the generated builders
- *
- * Delegation contract:
- *   - All URL templates, HTTP methods, error mappings, and serialization metadata
- *     come from the _generated/ Kiota core (src/_generated/v1/ builders).
- *   - The facade constructs request bodies using the Kiota additionalData mechanism
- *     (the Kiota serializer writes all additional-data fields as top-level JSON keys).
- *   - Auth: BaseBearerTokenAuthenticationProvider + static AccessTokenProvider.
- *   - Transport: @microsoft/kiota-http-fetchlibrary FetchRequestAdapter.
- *
- * Note on body construction: The Kiota-generated model classes use a typed request-builder
- * pattern. We use the `additionalData` body mechanism (Kiota's serialization path that
- * writes all additional-data fields as top-level JSON keys) which is equivalent to
- * constructing the typed model instances. This keeps the facade independent of generated
- * model import churn when the spec changes. See sdks/FACADE-PATTERN.md for the design.
+ * URL templates, HTTP methods, serialization, and error mapping come from the
+ * generated request builders; this layer adds ergonomic methods and typed
+ * results. Transport is the shared authenticated `request()` path.
  *
  * Usage:
  *   ```typescript
@@ -536,19 +522,14 @@ function buildV1Core(token: string, baseUrl: string): V1Builder {
 // ---------------------------------------------------------------------------
 // Typed-but-index-accessible results
 //
-// Every per-lane result is BOTH statically typed (discoverable canonical fields)
-// AND index-accessible (`result["identity_id"]`) via the `[k: string]: unknown`
-// index signature, so existing callers that treat a result as a plain object
-// keep working unchanged while new code gets typed field access. The field names
-// are the SINGLE source of truth in parity/sdk_surface_contract.json (`lanes.*`)
-// and MUST be byte-identical across all seven SDKs. The raw Kiota `_generated/`
-// models are NEVER exposed to the user — the facade returns these owned
-// types. NB: these are structural TS interfaces (zero runtime cost); an
-// unwrapped response object IS one of these once cast, so index access to any
-// extra/unknown server field is preserved.
+// Each result is statically typed (discoverable fields) AND index-accessible
+// (`result["extra_field"]`) via the `[k: string]: unknown` signature, so callers
+// that treat a result as a plain object keep working unchanged. Raw generated
+// models are never exposed. These are structural TS interfaces with zero
+// runtime cost; index access to extra server fields is preserved.
 // ---------------------------------------------------------------------------
 
-/** Result of `scrape` / `content` — parity lane `scrape`. */
+/** Result of `scrape` / `content`. */
 export interface ScrapeResult {
     status?: string;
     /** Cross-format alias for the rendered output (markdown/html/text). */
@@ -564,7 +545,7 @@ export interface ScrapeResult {
     [k: string]: unknown;
 }
 
-/** Result of `search` — parity lane `search`. */
+/** Result of `search`. */
 export interface SearchResult {
     status?: string;
     results?: unknown[];
@@ -573,7 +554,7 @@ export interface SearchResult {
     [k: string]: unknown;
 }
 
-/** A crawl run — parity lane `crawl`. Returned by `crawl` / `crawlRuns.*`. */
+/** A crawl run, returned by `crawl` / `crawlRuns.*`. */
 export interface CrawlRun {
     run_id?: string;
     status?: string;
@@ -581,7 +562,17 @@ export interface CrawlRun {
     [k: string]: unknown;
 }
 
-/** A single crawled/searched document — parity lane `document`. */
+/**
+ * A crawl run as returned by {@link CrawlRunsClient.start}. `run_id` is always
+ * present on a successful start, so the documented
+ * `const { run_id } = await client.crawlRuns.start(...)` flow type-checks without
+ * a cast — the id can go straight into `wait(run_id)`.
+ */
+export interface CrawlRunStarted extends CrawlRun {
+    run_id: string;
+}
+
+/** A single crawled or searched document. */
 export interface Document {
     title?: string;
     url?: string;
@@ -590,10 +581,10 @@ export interface Document {
 }
 
 /**
- * Binary lane result (`pdf` / `screenshot`) — parity lanes `pdf` / `screenshot`.
+ * Binary result for `pdf` / `screenshot`.
+ *
  * The binary methods return a raw `Uint8Array` for back-compat; this interface
- * documents the canonical parity field names (`bytes`, `content_type`) shared
- * across all seven SDKs.
+ * documents the fields (`bytes`, `content_type`) used by the other SDKs.
  */
 export interface BinaryResult {
     bytes?: Uint8Array;
@@ -674,7 +665,7 @@ export class CrawlRunsClient {
      * `wait_until: "completed"`, bounded by `timeout` seconds, default 300) and
      * receive the finished run with results — no client poll loop required.
      */
-    async start(options: CrawlStartOptions): Promise<Record<string, unknown>> {
+    async start(options: CrawlStartOptions): Promise<CrawlRunStarted> {
         const { url, maxDepth = 3, maxPages = 100, includePatterns, wait = false, timeout = 300, ...rest } = options;
         const fields: Record<string, unknown> = {
             ...rest,
@@ -692,11 +683,12 @@ export class CrawlRunsClient {
             fields.wait_until = "completed";
             fields.timeout_s = timeout;
             if (this._request) {
-                return (await this._request("POST", "/v1/crawl-runs", fields)) as Record<string, unknown>;
+                return (await this._request("POST", "/v1/crawl-runs", fields)) as CrawlRunStarted;
             }
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        return callKiota(this._v1.crawlRuns.post(makeBody(fields)));
+        const started = await callKiota(this._v1.crawlRuns.post(makeBody(fields)));
+        return started as CrawlRunStarted;
     }
 
     /** List crawl runs. Delegates to GET /v1/crawl-runs. */

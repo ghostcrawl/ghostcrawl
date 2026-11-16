@@ -107,7 +107,7 @@ extend-exclude = [
 [tool.ruff.lint]
 # Meaningful rule set for the hand-written surface — catches real bugs, not just
 # style. F=pyflakes (undefined names, unused imports), E/W=pycodestyle,
-# I=isort (import order), UP=pyupgrade (modern syntax), B=bugbear (real footguns).
+# I=isort (import order), UP=pyupgrade (modern syntax), B=bugbear (bug-prone patterns).
 select = ["F", "E", "W", "I", "UP", "B"]
 ignore = [
   "E501",  # line-length is formatter's job; long strings/URLs are fine.

@@ -1,38 +1,41 @@
 /**
- * W6 (2026-10-24) — Playwright / Puppeteer drop-in adapters over GhostCrawl BYO endpoints.
+ * Playwright / Puppeteer adapters for GhostCrawl browser sessions.
  *
- * WHY
- * ---
- * Our product surface was Python + MCP + HTTP. A customer who already drove browsers with
- * Playwright or Puppeteer had NO drop-in path — they had to re-write against our verbs. These
- * adapters close that gap **client-side**: they mint a session, resolve its connect endpoint, and
- * hand back the one string the customer's own library already understands. No engine fork, no
- * local browser download, no class monkey-patching — the engine stays ours, on our fleet.
+ * These helpers mint a session, resolve its connect endpoint, and return the string your
+ * own client library already understands — no engine fork, no local browser download, no
+ * monkey-patching.
  *
- * PROTOCOL PARITY (ADR-004 — no facades)
- * --------------------------------------
- * - chromium → real Chrome CDP (`protocol: "cdp"`). Works with
- *   `puppeteer.connect({ browserWSEndpoint })` AND `chromium.connectOverCDP(url)`.
- * - firefox / webkit → native Playwright-wire (`protocol: "playwright-wire"`, ByoWireServer).
- *   Works with `playwright.firefox.connect(url)` / `playwright.webkit.connect(url)`.
- * - puppeteer-core speaks **Chrome CDP only**. It cannot attach to FF/WK. We refuse that
- *   footgun up front (and the wire server fails closed with `protocol_mismatch` if a CDP
- *   client still dials the FF/WK URL). Inventing a CDP facade over Juggler/Inspector is
- *   forbidden nonsense.
+ * Protocols:
+ * - chromium → Chrome CDP (`protocol: "cdp"`). Works with
+ *   `puppeteer.connect({ browserWSEndpoint })` and `chromium.connectOverCDP(url)`.
+ * - firefox / webkit → Playwright-wire (`protocol: "playwright-wire"`). Works with
+ *   `playwright.firefox.connect(url)` / `playwright.webkit.connect(url)`.
  *
- * TWO NON-NEGOTIABLE RULES THIS MODULE ENFORCES
- * ---------------------------------------------
- * 1. **locale / timezoneId are warn-and-IGNORED.** Both are CDP *emulation* knobs and are
- *    detectably different from a real device that simply *is* in that locale. They travel
- *    inside the identity request instead.
- * 2. **No default launch args leak.** `--enable-automation` and `--enable-unsafe-swiftshader`
- *    must never reach a final argv.
+ * `puppeteer-core` speaks Chrome CDP only and cannot attach to a Firefox or WebKit
+ * session. Each adapter checks the protocol it was handed and throws on a mismatch, so
+ * the wrong client library cannot be attached by accident.
+ *
+ * Two rules this module enforces:
+ * 1. **`locale` / `timezone` are accepted but ignored as CDP overrides.** Both are
+ *    emulation knobs and are detectably different from a real device in that locale.
+ *    They are delivered through the identity request instead.
+ * 2. **No leaking default launch args.** `--enable-automation` and
+ *    `--enable-unsafe-swiftshader` must never reach a final argv.
  */
 
-/** The subset of our client this module needs (structurally typed — no import cycle). */
+/** The HTTP verbs the GhostCrawl client's raw transport accepts. */
+export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+
+/**
+ * The subset of our client this module needs (structurally typed — no import cycle).
+ *
+ * `method` is the same literal union the client's `request()` exposes, so
+ * `chromium.connect(client, …)` type-checks directly against a real
+ * `GhostCrawlClient` instead of needing a cast.
+ */
 export interface CdpMintSource {
     /** POST /v1/cdp/url — mints a short-TTL signed WS URL for a live session. */
-    request: (method: string, path: string, body?: unknown) => Promise<unknown>;
+    request: (method: HttpMethod, path: string, body?: unknown) => Promise<unknown>;
 }
 
 /** Options accepted by {@link connect}. */
@@ -72,9 +75,9 @@ export interface GhostCrawlConnection {
     /** Alias for Playwright wire clients that prefer `wsEndpoint`. */
     wsEndpoint: string;
     sessionId: string;
-    /** Which engine the fleet routed this session to (chromium | firefox | webkit). */
+    /** Which engine the session was routed to (chromium | firefox | webkit). */
     engine: string;
-    /** Honest protocol discriminator from `/v1/cdp/url`. */
+    /** Protocol discriminator returned by `/v1/cdp/url`. */
     protocol: "cdp" | "playwright-wire";
     /** Seconds until the minted URL expires — reconnect before this. */
     expiresIn: number;
@@ -129,7 +132,7 @@ export function assertNoAutomationTells(argv: readonly string[]): void {
     }
 }
 
-/** Resolve the engine a claim routes to (client-side mirror of the fleet's routing table). */
+/** Resolve the engine a claim routes to. */
 export function engineForClaim(claimOs?: string, claimBrowser?: string): string {
     const browser = String(claimBrowser || "").toLowerCase();
     if (browser === "firefox" || browser === "fxios") return "firefox";
@@ -243,7 +246,7 @@ export const chromium = {
 };
 
 /**
- * Firefox Playwright-wire connect (ADR-004).
+ * Firefox Playwright-wire connect.
  *
  * Usage:
  *   const conn = await firefox.connect(client, { claimOs: "windows", claimBrowser: "firefox" });
@@ -260,7 +263,7 @@ export const firefox = {
 };
 
 /**
- * WebKit Playwright-wire connect (ADR-004).
+ * WebKit Playwright-wire connect.
  *
  * Usage:
  *   const conn = await webkit.connect(client, { claimOs: "ios", claimBrowser: "safari" });
@@ -293,7 +296,7 @@ export async function connect(
         throw new Error(
             `connect() is the chromium CDP helper. For ${engine} use ${engine}.connect() ` +
                 `with playwright.${engine}.connect(url). puppeteer-core cannot attach to ` +
-                `firefox/webkit (Chrome CDP only — ADR-004).`,
+                `firefox/webkit (Chrome CDP only).`,
         );
     }
     return chromium.connect(source, options);

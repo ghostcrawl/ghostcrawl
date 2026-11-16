@@ -10,8 +10,8 @@
  *
  * API key: GHOSTCRAWL_API_KEY env var, or a key saved via `ghostcrawl init`.
  */
-import { readFileSync } from "node:fs";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { readFileSync, realpathSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { Command } from "commander";
 import { scrapeCommand } from "./commands/scrape.js";
@@ -40,7 +40,7 @@ function resolveVersion(): string {
   } catch {
     /* fall through to compile-time fallback */
   }
-  return "2.3.6";
+  return "0.0.0";
 }
 
 const program = new Command();
@@ -72,6 +72,21 @@ export { program };
 
 // Only drive the CLI when this file is the process entry point — importing it
 // (for introspection) must NOT parse argv or exit.
-if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
+//
+// npm installs a package `bin` as a symlink, so process.argv[1] is the symlink
+// path (`…/node_modules/.bin/ghostcrawl`) while import.meta.url is the real file
+// (`…/node_modules/@ghostcrawl/cli/dist/index.js`). Comparing them directly made
+// a globally installed CLI exit 0 and do nothing, so compare REAL paths.
+function isEntryPoint(): boolean {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  try {
+    return realpathSync(entry) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (isEntryPoint()) {
   program.parse();
 }

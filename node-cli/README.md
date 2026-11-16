@@ -66,6 +66,7 @@ Each subcommand wraps the real `@ghostcrawl/sdk` node facade method.
 | Command | Description |
 |---------|-------------|
 | `ghostcrawl scrape <url>` | Scrape a URL; emit content as JSON (`POST /v1/scrape`) |
+| `ghostcrawl batch --input-file <f>` | Batch-scrape every URL in a file; write NDJSON per URL to `--output-dir` |
 | `ghostcrawl content <url>` | Fetch a URL's rendered content (`POST /v1/content`) |
 | `ghostcrawl screenshot <url>` | Capture a screenshot; write image bytes to `--out` (`POST /v1/screenshot`) |
 | `ghostcrawl pdf <url>` | Render a URL to PDF (Chrome-only); write bytes to `--out` (`POST /v1/pdf`) |
@@ -110,4 +111,4 @@ The `ghostcrawl` CLI is available via two install channels:
 
 ## License
 
-Proprietary — GhostCrawl Software License. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

@@ -65,4 +65,4 @@ Every tool is verified by a real-execution parity suite (transcripts record coun
 
 ## License
 
-Proprietary — GhostCrawl Software License. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

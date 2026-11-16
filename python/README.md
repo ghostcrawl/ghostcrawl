@@ -279,4 +279,4 @@ print(persona["device_class"], persona["os_class"],
 
 ## License
 
-Proprietary — GhostCrawl Software License. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

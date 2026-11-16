@@ -157,6 +157,53 @@ const pdf = await client.pdf({ url: "https://example.com", paperFormat: "a4" });
 writeFileSync("page.pdf", pdf);
 ```
 
+## Playwright / Puppeteer drop-in (BYO browser control)
+
+`@ghostcrawl/sdk/automation` mints a live session and hands back the exact endpoint
+string your own Playwright or Puppeteer already understands — no engine fork, no local
+browser download, no monkey-patching. Each adapter refuses a socket whose protocol does
+not match, so you cannot attach the wrong client library by accident.
+
+| Adapter | Protocol | Attach with |
+|---|---|---|
+| `chromium.connect(client)` | Chrome CDP | `puppeteer.connect({ browserWSEndpoint })` or `playwright.chromium.connectOverCDP(url)` |
+| `firefox.connect(client)` | Playwright-wire | `playwright.firefox.connect(url)` |
+| `webkit.connect(client)` | Playwright-wire | `playwright.webkit.connect(url)` |
+
+```typescript
+import { createGhostCrawlClient } from "@ghostcrawl/sdk";
+import { chromium } from "@ghostcrawl/sdk/automation";
+import puppeteer from "puppeteer-core";
+
+const client = createGhostCrawlClient({ token: "gck_live_YOUR_KEY" });
+
+const conn = await chromium.connect(client, { claimOs: "windows", claimBrowser: "chrome" });
+const browser = await puppeteer.connect({
+  browserWSEndpoint: conn.browserWSEndpoint,
+  defaultViewport: null, // required — Puppeteer's 800x600 default is a bot tell
+});
+const page = await browser.newPage();
+await page.goto("https://example.com");
+
+await browser.close();
+await conn.close(); // releases the GhostCrawl session
+```
+
+Notes:
+
+- `defaultViewport: null` is required. Puppeteer's 800x600 default is a physically
+  impossible window; the engine's identity carries the real viewport.
+- `locale` / `timezone` are accepted but **never** applied as CDP emulation overrides
+  (both are detectable). They travel through the identity request instead.
+- Launching Chromium yourself? `chromium.ignoreDefaultArgs` and
+  `chromium.buildArgs(argv)` strip `--enable-automation` and
+  `--enable-unsafe-swiftshader`, which are automation tells.
+- `conn` exposes `browserWSEndpoint` (alias `wsEndpoint`), `sessionId`, `engine`,
+  `protocol`, `expiresIn`, and `close()`.
+- `puppeteer-core` speaks Chrome CDP only — it cannot attach to a firefox or webkit
+  session. The legacy `connect()` entry point is chromium-only and names the right
+  helper if you ask for another engine.
+
 ## Agent (BYO model, account-gated)
 
 The agent lane runs a natural-language browser task. It is **bring-your-own-model** (pass your
@@ -276,6 +323,7 @@ const nav = await mcp.navigate({ url: "https://example.com" });
 | Datasets | `client.datasets` | list, get, create, delete, rows, append |
 | Recordings | `client.recordings` | list, get, delete |
 | Key-Value Store | `client.kv` | get, set, delete |
+| Playwright / Puppeteer | `@ghostcrawl/sdk/automation` | `chromium` / `firefox` / `webkit` connect |
 
 ## CLI
 
@@ -319,4 +367,4 @@ console.log(persona.device_class, persona.os_class, persona.browser_class, perso
 
 ## License
 
-Proprietary — GhostCrawl Software License. See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

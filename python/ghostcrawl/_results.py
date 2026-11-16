@@ -1,10 +1,6 @@
 """Typed-but-dict-accessible result models for the GhostCrawl SDK.
 
-This is the **canonical reference implementation** the six non-Python SDKs
-mirror. The per-lane field names are the single source of truth in
-``parity/sdk_surface_contract.json`` (``lanes.*``) and MUST be byte-identical
-across all seven SDKs. Pure stdlib — **no pydantic**, no new runtime dependency
-(operator directive "wire our own with what we have"; RESEARCH Standard Stack).
+Pure stdlib — no pydantic, no new runtime dependency.
 
 Every result is BOTH:
 
@@ -14,8 +10,7 @@ Every result is BOTH:
 so existing callers that treat a result as a plain ``dict`` keep working
 unchanged (back-compat), while new code gets discoverable typed attributes.
 
-The raw kiota ``_generated/`` models are NEVER returned to the user; the
-facade wraps every response into one of these owned types.
+The facade wraps every response into one of these owned types.
 """
 
 from __future__ import annotations
@@ -113,7 +108,7 @@ class _MappingResult(collections.abc.Mapping):
 
 
 class ScrapeResult(_MappingResult):
-    """Result of ``scrape`` / ``content`` — parity lane ``scrape``.
+    """Result of ``scrape`` / ``content``.
 
     Canonical fields: ``status``, ``content``, ``markdown``, ``html``,
     ``status_code``, ``bytes``, ``url``, ``format``, ``warnings``. ``content`` is
@@ -140,7 +135,7 @@ class ScrapeResult(_MappingResult):
 
 
 class SearchResult(_MappingResult):
-    """Result of ``search`` — parity lane ``search`` (``status``, ``results``, ``query``)."""
+    """Result of ``search`` (``status``, ``results``, ``query``)."""
 
     _FIELDS = ("status", "results", "query")
 
@@ -154,15 +149,11 @@ class SearchResult(_MappingResult):
         # while the raw ``items`` key stays accessible for anyone who wants it.
         if "results" not in self._data and "items" in self._data:
             self._data["results"] = self._data["items"]
-        # STABLE SHAPE GUARANTEE (LAUNCH hardening): a ``search`` result is NEVER
-        # a surprise shape — even a client-poll that timed out before the job
-        # reached terminal (the cold-rotation 202 handle: ``{status:"running",
-        # job_id, poll_url,...}`` with no ``items``) still exposes ``results`` (an
-        # empty list), ``query`` and ``status`` by BOTH dict- and attribute-access.
-        # Without this, ``result["results"]`` / ``result["query"]`` raised
-        # ``KeyError`` on the timed-out handle. The facade injects the real
-        # ``query``/``engine`` before wrapping; these defaults are the last line so
-        # any construction path (``wait=False``, direct ``wrap_search``) is safe.
+        # A search result always has the same shape, even when a poll times out
+        # before the job reaches a terminal state: ``results`` (empty list),
+        # ``query`` and ``status`` are always available by dict or attribute
+        # access. These defaults are the last line so every construction path
+        # is safe.
         if self._data.get("results") is None:
             self._data["results"] = []
         self._data.setdefault("query", None)
@@ -170,19 +161,19 @@ class SearchResult(_MappingResult):
 
 
 class CrawlRun(_MappingResult):
-    """A crawl run — parity lane ``crawl`` (``run_id``, ``status``, ``results``)."""
+    """A crawl run (``run_id``, ``status``, ``results``)."""
 
     _FIELDS = ("run_id", "status", "results")
 
 
 class Document(_MappingResult):
-    """A single crawled/searched document — parity lane ``document``."""
+    """A single crawled or searched document."""
 
     _FIELDS = ("title", "url", "content")
 
 
 class BinaryResult(bytes):
-    """Binary lane result (``pdf`` / ``screenshot``) — parity lane ``pdf`` / ``screenshot``.
+    """Binary result (``pdf`` / ``screenshot``).
 
     A GENUINE ``bytes`` object (full back-compat: ``f.write(result)`` / slicing /
     ``len()`` all still work exactly as before) that is ALSO attribute- and

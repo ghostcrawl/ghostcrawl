@@ -21,7 +21,15 @@ export {
     RecordingsClient,
     KVClient,
 } from "./facade.js";
-export type { GhostCrawlClientOptions, CrawlWaitOptions, CrawlStartOptions } from "./facade.js";
+export type {
+    GhostCrawlClientOptions,
+    CrawlWaitOptions,
+    CrawlStartOptions,
+    CrawlRun,
+    CrawlRunStarted,
+    ScrapeResult,
+    SearchResult,
+} from "./facade.js";
 // Base + timeout error classes (self-contained; defined in src/errors.ts).
 export { GhostCrawlError, GhostCrawlTimeoutError } from "./errors.js";
 // Domain error set (the ONE canonical surface) + status-code/code classifier +
