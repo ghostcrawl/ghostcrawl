@@ -12,8 +12,8 @@ Canonical guide: [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-
 ## Bring it up (Docker)
 
 **Recommended:** use the Docker-only launcher — it asks for your key and configures
-everything (available for [Linux/macOS](https://ghostcrawl.io/ghostcrawl.sh) and
-[Windows](https://ghostcrawl.io/ghostcrawl.ps1)):
+everything (available for [Linux/macOS](https://dev.ghostcrawl.io/ghostcrawl.sh) and
+[Windows](https://dev.ghostcrawl.io/ghostcrawl.ps1)):
 
 ```bash
 ./ghostcrawl.sh start

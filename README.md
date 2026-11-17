@@ -218,13 +218,13 @@ It handles the RAM filesystem, storage, localhost binding, health check, and lif
 
 ```bash
 # Linux / macOS
-curl -fsSLO https://ghostcrawl.io/ghostcrawl.sh && chmod +x ghostcrawl.sh
+curl -fsSLO https://dev.ghostcrawl.io/ghostcrawl.sh && chmod +x ghostcrawl.sh
 ./ghostcrawl.sh start
 ```
 
 ```powershell
 # Windows PowerShell
-Invoke-WebRequest -Uri https://ghostcrawl.io/ghostcrawl.ps1 -OutFile ghostcrawl.ps1
+Invoke-WebRequest -Uri https://dev.ghostcrawl.io/ghostcrawl.ps1 -OutFile ghostcrawl.ps1
 .\ghostcrawl.ps1 start
 ```
 

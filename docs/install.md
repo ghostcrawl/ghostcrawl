@@ -45,7 +45,7 @@ Full flags (EULA, key, tmpfs, health, first scrape):
 [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
 
 Easiest: the Docker-only launcher at
-[`https://ghostcrawl.io/ghostcrawl.sh`](https://ghostcrawl.io/ghostcrawl.sh)
+[`https://dev.ghostcrawl.io/ghostcrawl.sh`](https://dev.ghostcrawl.io/ghostcrawl.sh)
 (or `ghostcrawl.ps1` on Windows) handles the RAM mount, storage, and lifecycle.
 Advanced: [`docker-compose.yml.template`](../docker-compose.yml.template).
 
