@@ -44,15 +44,17 @@ Full flags (EULA, key, tmpfs, health, first scrape):
 [Self-host usage](usage-selfhost.md) and
 [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
 
-Compose template: [`docker-compose.yml.template`](../docker-compose.yml.template)
-(requires a host tmpfs with `exec` — see the comments in that file).
+Easiest: the Docker-only launcher at
+[`https://ghostcrawl.io/ghostcrawl.sh`](https://ghostcrawl.io/ghostcrawl.sh)
+(or `ghostcrawl.ps1` on Windows) handles the RAM mount, storage, and lifecycle.
+Advanced: [`docker-compose.yml.template`](../docker-compose.yml.template).
 
 ### Requirements
 
-- A container runtime (Docker or Podman).
+- Docker only (Docker Engine on Linux, Docker Desktop on macOS/Windows).
 - An API key from your [account](https://app.ghostcrawl.io) (or a license key).
 - Outbound access to GhostCrawl for the start-time license check.
-- ~2 GB RAM for `/run/gc`.
+- ~3 GB memory allocated to Docker (the 2 GB tmpfs is executable RAM).
 
 ### Verifying
 

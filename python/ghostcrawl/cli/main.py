@@ -364,10 +364,8 @@ GHOSTCRAWL_API_KEY=
 """
 
 _SELF_HOST_COMPOSE_TEMPLATE = f"""# GhostCrawl self-host stack.
-# Compose cannot use an exec-capable tmpfs via `tmpfs:` — bind a host tmpfs first:
-#   sudo mkdir -p /mnt/gc-onefile
-#   sudo mount -t tmpfs -o size=2g,mode=1777,exec gc-onefile /mnt/gc-onefile
-# Prefer the simpler `docker run --tmpfs …,exec` recipe in docs.ghostcrawl.io/self-host.
+# Compose-native exec-enabled RAM mount at /run/gc — no host setup needed.
+# Requires Docker Compose v2.20+/v5 (Docker Desktop handles macOS/Windows).
 # Start:  docker compose up -d
 # Then:   docker compose logs -f | grep LOCAL_ADMIN_READY
 services:
@@ -376,13 +374,14 @@ services:
     restart: unless-stopped
     ports:
       - "47700:47700"
+    tmpfs:
+      - /run/gc:rw,exec,size=2g,mode=1777
     environment:
       GHOSTCRAWL_EULA_ACCEPTED: "${{GHOSTCRAWL_EULA_ACCEPTED:-1}}"
       GHOSTCRAWL_API_KEY: "${{GHOSTCRAWL_API_KEY:-}}"
       GHOSTCRAWL_LICENSE_KEY: "${{GHOSTCRAWL_LICENSE_KEY:-}}"
       GHOSTCRAWL_LOCAL_PORT: "47700"
     volumes:
-      - /mnt/gc-onefile:/run/gc
       - gc-data:/data
 volumes:
   gc-data:
@@ -394,7 +393,7 @@ Run the local image and point the SDK/CLI at `{_SELF_HOST_BASE_URL}`.
 
 ## Files
 
-- `docker-compose.yml` — `{_SELF_HOST_IMAGE}` (needs host tmpfs bind — see file comments).
+- `docker-compose.yml` — `{_SELF_HOST_IMAGE}` (Compose-native `tmpfs:` RAM mount; see file comments).
 - `.env` — EULA + API key (or license key).
 - `ghostcrawl.toml` — SDK/CLI `base_url` for localhost.
 
@@ -480,10 +479,10 @@ def init(
         for path in written:
             typer.echo(f"  {path}")
         typer.echo(
-            "Next: set GHOSTCRAWL_API_KEY (or LICENSE_KEY) in .env, prefer "
-            "`docker run --tmpfs /run/gc:size=2g,mode=1777,exec …` from "
-            "https://docs.ghostcrawl.io/self-host (Compose needs a host tmpfs "
-            "bind), then put the LOCAL_ADMIN_READY token in ghostcrawl.toml and "
+            "Next: set GHOSTCRAWL_API_KEY (or LICENSE_KEY) in .env, then run "
+            "`docker compose up -d` (Compose v2.20+/v5; the bundled compose file "
+            "uses a Compose-native exec-enabled tmpfs — no host setup needed), "
+            "then put the LOCAL_ADMIN_READY token in ghostcrawl.toml and "
             "`ghostcrawl scrape https://example.com`."
         )
         return

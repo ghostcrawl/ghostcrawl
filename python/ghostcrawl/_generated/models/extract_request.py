@@ -27,7 +27,7 @@ class ExtractRequest(AdditionalDataHolder, Parsable):
     engine: Optional[ExtractRequest_engine] = ExtractRequest_engine("auto")
     # Override geo-coherence: use `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. Requires a pinned `identity_country` (and the geo_select tier). Off by default, the default is IP-coherent geo (the browser identity follows the exit). Forcing may create an IP<->timezone mismatch that some sites cross-check; opt-in at your own risk.
     geo_force: Optional[bool] = False
-    # BYO behavior: trusted-input actions replayed on the loaded page instead of the built-in human session. Sanitized + bounded server-side (max 256 actions). Available on every tier.
+    # BYO behavior: trusted-input actions replayed on the loaded page instead of the built-in browser session. Sanitized + bounded server-side (max 256 actions). Available on every tier.
     behavior_actions: Optional[ExtractRequest_behavior_actions] = None
     # Optional two-letter country code to pin (geo-filters the exit and derives timezone; tier-gated). Omitted = timezone follows the exit.
     identity_country: Optional[ExtractRequest_identity_country] = None

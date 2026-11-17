@@ -1284,7 +1284,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO behavior: trusted-input actions replayed on the loaded page instead of the built-in human session. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
+            "description": "BYO behavior: trusted-input actions replayed on the loaded page instead of the built-in browser session. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
             "title": "Behavior Actions"
           },
           "engine": {
@@ -2022,7 +2022,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO behavior: a list of trusted-input actions replayed on the loaded page instead of the built-in human session. Each item is {\"kind\":\"move\",\"x\":int,\"y\":int} | {\"kind\":\"wheel\",\"x\":int,\"y\":int,\"dy\":int} | {\"kind\":\"dwell\",\"ms\":int}. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
+            "description": "BYO behavior: a list of trusted-input actions replayed on the loaded page instead of the built-in browser session. Each item is {\"kind\":\"move\",\"x\":int,\"y\":int} | {\"kind\":\"wheel\",\"x\":int,\"y\":int,\"dy\":int} | {\"kind\":\"dwell\",\"ms\":int}. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
             "title": "Behavior Actions"
           },
           "chunk_tokens": {

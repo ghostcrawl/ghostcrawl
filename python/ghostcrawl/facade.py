@@ -1150,7 +1150,7 @@ class SessionsClient:
         action: str | None = None,
         **kwargs: typing.Any,
     ) -> dict:
-        """Take interactive control of a running session (human-in-the-loop).
+        """Take interactive control of a running session (interactive).
 
         Calls ``POST /v1/sessions/{session_id}/takeover`` via the generated
         builder. ``action`` and any extra fields are sent in the request body.

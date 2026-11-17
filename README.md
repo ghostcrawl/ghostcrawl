@@ -213,25 +213,28 @@ more, the same managed browsers behind the REST API. See
 
 Run GhostCrawl on your own machine. Your compute, your IP, your data.
 
-```bash
-docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
+**Easiest (Linux, macOS, Windows):** download the Docker-only launcher and run it.
+It handles the RAM filesystem, storage, localhost binding, health check, and lifecycle.
 
-docker run --rm -d --name ghostcrawl \
-  -p 47700:47700 \
-  --tmpfs /run/gc:size=2g,mode=1777,exec \
-  -v gc-data:/data \
-  -e GHOSTCRAWL_EULA_ACCEPTED=1 \
-  -e GHOSTCRAWL_API_KEY="gck_live_YOUR_KEY" \  # pragma: allowlist secret
-  get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
+```bash
+# Linux / macOS
+curl -fsSLO https://ghostcrawl.io/ghostcrawl.sh && chmod +x ghostcrawl.sh
+./ghostcrawl.sh start
 ```
 
-Then open `http://localhost:47700/dashboard` and grab the per-boot API token from
-`docker logs ghostcrawl | grep LOCAL_ADMIN_READY`. Full guide:
-[docs/usage-selfhost.md](docs/usage-selfhost.md) ·
-[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
+```powershell
+# Windows PowerShell
+Invoke-WebRequest -Uri https://ghostcrawl.io/ghostcrawl.ps1 -OutFile ghostcrawl.ps1
+.\ghostcrawl.ps1 start
+```
 
-Compose: [`docker-compose.yml.template`](docker-compose.yml.template) (needs a
-host tmpfs with `exec`).
+The launcher prompts for your API key. Commands: `start`, `stop`, `restart`, `status`,
+`logs`, `update`, `uninstall`. Dashboard: `http://localhost:47700/dashboard`.
+
+Advanced: [`docker-compose.yml.template`](docker-compose.yml.template) or the full
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host) guide. The image
+is `linux/amd64`; Intel/x86 hosts run it natively, Apple Silicon and ARM Windows use
+Docker Desktop's built-in translation.
 
 Free tier = **one browser per engine** + stock Windows Chrome / Windows Firefox /
 Mac Safari. **Self-host Plus ($9/mo)** or any paid plan unlocks more seats and

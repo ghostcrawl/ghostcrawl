@@ -48,7 +48,7 @@ export interface GhostCrawlConnectOptions {
     claimBrowser?: string;
     /** Force engine when known (chromium | firefox | webkit). Overrides claim routing. */
     engine?: "chromium" | "firefox" | "webkit";
-    /** Route the session's acts through the human layer. */
+    /** Route the session's acts through the browser behavior layer. */
     humanize?: boolean;
     /**
      * Timezone. ACCEPTED — but delivered through the identity request, never as a CDP

@@ -57,7 +57,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
     screenshot: Optional[bool] = False
     # When true, returns text/event-stream with one SSE event per chunk. Per-tenant concurrency is capped (default 5). Final 'done' event carries estimated_llm_input_tokens.
     stream: Optional[bool] = False
-    # BYO behavior: a list of trusted-input actions replayed on the loaded page instead of the built-in human session. Each item is {"kind":"move","x":int,"y":int} | {"kind":"wheel","x":int,"y":int,"dy":int} | {"kind":"dwell","ms":int}. Sanitized + bounded server-side (max 256 actions). Available on every tier.
+    # BYO behavior: a list of trusted-input actions replayed on the loaded page instead of the built-in browser session. Each item is {"kind":"move","x":int,"y":int} | {"kind":"wheel","x":int,"y":int,"dy":int} | {"kind":"dwell","ms":int}. Sanitized + bounded server-side (max 256 actions). Available on every tier.
     behavior_actions: Optional[ScrapeRequest_behavior_actions] = None
     # Previously-persisted identity_id from POST /v1/identity (persist=true).
     identity: Optional[ScrapeRequest_identity] = None

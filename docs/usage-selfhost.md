@@ -11,34 +11,44 @@ Canonical guide: [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-
 
 ## Bring it up (Docker)
 
+**Recommended:** use the Docker-only launcher — it asks for your key and configures
+everything (available for [Linux/macOS](https://ghostcrawl.io/ghostcrawl.sh) and
+[Windows](https://ghostcrawl.io/ghostcrawl.ps1)):
+
+```bash
+./ghostcrawl.sh start
+```
+
+**Advanced — docker run directly:**
+
 ```bash
 docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
-
-docker run --rm -d \
-  --name ghostcrawl \
-  -p 47700:47700 \
-  --tmpfs /run/gc:size=2g,mode=1777,exec \
+docker volume create gc-data
+docker run -d --name ghostcrawl --restart unless-stopped \
+  -p 127.0.0.1:47700:47700 \
+  --tmpfs /run/gc:rw,exec,size=2g,mode=1777 \
   -v gc-data:/data \
   -e GHOSTCRAWL_EULA_ACCEPTED=1 \
-  -e GHOSTCRAWL_API_KEY="gck_live_YOUR_KEY" \  # pragma: allowlist secret
+  -e GHOSTCRAWL_API_KEY="$GC_API_KEY" \
   -e GHOSTCRAWL_LOCAL_PORT=47700 \
   get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
 ```
 
-You need:
+Set `GC_API_KEY` to your account key first. Do not add `--rm`: keeping a failed
+container lets you read its logs. You need:
 
-- Docker (or Podman / Kubernetes).
-- An account API key (`gck_live_…`) from [app.ghostcrawl.io](https://app.ghostcrawl.io)
-  — or a `GHOSTCRAWL_LICENSE_KEY` if you already have one.
+- **Docker only** — Docker Engine on Linux, Docker Desktop on macOS/Windows. No VM,
+  WSL, or hypervisor setup by you. Docker Desktop manages its own Linux environment.
+- An account API key (`gck_live_…`) from [app.ghostcrawl.io](https://app.ghostcrawl.io).
 - `GHOSTCRAWL_EULA_ACCEPTED=1`.
-- Outbound access to GhostCrawl for the **online license check on every start**
-  (no offline grace).
-- ~2 GB free RAM for the `/run/gc` tmpfs (`exec` is required).
+- Outbound HTTPS to GhostCrawl for the **online license check on every start**
+  (no offline grace). Configure proxies in Docker Desktop settings if needed.
+- ~3 GB allocated to Docker (the 2 GB tmpfs counts against the container's limit).
+- `linux/amd64` image: native on Intel/x86; Apple Silicon and ARM Windows use Docker
+  Desktop's built-in translation (approved, slower) until native ARM images ship.
 
 Compose users: copy [`docker-compose.yml.template`](../docker-compose.yml.template)
-and mount a **host** tmpfs with `exec` (Compose’s built-in `tmpfs:` is not enough).
-
----
+and run `docker compose up -d` (requires Compose v2.20+/v5). The launcher is simpler.
 
 ## Local endpoints
 

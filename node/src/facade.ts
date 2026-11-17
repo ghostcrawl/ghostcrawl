@@ -881,7 +881,7 @@ export class SessionsClient {
     }
 
     /**
-     * Take interactive control of a running session (human-in-the-loop).
+     * Take interactive control of a running session (interactive).
      * POST /v1/sessions/{session_id}/takeover. The generated core has no
      * `takeover` builder, so this is routed through the shared authenticated
      * `request()` transport. `action` and any extra fields are sent in the body.
