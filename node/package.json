@@ -1,6 +1,6 @@
 {
   "name": "@ghostcrawl/sdk",
-  "version": "2.3.7",
+  "version": "2.3.8",
   "description": "Official Node.js SDK for the GhostCrawl orchestration API.",
   "homepage": "https://github.com/ghostcrawl/ghostcrawl",
   "repository": {
@@ -44,7 +44,7 @@
     "test:watch": "vitest"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   },
   "keywords": [
     "ghostcrawl",

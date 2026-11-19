@@ -9,11 +9,21 @@ Pydantic params validation.
 
 ## Install
 
+The current release is **2.3.8** (`ghostcrawl-langchain==2.3.8`):
+
 ```bash
-pip install ghostcrawl-langchain
+pip install ghostcrawl-langchain==2.3.8
 ```
 
 **Publish = yes** (public PyPI `ghostcrawl-langchain`).
+
+### First step: runtime setup
+
+The tools talk to the GhostCrawl API (hosted cloud or your own machine). To run
+them locally, use the single unified terminal-install path — Docker, the three
+browser engines and your API key — documented at
+**https://docs.ghostcrawl.io/self-host**. One launcher covers Linux, macOS and
+Windows; no per-SDK installer is needed.
 
 ## Quickstart
 

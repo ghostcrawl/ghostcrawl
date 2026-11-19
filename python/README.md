@@ -4,11 +4,21 @@ The official Python client for the [GhostCrawl](https://ghostcrawl.io) API. Coll
 
 ## Install
 
+The current release is **2.3.8** (`ghostcrawl==2.3.8`):
+
 ```bash
-pip install ghostcrawl
+pip install ghostcrawl==2.3.8
 ```
 
 Requires Python 3.10+. Runtime dependencies: `httpx>=0.28.1`.
+
+### First step: runtime setup
+
+The client talks to the GhostCrawl API (hosted cloud or your own machine). To run
+it locally, use the single unified terminal-install path — Docker, the three
+browser engines and your API key — documented at
+**https://docs.ghostcrawl.io/self-host**. One launcher covers Linux, macOS and
+Windows; no per-SDK installer is needed.
 
 > The default client is **synchronous** — no `await`, no `asyncio.run`. Every
 > method returns a typed result directly. Prefer async? Import `AsyncGhostCrawl`

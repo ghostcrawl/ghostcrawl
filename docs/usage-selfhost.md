@@ -12,17 +12,21 @@ Canonical guide: [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-
 ## Bring it up (Docker)
 
 **Recommended:** use the Docker-only launcher — it asks for your key and configures
-everything (available for [Linux/macOS](https://dev.ghostcrawl.io/ghostcrawl.sh) and
-[Windows](https://dev.ghostcrawl.io/ghostcrawl.ps1)):
+everything. One launcher works on Linux, macOS and Windows; there is no Windows-only
+installer. Download it from
+[`https://dev.ghostcrawl.io/ghostcrawl.sh`](https://dev.ghostcrawl.io/ghostcrawl.sh) and run:
 
 ```bash
 ./ghostcrawl.sh start
 ```
 
+The single full guide — all six install requirements and inline PowerShell equivalents
+on one page — is [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
+
 **Advanced — docker run directly:**
 
 ```bash
-docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
+docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.8
 docker volume create gc-data
 docker run -d --name ghostcrawl --restart unless-stopped \
   -p 127.0.0.1:47700:47700 \
@@ -31,7 +35,7 @@ docker run -d --name ghostcrawl --restart unless-stopped \
   -e GHOSTCRAWL_EULA_ACCEPTED=1 \
   -e GHOSTCRAWL_API_KEY="$GC_API_KEY" \
   -e GHOSTCRAWL_LOCAL_PORT=47700 \
-  get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
+  get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.8
 ```
 
 Set `GC_API_KEY` to your account key first. Do not add `--rm`: keeping a failed
@@ -44,11 +48,32 @@ container lets you read its logs. You need:
 - Outbound HTTPS to GhostCrawl for the **online license check on every start**
   (no offline grace). Configure proxies in Docker Desktop settings if needed.
 - ~3 GB allocated to Docker (the 2 GB tmpfs counts against the container's limit).
-- `linux/amd64` image: native on Intel/x86; Apple Silicon and ARM Windows use Docker
-  Desktop's built-in translation (approved, slower) until native ARM images ship.
+- **Architecture:** native `linux/amd64` on Intel/x86 (the published, canonical
+  image); a native `linux/arm64` leg is being staged for 2.3.8 and is not public
+  yet — see [Platforms & architecture](#platforms--architecture) below.
 
 Compose users: copy [`docker-compose.yml.template`](../docker-compose.yml.template)
 and run `docker compose up -d` (requires Compose v2.20+/v5). The launcher is simpler.
+
+### Platforms & architecture (2.3.8)
+
+The published self-host image is `linux/amd64` — native on Intel/x86, and it stays
+the canonical live image (nothing is replaced). A native `linux/arm64` leg is being
+built and staged into the 2.3.8 multi-arch index; it is **not publicly published
+yet**, so no public arm64 tag exists today. Per-engine native-arm64 status is gated
+for 2.3.8 and will be recorded engine-by-engine (native or blocked) when the sign-off
+evidence lands — until then, no shipped arm64 engine is claimed.
+
+| Engine | Intel/x86 — `linux/amd64` (published, canonical) | Apple Silicon — native `linux/arm64` | ARM Windows |
+|--------|--------------------------------------------------|--------------------------------------|-------------|
+| Chromium | native | native arm64 leg staged for 2.3.8; not public yet (amd64 translation until it ships) | `linux/amd64` via Docker emulation; no native arm64 build |
+| Firefox | native | native arm64 leg staged for 2.3.8; not public yet (amd64 translation until it ships) | `linux/amd64` via Docker emulation; no native arm64 build |
+| WebKit | native | native arm64 leg staged for 2.3.8; not public yet (amd64 translation until it ships) | `linux/amd64` via Docker emulation; no native arm64 build |
+
+**Apple Silicon (M-series)** runs the native `linux/arm64` leg once it ships; until
+then Docker Desktop runs the amd64 image through its built-in translation.
+**ARM Windows** has no native arm64 image — Docker runs `linux/amd64` via amd64
+emulation (translation).
 
 ## Local endpoints
 
@@ -110,7 +135,7 @@ concurrency uses more CPU/RAM on **your** machine.
 ## Updating
 
 ```bash
-docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
+docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.8
 docker rm -f ghostcrawl
 # re-run the docker run command above
 ```

@@ -3433,7 +3433,7 @@
   "info": {
     "description": "The GhostCrawl web data API: scrape, crawl, search, and extract any URL with real browser engines and consistent identity profiles.",
     "title": "GhostCrawl API",
-    "version": "2.3.7"
+    "version": "2.3.8"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -9207,7 +9207,7 @@
     },
     "/v1/selfhost/byo/behavior": {
       "put": {
-        "description": "**Self-host deployments only.** Validate + persist a BYO behavior JSON, then report the sanitized count. Contract: ``{\"human_actions\": [ {kind,.},. ]}``. ``human_actions`` MUST be a list; it is passed through byo_behavior.sanitize_actions (allow-list + clamp). A non-empty input that sanitizes to an EMPTY plan (every action an invalid kind) → 422 invalid_behavior_json (nothing valid to apply). Success → write ~/.ghostcrawl/behavior.json + {reloaded, actions}.",
+        "description": "**Self-host deployments only.** Validate + persist a BYO behavior JSON, then report the sanitized count. Contract: ``{\"browser_actions\": [ {kind,.},. ]}``. ``browser_actions`` MUST be a list; it is passed through byo_behavior.sanitize_actions (allow-list + clamp). A non-empty input that sanitizes to an EMPTY plan (every action an invalid kind) → 422 invalid_behavior_json (nothing valid to apply). Success → write ~/.ghostcrawl/behavior.json + {reloaded, actions}.",
         "operationId": "put_selfhost_byo_behavior_v1_selfhost_byo_behavior_put",
         "requestBody": {
           "content": {

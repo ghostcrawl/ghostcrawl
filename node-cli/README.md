@@ -8,11 +8,23 @@ same JSON output format.
 
 ## Install
 
+The current release is **2.3.8** (`@ghostcrawl/cli@2.3.8`):
+
 ```bash
-npm install -g @ghostcrawl/cli
+npm install -g @ghostcrawl/cli@2.3.8
 ```
 
-Requires Node.js >= 18.
+Requires Node.js >= 18. The `ghostcrawl init` and `ghostcrawl install` verbs below
+are the CLI's own first-run commands; keep them — they are the real CLI surface,
+not a per-SDK runtime installer.
+
+### First step: runtime setup
+
+The CLI talks to the GhostCrawl API (hosted cloud or your own machine). To run it
+locally, use the single unified terminal-install path — Docker, the three browser
+engines and your API key — documented at
+**https://docs.ghostcrawl.io/self-host**. One launcher covers Linux, macOS and
+Windows; no per-SDK installer is needed.
 
 ## First-time setup
 

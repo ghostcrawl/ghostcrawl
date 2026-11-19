@@ -1053,7 +1053,7 @@ class SessionsClient:
         *,
         profile_name: str | None = None,
         engine: str | None = None,
-        humanize: bool = False,
+        browser_behavior: bool = False,
         **kwargs: typing.Any,
     ) -> dict:
         """Create a new browser session.
@@ -1072,7 +1072,7 @@ class SessionsClient:
 
         Passing both is a validation error server-side; pass exactly one.
 
-        ``humanize`` (default ``False``) opts the session into human-like
+        ``browser_behavior`` (default ``False``) opts the session into browser-like
         interaction timing/motion.
         """
         from ghostcrawl._generated.models.session_create_request import SessionCreateRequest
@@ -1094,7 +1094,7 @@ class SessionsClient:
             )
 
             body.engine = SessionCreateRequest_engine(engine or "auto")
-        body.additional_data = {"humanize": humanize, **kwargs}
+        body.additional_data = {"browser_behavior": browser_behavior, **kwargs}
         return await _resolve_response(self._core.v1.sessions.create.post(body))
 
     async def extend(self, session_id: str, *, duration_seconds: int = 300) -> dict:
@@ -2113,7 +2113,7 @@ class GhostCrawlClient:
         engine: str = "auto",
         javascript: bool = True,
         extract_schema: dict | None = None,
-        humanize: bool = False,
+        browser_behavior: bool = False,
         **kwargs: typing.Any,
     ) -> dict:
         """Scrape a single URL and return the rendered content.
@@ -2133,8 +2133,8 @@ class GhostCrawlClient:
             Enable JavaScript rendering. Default ``True``.
         extract_schema : dict, optional
             JSON Schema for structured data extraction alongside the scrape.
-        humanize : bool
-            Opt into human-like interaction timing/motion for this request.
+        browser_behavior : bool
+            Opt into browser-like interaction timing/motion for this request.
             Default ``False``.
 
         Returns
@@ -2167,7 +2167,7 @@ class GhostCrawlClient:
         body.format = ScrapeRequest_format(format)
         body.additional_data = {
             "javascript_enabled": javascript,
-            "humanize": humanize,
+            "browser_behavior": browser_behavior,
             **kwargs,
         }
         if extract_schema is not None:
@@ -2565,7 +2565,7 @@ class GhostCrawlClient:
         url: str | None = None,
         steps: list | None = None,
         task: dict | None = None,
-        humanize: bool = False,
+        browser_behavior: bool = False,
         **kwargs: typing.Any,
     ) -> dict:
         """Execute an agent task via ``POST /v1/agent``.
@@ -2591,8 +2591,8 @@ class GhostCrawlClient:
             Explicit step list for ``task.steps``.
         task : dict, optional
             Full task dict (used directly, overriding the assembled fields).
-        humanize : bool
-            Opt into human-like interaction timing/motion for this task.
+        browser_behavior : bool
+            Opt into browser-like interaction timing/motion for this task.
             Default ``False``.
         **kwargs
             Additional top-level body fields (e.g. ``engine="webkit"``).
@@ -2615,7 +2615,7 @@ class GhostCrawlClient:
             if steps is not None:
                 built_task["steps"] = steps
 
-        body: dict = {"task": built_task, "humanize": humanize}
+        body: dict = {"task": built_task, "browser_behavior": browser_behavior}
         body.update(kwargs)
         if self._provider_config is not None:
             body["provider_config"] = self._provider_config

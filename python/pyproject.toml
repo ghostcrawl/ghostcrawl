@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ghostcrawl"
-version = "2.3.7"
+version = "2.3.8"
 description = "Official Python SDK for the GhostCrawl local orchestration API."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "GhostCrawl" }]
 keywords = ["ghostcrawl", "scraping", "browser", "automation", "agent"]
@@ -16,7 +16,6 @@ classifiers = [
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Software Development :: Libraries :: Python Modules",
@@ -83,7 +82,7 @@ exclude = [
   "examples*",
   "ghostcrawl.tests*",
   
-  "ghostcrawl.human*",
+  "ghostcrawl.browser_behavior*",
   "ghostcrawl.fleet*",
   "ghostcrawl.behavior*",
   "ghostcrawl.soul*",

@@ -49,7 +49,7 @@ export interface GhostCrawlConnectOptions {
     /** Force engine when known (chromium | firefox | webkit). Overrides claim routing. */
     engine?: "chromium" | "firefox" | "webkit";
     /** Route the session's acts through the browser behavior layer. */
-    humanize?: boolean;
+    browser_behavior?: boolean;
     /**
      * Timezone. ACCEPTED — but delivered through the identity request, never as a CDP
      * `setTimezoneOverride`. See {@link assertNoEmulationOverrides}.
@@ -169,7 +169,7 @@ async function mintConnection(
             claim_os: options.claimOs,
             claim_browser: options.claimBrowser,
             engine: options.engine ?? expectedEngine,
-            humanize: options.humanize,
+            browser_behavior: options.browser_behavior,
             timezone: options.timezone,
             locale: options.locale,
             proxy: options.proxy,

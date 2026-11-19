@@ -7,6 +7,7 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 if TYPE_CHECKING:
     from .scrape_request_batch_identity_mode import ScrapeRequest_batch_identity_mode
     from .scrape_request_behavior_actions import ScrapeRequest_behavior_actions
+    from .scrape_request_device import ScrapeRequest_device
     from .scrape_request_engine import ScrapeRequest_engine
     from .scrape_request_format import ScrapeRequest_format
     from .scrape_request_identity import ScrapeRequest_identity
@@ -35,6 +36,10 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
     batch_identity_mode: Optional[ScrapeRequest_batch_identity_mode] = ScrapeRequest_batch_identity_mode("persist")
     # Maximum tokens per markdown chunk. Clamped server-side to [256, 32768] regardless of caller input.
     chunk_tokens: Optional[int] = 8192
+    from .scrape_request_device import ScrapeRequest_device
+
+    # Device class for the population identity draw. 'random' (default) = unchanged. The random_* classes restrict which real-population devices may be drawn (weights inside the class unchanged); with engine 'auto' the engine follows the drawn device (iOS -> webkit always, android -> chrome). An engine the class cannot render on -> 422 device_engine_mismatch. Not combinable with identity / profile; identity_spec's operating system must lie inside the class. For a fixed device use profile=<name>. Cloud only: where no population draw runs (self-host / direct egress) a non-random class -> 422 device_unsupported.
+    device: Optional[ScrapeRequest_device] = ScrapeRequest_device("random")
     from .scrape_request_engine import ScrapeRequest_engine
 
     # Engine override. 'auto' (default): the identity's browser decides the engine. 'chrome'|'firefox'|'webkit': force that engine, enforced only if coherent with the identity (e.g. iOS identities are always webkit); incoherent picks are rejected, never coerced to a hybrid.
@@ -98,6 +103,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
         """
         from .scrape_request_batch_identity_mode import ScrapeRequest_batch_identity_mode
         from .scrape_request_behavior_actions import ScrapeRequest_behavior_actions
+        from .scrape_request_device import ScrapeRequest_device
         from .scrape_request_engine import ScrapeRequest_engine
         from .scrape_request_format import ScrapeRequest_format
         from .scrape_request_identity import ScrapeRequest_identity
@@ -114,6 +120,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
 
         from .scrape_request_batch_identity_mode import ScrapeRequest_batch_identity_mode
         from .scrape_request_behavior_actions import ScrapeRequest_behavior_actions
+        from .scrape_request_device import ScrapeRequest_device
         from .scrape_request_engine import ScrapeRequest_engine
         from .scrape_request_format import ScrapeRequest_format
         from .scrape_request_identity import ScrapeRequest_identity
@@ -132,6 +139,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
             "batch_identity_mode": lambda n : setattr(self, 'batch_identity_mode', n.get_enum_value(ScrapeRequest_batch_identity_mode)),
             "behavior_actions": lambda n : setattr(self, 'behavior_actions', n.get_object_value(ScrapeRequest_behavior_actions)),
             "chunk_tokens": lambda n : setattr(self, 'chunk_tokens', n.get_int_value()),
+            "device": lambda n : setattr(self, 'device', n.get_enum_value(ScrapeRequest_device)),
             "engine": lambda n : setattr(self, 'engine', n.get_enum_value(ScrapeRequest_engine)),
             "format": lambda n : setattr(self, 'format', n.get_enum_value(ScrapeRequest_format)),
             "full_page": lambda n : setattr(self, 'full_page', n.get_bool_value()),
@@ -164,6 +172,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
         writer.write_enum_value("batch_identity_mode", self.batch_identity_mode)
         writer.write_object_value("behavior_actions", self.behavior_actions)
         writer.write_int_value("chunk_tokens", self.chunk_tokens)
+        writer.write_enum_value("device", self.device)
         writer.write_enum_value("engine", self.engine)
         writer.write_enum_value("format", self.format)
         writer.write_bool_value("full_page", self.full_page)

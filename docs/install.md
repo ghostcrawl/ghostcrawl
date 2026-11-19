@@ -37,7 +37,7 @@ ghostcrawl init   # prompts for gck_live_… ; writes ./ghostcrawl.toml
 Canonical path — pull and run the image:
 
 ```bash
-docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.7
+docker pull get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.8
 ```
 
 Full flags (EULA, key, tmpfs, health, first scrape):
@@ -46,8 +46,22 @@ Full flags (EULA, key, tmpfs, health, first scrape):
 
 Easiest: the Docker-only launcher at
 [`https://dev.ghostcrawl.io/ghostcrawl.sh`](https://dev.ghostcrawl.io/ghostcrawl.sh)
-(or `ghostcrawl.ps1` on Windows) handles the RAM mount, storage, and lifecycle.
+handles the RAM mount, storage, localhost binding and lifecycle through one shared
+command set on Linux, macOS and Windows — there is no Windows-only installer. The one
+full guide, with all six install requirements and inline PowerShell equivalents, is
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
 Advanced: [`docker-compose.yml.template`](../docker-compose.yml.template).
+
+### Platforms & architecture
+
+The published image is `linux/amd64` — native on Intel/x86 and the canonical live
+image (not replaced). A native `linux/arm64` leg is being built and staged for 2.3.8
+but is **not publicly published yet**; no public arm64 tag exists today.
+**Apple Silicon (M-series)** runs that native arm64 leg once it ships (until then Docker
+Desktop translates the amd64 image). **ARM Windows** has no native arm64 image —
+Docker uses amd64 emulation. All three engines (Chromium, Firefox, WebKit) are
+being gated for native arm64 in 2.3.8; their per-engine status is recorded once
+the sign-off evidence lands.
 
 ### Requirements
 

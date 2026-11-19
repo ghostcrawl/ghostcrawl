@@ -217,24 +217,26 @@ Run GhostCrawl on your own machine. Your compute, your IP, your data.
 It handles the RAM filesystem, storage, localhost binding, health check, and lifecycle.
 
 ```bash
-# Linux / macOS
 curl -fsSLO https://dev.ghostcrawl.io/ghostcrawl.sh && chmod +x ghostcrawl.sh
 ./ghostcrawl.sh start
 ```
 
-```powershell
-# Windows PowerShell
-Invoke-WebRequest -Uri https://dev.ghostcrawl.io/ghostcrawl.ps1 -OutFile ghostcrawl.ps1
-.\ghostcrawl.ps1 start
-```
-
-The launcher prompts for your API key. Commands: `start`, `stop`, `restart`, `status`,
-`logs`, `update`, `uninstall`. Dashboard: `http://localhost:47700/dashboard`.
+The same launcher runs on Linux, macOS and Windows — one shared, shell-safe command set,
+with no Windows-only installer. It prompts for your API key. Commands: `start`, `stop`,
+`restart`, `status`, `logs`, `update`, `uninstall`. Dashboard:
+`http://localhost:47700/dashboard`. Full guide — all six install requirements and inline
+PowerShell equivalents on one page:
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
 
 Advanced: [`docker-compose.yml.template`](docker-compose.yml.template) or the full
-[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host) guide. The image
-is `linux/amd64`; Intel/x86 hosts run it natively, Apple Silicon and ARM Windows use
-Docker Desktop's built-in translation.
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host) guide. The
+published image is `linux/amd64` — native on Intel/x86 and the canonical live image
+(not replaced). A native `linux/arm64` leg is being built and staged for 2.3.8 but
+is **not publicly published yet**; no public arm64 tag exists today. **Apple Silicon
+(M-series)** runs the native arm64 leg once it ships (Docker Desktop translates the
+amd64 image until then). **ARM Windows** has no native arm64 image — Docker uses
+amd64 emulation. Each of the three engines (Chromium, Firefox, WebKit) is gated for
+native arm64 in 2.3.8; per-engine status is recorded when the sign-off evidence lands.
 
 Free tier = **one browser per engine** + stock Windows Chrome / Windows Firefox /
 Mac Safari. **Self-host Plus ($9/mo)** or any paid plan unlocks more seats and

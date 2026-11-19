@@ -147,21 +147,21 @@ class GhostCrawlMCPClient:
     # Browser / navigation tools
     # ------------------------------------------------------------------
 
-    async def navigate(self, url: str, *, humanize: bool = False, **kwargs: Any) -> Any:
+    async def navigate(self, url: str, *, browser_behavior: bool = False, **kwargs: Any) -> Any:
         """Navigate the current browser context to *url*.
 
-        ``humanize`` (default ``False``) opts into human-like interaction
+        ``browser_behavior`` (default ``False``) opts into browser-like interaction
         timing/motion for this call.
         """
-        return await self._call("navigate", {"url": url, "humanize": humanize, **kwargs})
+        return await self._call("navigate", {"url": url, "browser_behavior": browser_behavior, **kwargs})
 
-    async def act(self, goal: str, *, humanize: bool = False, **kwargs: Any) -> Any:
+    async def act(self, goal: str, *, browser_behavior: bool = False, **kwargs: Any) -> Any:
         """Perform a high-level browser action described by *goal*.
 
-        ``humanize`` (default ``False``) opts into human-like interaction
+        ``browser_behavior`` (default ``False``) opts into browser-like interaction
         timing/motion for this call.
         """
-        return await self._call("act", {"goal": goal, "humanize": humanize, **kwargs})
+        return await self._call("act", {"goal": goal, "browser_behavior": browser_behavior, **kwargs})
 
     async def observe(self, **kwargs: Any) -> Any:
         """Return an observation of the current browser state."""

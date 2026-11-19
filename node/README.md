@@ -8,11 +8,21 @@ The official TypeScript/JavaScript client for the [GhostCrawl](https://ghostcraw
 
 ## Install
 
+The current release is **2.3.8** (`@ghostcrawl/sdk@2.3.8`):
+
 ```bash
-npm install @ghostcrawl/sdk
+npm install @ghostcrawl/sdk@2.3.8
 ```
 
 Requires Node.js >= 18.
+
+### First step: runtime setup
+
+The client talks to the GhostCrawl API (hosted cloud or your own machine). To run
+it locally, use the single unified terminal-install path — Docker, the three
+browser engines and your API key — documented at
+**https://docs.ghostcrawl.io/self-host**. One launcher covers Linux, macOS and
+Windows; no per-SDK installer is needed.
 
 ## Quickstart
 

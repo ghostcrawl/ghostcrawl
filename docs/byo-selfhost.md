@@ -97,11 +97,11 @@ and edit each field to describe the identity you want.
 ## Behavior — `behavior.json`
 
 An optional per-page action script. The file is a single object with a
-`human_actions` array; each action is one of three kinds:
+`browser_actions` array; each action is one of three kinds:
 
 ```json
 {
-  "human_actions": [
+  "browser_actions": [
     { "kind": "dwell", "ms": 500 },
     { "kind": "move", "x": 640, "y": 400 },
     { "kind": "wheel", "x": 640, "y": 400, "dy": -300 },
