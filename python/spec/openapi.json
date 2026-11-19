@@ -3667,6 +3667,26 @@
                   "format": "jpeg",
                   "height": 720,
                   "width": 1280
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string"
+                    },
+                    "engine": {
+                      "type": "string"
+                    },
+                    "format": {
+                      "type": "string"
+                    },
+                    "height": {
+                      "type": "integer"
+                    },
+                    "width": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -3750,6 +3770,17 @@
                 "example": {
                   "ok": true,
                   "step_type": "navigate"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "step_type": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -3833,6 +3864,17 @@
                 "example": {
                   "expires_in_seconds": 120,
                   "url": "wss://example.com/cdp/sess_123"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "expires_in_seconds": {
+                      "type": "integer"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -4073,6 +4115,34 @@
                     }
                   ],
                   "total_count": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "seed_url": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "total_count": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -4171,6 +4241,29 @@
                   "run_id": "cr_123",
                   "started_at": 1763323200,
                   "status": "completed"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "completed_at": {
+                      "type": "integer"
+                    },
+                    "pages_crawled": {
+                      "type": "integer"
+                    },
+                    "pages_failed": {
+                      "type": "integer"
+                    },
+                    "run_id": {
+                      "type": "string"
+                    },
+                    "started_at": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -4297,6 +4390,29 @@
                   "run_id": "cr_123",
                   "started_at": 1763323200,
                   "status": "completed"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "completed_at": {
+                      "type": "integer"
+                    },
+                    "pages_crawled": {
+                      "type": "integer"
+                    },
+                    "pages_failed": {
+                      "type": "integer"
+                    },
+                    "run_id": {
+                      "type": "string"
+                    },
+                    "started_at": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -4415,6 +4531,29 @@
                   "run_id": "cr_123",
                   "started_at": 1763323200,
                   "status": "completed"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "completed_at": {
+                      "type": "integer"
+                    },
+                    "pages_crawled": {
+                      "type": "integer"
+                    },
+                    "pages_failed": {
+                      "type": "integer"
+                    },
+                    "run_id": {
+                      "type": "string"
+                    },
+                    "started_at": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -4512,6 +4651,29 @@
                   "run_id": "cr_123",
                   "started_at": 1763323200,
                   "status": "completed"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "completed_at": {
+                      "type": "integer"
+                    },
+                    "pages_crawled": {
+                      "type": "integer"
+                    },
+                    "pages_failed": {
+                      "type": "integer"
+                    },
+                    "run_id": {
+                      "type": "string"
+                    },
+                    "started_at": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -4841,6 +5003,31 @@
                     }
                   ],
                   "total_count": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "total_count": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -5190,6 +5377,33 @@
                       "written_at": "2026-11-17T00:00:00Z"
                     }
                   ]
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rows": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "payload": {
+                            "type": "object",
+                            "properties": {
+                              "field": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "row_id": {
+                            "type": "string"
+                          },
+                          "written_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             },
@@ -5282,6 +5496,14 @@
               "application/json": {
                 "example": {
                   "appended": 2
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "appended": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -5706,6 +5928,14 @@
               "application/json": {
                 "example": {
                   "deleted": true
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             },
@@ -5788,6 +6018,25 @@
                     "hello": "world"
                   },
                   "value_type": "json"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "object",
+                      "properties": {
+                        "hello": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "value_type": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -5880,6 +6129,20 @@
                   "key": "my-key",
                   "size": 42,
                   "value_type": "json"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer"
+                    },
+                    "value_type": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -6124,6 +6387,20 @@
                     "https://example.com/popup"
                   ],
                   "count": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "closed": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -7414,6 +7691,31 @@
                     }
                   ],
                   "total_count": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "total_count": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -8142,6 +8444,34 @@
                     }
                   ],
                   "total_count": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "session_id": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "total_count": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -8374,6 +8704,23 @@
                   "frame_count": 42,
                   "manifest_url": "https://cdn.example.com/recordings/rec_123/manifest.m3u8",
                   "status": "completed"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "engine": {
+                      "type": "string"
+                    },
+                    "frame_count": {
+                      "type": "integer"
+                    },
+                    "manifest_url": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -8486,6 +8833,20 @@
                     "recordings/rec_123/0002.jpg"
                   ],
                   "next_cursor": 2
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "frames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -8569,6 +8930,20 @@
                   "recording_id": "rec_123",
                   "session_id": "sess_123",
                   "status": "recording"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recording_id": {
+                      "type": "string"
+                    },
+                    "session_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -8652,6 +9027,20 @@
                   "manifest_ref": "recordings/rec_123/manifest.m3u8",
                   "session_id": "sess_123",
                   "status": "completed"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "manifest_ref": {
+                      "type": "string"
+                    },
+                    "session_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -8729,7 +9118,27 @@
                     "last_run_status": "completed",
                     "url": "https://example.com"
                   }
-                ]
+                ],
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "cron": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "last_run_status": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
               }
             },
             "description": "Successful Response"
@@ -9466,6 +9875,23 @@
                   "page_url_host": "example.com",
                   "png_base64": "<base64-png>",
                   "ref": "00000000-0000-0000-0000-000000000000"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "page_url_host": {
+                      "type": "string"
+                    },
+                    "png_base64": {
+                      "type": "string"
+                    },
+                    "ref": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             },
@@ -9570,6 +9996,41 @@
                   ],
                   "query": "weather in Paris",
                   "total": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "engine": {
+                      "type": "string"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "snippet": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "query": {
+                      "type": "string"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -9683,6 +10144,41 @@
                   ],
                   "query": "weather in Paris",
                   "total": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "engine": {
+                      "type": "string"
+                    },
+                    "extras": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "snippet": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "query": {
+                      "type": "string"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
@@ -9733,6 +10229,17 @@
                 "example": {
                   "actions": 3,
                   "reloaded": true
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "actions": {
+                      "type": "integer"
+                    },
+                    "reloaded": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             },
@@ -9783,6 +10290,14 @@
               "application/json": {
                 "example": {
                   "reloaded": true
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reloaded": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             },
@@ -9834,6 +10349,17 @@
                 "example": {
                   "count": 2,
                   "reloaded": true
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "reloaded": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             },
@@ -10791,6 +11317,14 @@
               "application/json": {
                 "example": {
                   "released": true
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "released": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             },
@@ -11058,6 +11592,43 @@
                     }
                   ],
                   "total_count": 1
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "blob_bytes": {
+                            "type": "integer"
+                          },
+                          "cookie_count": {
+                            "type": "integer"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "origins_count": {
+                            "type": "integer"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "total_count": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             },
