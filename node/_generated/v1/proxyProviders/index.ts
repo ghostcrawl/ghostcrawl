@@ -11,14 +11,14 @@ import { createUntypedNodeFromDiscriminatorValue, type BaseRequestBuilder, type 
  */
 export interface ProxyProvidersRequestBuilder extends BaseRequestBuilder<ProxyProvidersRequestBuilder> {
     /**
-     * curated proxy provider list. Bearer-gated. Returns the operator-curated list of proxyproviders with referral URLs (carrying the operator's creator code) andpricing summaries. The customer signs up here, pays the provider, and bringsthe creds. Security:, referral URLs are not secrets, but the customer-facing list is bearer-gated (a 140. 4-era extract-method refactor accidentallypromoted the unauthenticated renderer to the route + orphaned this gated handler;restored 2026-06-11).
+     * curated proxy provider list. Bearer-gated. The customer signs up here, pays the provider, and bringsthe creds. Security:, referral URLs are not secrets, but the customer-facing list is bearer-gated (a 140. 4-era extract-method refactor accidentallypromoted the unauthenticated renderer to the route + orphaned this gated handler;restored 2026-06-11).
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {Promise<UntypedNode>}
      * @throws {HTTPValidationError} error when the service returns a 422 status code
      */
      get(requestConfiguration?: RequestConfiguration<object> | undefined) : Promise<UntypedNode | undefined>;
     /**
-     * curated proxy provider list. Bearer-gated. Returns the operator-curated list of proxyproviders with referral URLs (carrying the operator's creator code) andpricing summaries. The customer signs up here, pays the provider, and bringsthe creds. Security:, referral URLs are not secrets, but the customer-facing list is bearer-gated (a 140. 4-era extract-method refactor accidentallypromoted the unauthenticated renderer to the route + orphaned this gated handler;restored 2026-06-11).
+     * curated proxy provider list. Bearer-gated. The customer signs up here, pays the provider, and bringsthe creds. Security:, referral URLs are not secrets, but the customer-facing list is bearer-gated (a 140. 4-era extract-method refactor accidentallypromoted the unauthenticated renderer to the route + orphaned this gated handler;restored 2026-06-11).
      * @param requestConfiguration Configuration for the request such as headers, query parameters, and middleware options.
      * @returns {RequestInformation}
      */

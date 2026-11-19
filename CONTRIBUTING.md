@@ -101,13 +101,13 @@ This appends:
 Signed-off-by: Your Name <you@example.com>
 ```
 
-By signing off you certify that you wrote the code (or have the right to submit it) and grant
-GhostCrawl, LLC the rights to use it under the [GhostCrawl Software License](LICENSE) terms.
+By signing off you certify that you wrote the code (or have the right to submit it) and agree
+that your contribution is licensed under the MIT License, the same terms as the public client toolkit.
 Full DCO text at <https://developercertificate.org>.
 
 ---
 
 ## License
 
-By contributing you agree that your contribution is licensed to GhostCrawl, LLC under the
-[GhostCrawl Software License](LICENSE) (proprietary).
+By contributing you agree that your contribution is licensed under the
+[MIT License](LICENSE), the same open-source license that covers the public client toolkit.

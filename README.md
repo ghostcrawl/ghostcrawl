@@ -56,9 +56,12 @@ Protocol surface, so any agent can drive it directly.
 
 - **It gets through.** Pages render and return authentic results where ordinary
   headless setups get blocked or fed altered content.
-- **CAPTCHAs handled for you.** When a site throws a CAPTCHA, it's cleared
-  automatically as part of the request — included on every paid plan, with no
-  third-party solver to wire up and no per-solve fee.
+- **Access challenges.** Included on every paid plan: renders are compatible with
+  common anti-automation checks; no separate solver is required, within the limits
+  of the AUP. For publicly accessible content you are authorized to collect, routine
+  checks are satisfied as part of a normal render. Credential-gated, paywalled, or
+  otherwise restricted content you are not authorized to access is out of scope —
+  see the [Acceptable Use Policy](https://docs.ghostcrawl.io/legal/aup).
 - **Three real engines.** Chrome, Firefox, and WebKit. Pick one or let
   `auto` choose. The same site looks the same to GhostCrawl as it does to a
   real visitor.
@@ -83,7 +86,7 @@ Protocol surface, so any agent can drive it directly.
 | **Extract** | Pull structured JSON from a page against a schema you provide. Deterministic by default — reads the structured data pages already embed and fills your schema, no model to configure. |
 | **Browser control** | Drive a live session: navigate, click, type, scroll, screenshot. |
 | **Agent (MCP)** | Give an agent a goal; it navigates and acts to complete it. |
-| **CAPTCHA solving** | Clears CAPTCHA challenges automatically as part of the request — included on paid plans. |
+| **Access challenge handling** | Renders are compatible with common anti-automation checks — no separate solver required, within the limits of the AUP. Included on paid plans. |
 | **Search / SERP** | Query search engines and verticals (web, news, shopping, and more). |
 | **Sessions** | Sticky, reusable browser sessions with consistent identity. |
 | **Identity profiles** | Persistent, coherent browser identities that survive across runs. |
@@ -231,12 +234,12 @@ PowerShell equivalents on one page:
 Advanced: [`docker-compose.yml.template`](docker-compose.yml.template) or the full
 [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host) guide. The
 published image is `linux/amd64` — native on Intel/x86 and the canonical live image
-(not replaced). A native `linux/arm64` leg is being built and staged for 2.3.8 but
+(not replaced). A native `linux/arm64` leg is being built and staged for 2.3.9 but
 is **not publicly published yet**; no public arm64 tag exists today. **Apple Silicon
 (M-series)** runs the native arm64 leg once it ships (Docker Desktop translates the
 amd64 image until then). **ARM Windows** has no native arm64 image — Docker uses
 amd64 emulation. Each of the three engines (Chromium, Firefox, WebKit) is gated for
-native arm64 in 2.3.8; per-engine status is recorded when the sign-off evidence lands.
+native arm64 in 2.3.9; per-engine status is recorded when the sign-off evidence lands.
 
 Free tier = **one browser per engine** + stock Windows Chrome / Windows Firefox /
 Mac Safari. **Self-host Plus ($9/mo)** or any paid plan unlocks more seats and

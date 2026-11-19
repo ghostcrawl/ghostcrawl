@@ -8,10 +8,10 @@ same JSON output format.
 
 ## Install
 
-The current release is **2.3.8** (`@ghostcrawl/cli@2.3.8`):
+The current release is **2.3.9** (`@ghostcrawl/cli@2.3.9`):
 
 ```bash
-npm install -g @ghostcrawl/cli@2.3.8
+npm install -g @ghostcrawl/cli@2.3.9
 ```
 
 Requires Node.js >= 18. The `ghostcrawl init` and `ghostcrawl install` verbs below

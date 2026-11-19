@@ -12,7 +12,7 @@
     },
     "schemas": {
       "AgentBudgetExceededEnvelope": {
-        "description": "per-session `max_total_llm_calls` budget exceeded. The session is tombstoned atomically inside `llm_provider.dispatch`; subsequent `/v1/agent` calls against the same session_id return 404 (session ended). Header `X-Ghostcrawl-Warning: budget-exceeded` is copied to the actual HTTP response by the serving gateway.",
+        "description": "Returned when a session exceeds its `max_total_llm_calls` budget. The session ends at that point, so subsequent `/v1/agent` calls with the same session_id return 404 (session ended). The HTTP response includes the `X-Ghostcrawl-Warning: budget-exceeded` header.",
         "properties": {
           "headers": {
             "properties": {
@@ -401,7 +401,7 @@
             "type": "object"
           },
           "reason": {
-            "description": "Coarse reason (\"limiter_reject\"). intentionally omits limits.reason to avoid leaking limiter internal state.",
+            "description": "Coarse reason code describing the rejection (for example, \"limiter_reject\"). A detailed internal reason is not included.",
             "type": "string"
           },
           "route": {
@@ -554,6 +554,16 @@
       },
       "ClosePopupsBody": {
         "properties": {
+          "detect_only": {
+            "default": false,
+            "title": "Detect Only",
+            "type": "boolean"
+          },
+          "interact": {
+            "default": false,
+            "title": "Interact",
+            "type": "boolean"
+          },
           "keep_host": {
             "anyOf": [
               {
@@ -614,7 +624,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).",
+            "description": "Advanced geo override for entitled accounts. When enabled, uses the pinned `identity_country` timezone and location even if it differs from the exit IP. Ignored when your account is not entitled. Default off, geo follows the exit; use `identity_country` for standard country pinning on plans that include it.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -1097,16 +1107,16 @@
             ],
             "type": "string"
           },
-          "issued_at": {
-            "type": "integer"
-          },
-          "lane": {
-            "type": "string"
-          },
           "identity_layer": {
             "enum": [
               "managed"
             ],
+            "type": "string"
+          },
+          "issued_at": {
+            "type": "integer"
+          },
+          "lane": {
             "type": "string"
           },
           "receipt_id": {
@@ -1269,7 +1279,7 @@
         "type": "object"
       },
       "ExtractRequest": {
-        "description": "POST /v1/extract request body, schema-driven extraction (deterministic) + bring-your-own-model extraction. Two extraction modes: - Deterministic (default, model_provider absent): native structured-data extraction, reads the schema.org JSON-LD / microdata / Open Graph a page already embeds and fills the schema (no model, no third party); returns whole priced product grids. Requires 'schema'. Returns {\"url\",\"data\",\"token_estimate\"}. - Bring-your-own-model (model_provider present): GhostCrawl fetches and prepares clean Markdown; your connected model performs the semantic extraction (you are not billed for model inference here, only the request quota). Returns {\"urls\",\"data\",\"token_estimate\"}. Security notes: - The 'schema' field is validated before any fetch (fail-fast input guard). - URLs are validated against private, loopback, and metadata targets before any fetch. - Error responses never echo the schema body, fetched content, or model credentials. - model_provider.api_key is request-scoped only: never persisted, logged, or returned in any response body or error message.",
+        "description": "POST /v1/extract request body, schema-driven extraction (deterministic) + connected-model extraction. Two extraction modes: - Deterministic (default, model_provider absent): native structured-data extraction, reads the schema.org JSON-LD / microdata / Open Graph a page already embeds and fills the schema (no model, no third party); returns whole priced product grids. Requires 'schema'. Returns {\"url\",\"data\",\"token_estimate\"}. - Connected model (model_provider present): GhostCrawl fetches and prepares clean Markdown; your connected model performs the semantic extraction (you are not billed for model inference here, only the request quota). Returns {\"urls\",\"data\",\"token_estimate\"}. Security notes: - The 'schema' field is validated before any fetch (fail-fast input guard). - URLs are validated against private, loopback, and metadata targets before any fetch. - Error responses never echo the schema body, fetched content, or model credentials. - model_provider.api_key is request-scoped only: never persisted, logged, or returned in any response body or error message.",
         "properties": {
           "behavior_actions": {
             "anyOf": [
@@ -1284,7 +1294,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO behavior: trusted-input actions replayed on the loaded page instead of the built-in browser session. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
+            "description": "Custom page actions replayed on the loaded page instead of the built-in browser session. Sanitized + bounded server-side (max 256 actions). Available on every plan.",
             "title": "Behavior Actions"
           },
           "engine": {
@@ -1301,7 +1311,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Override geo-coherence: use `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. Requires a pinned `identity_country` (and the geo_select tier). Off by default, the default is IP-coherent geo (the browser identity follows the exit). Forcing may create an IP<->timezone mismatch that some sites cross-check; opt-in at your own risk.",
+            "description": "Advanced geo override for entitled accounts. When enabled, uses the pinned `identity_country` timezone and location even if it differs from the exit IP. Ignored when your account is not entitled. Default off, geo follows the exit; use `identity_country` for standard country pinning on plans that include it.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -1329,7 +1339,7 @@
                 "type": "null"
               }
             ],
-            "description": "Inline identity specification (Creates an ephemeral identity). Same shape as /v1/scrape: {operating system, browser, viewport|device_model}. Absent → default identity.",
+            "description": "Inline identity specification (Creates an ephemeral identity). Same shape as the /v1/scrape identity object (os class, browser, viewport or device model, see /v1/scrape for exact fields). Absent → default identity.",
             "title": "Identity Spec"
           },
           "language": {
@@ -1354,7 +1364,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO model credentials dict: {type, api_key, model, base_url?}. When present → BYO-LLM extraction path (GhostCrawl bills the request, not the inference tokens, inference runs on the user's connected model). When absent → deterministic native structured-data extraction (default): schema.org JSON-LD / microdata / Open Graph parsed into the schema, no model.",
+            "description": "Connected-model credentials: {type, api_key, model, base_url?}. When present → your model runs the semantic extraction (GhostCrawl bills the request, not inference tokens). When absent → deterministic native structured-data extraction (default): schema.org JSON-LD / microdata / Open Graph parsed into the schema, no model.",
             "title": "Model Provider"
           },
           "prompt": {
@@ -1379,7 +1389,7 @@
                 "type": "null"
               }
             ],
-            "description": "JSON Schema describing the desired extraction output. Required for deterministic extraction (model_provider absent). Optional for BYO-LLM extraction (model_provider present), when provided, the LLM is instructed to respond in JSON-mode conforming to this schema.",
+            "description": "JSON Schema describing the desired extraction output. Required for deterministic extraction (model_provider absent). Optional when using a connected model (model_provider present), when provided, the model is instructed to respond in JSON-mode conforming to this schema.",
             "title": "Schema"
           },
           "url": {
@@ -1574,7 +1584,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).",
+            "description": "Advanced geo override for entitled accounts. When enabled, uses the pinned `identity_country` timezone and location even if it differs from the exit IP. Ignored when your account is not entitled. Default off, geo follows the exit; use `identity_country` for standard country pinning on plans that include it.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -1786,6 +1796,54 @@
         "required": [
           "server"
         ],
+        "type": "object"
+      },
+      "RTOfferBody": {
+        "properties": {
+          "sdp": {
+            "maxLength": 131072,
+            "minLength": 1,
+            "title": "Sdp",
+            "type": "string"
+          },
+          "token": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Token",
+            "type": "string"
+          },
+          "viewport": {
+            "$ref": "#/components/schemas/RTViewportBody"
+          }
+        },
+        "required": [
+          "token",
+          "sdp",
+          "viewport"
+        ],
+        "title": "RTOfferBody",
+        "type": "object"
+      },
+      "RTViewportBody": {
+        "properties": {
+          "height": {
+            "maximum": 4096,
+            "minimum": 64,
+            "title": "Height",
+            "type": "integer"
+          },
+          "width": {
+            "maximum": 4096,
+            "minimum": 64,
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "title": "RTViewportBody",
         "type": "object"
       },
       "RetryDeliveryResponse": {
@@ -2022,7 +2080,7 @@
                 "type": "null"
               }
             ],
-            "description": "BYO behavior: a list of trusted-input actions replayed on the loaded page instead of the built-in browser session. Each item is {\"kind\":\"move\",\"x\":int,\"y\":int} | {\"kind\":\"wheel\",\"x\":int,\"y\":int,\"dy\":int} | {\"kind\":\"dwell\",\"ms\":int}. Sanitized + bounded server-side (max 256 actions). Available on every tier.",
+            "description": "Custom page actions replayed on the loaded page instead of the built-in browser session. Each item is {\"kind\":\"move\",\"x\":int,\"y\":int} | {\"kind\":\"wheel\",\"x\":int,\"y\":int,\"dy\":int} | {\"kind\":\"dwell\",\"ms\":int}. Sanitized + bounded server-side (max 256 actions). Available on every plan.",
             "title": "Behavior Actions"
           },
           "chunk_tokens": {
@@ -2030,6 +2088,20 @@
             "description": "Maximum tokens per markdown chunk. Clamped server-side to [256, 32768] regardless of caller input.",
             "title": "Chunk Tokens",
             "type": "integer"
+          },
+          "device": {
+            "default": "random",
+            "description": "Device class for the population identity draw. 'random' (default) = unchanged. The random_* classes restrict which real-population devices may be drawn (weights inside the class unchanged); with engine 'auto' the engine follows the drawn device (iOS -> webkit always, android -> chrome). An engine the class cannot render on -> 422 device_engine_mismatch. Not combinable with identity / profile; identity_spec's operating system must lie inside the class. For a fixed device use profile=<name>. Cloud only: where no population draw runs (self-host / direct egress) a non-random class -> 422 device_unsupported.",
+            "enum": [
+              "random",
+              "random_desktop",
+              "random_mobile",
+              "random_windows",
+              "random_android",
+              "random_ios"
+            ],
+            "title": "Device",
+            "type": "string"
           },
           "engine": {
             "default": "auto",
@@ -2062,7 +2134,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Override geo-coherence: use `identity_country`'s geo (timezone + geolocation) REGARDLESS of the exit IP's country. Requires a pinned `identity_country` (and the geo_select tier). Off by default, the default is IP-coherent geo (the browser identity follows the exit). Forcing may create an IP<->timezone mismatch that some sites cross-check; opt-in at your own risk.",
+            "description": "Advanced geo override for entitled accounts. When enabled, uses the pinned `identity_country` timezone and location even if it differs from the exit IP. Ignored when your account is not entitled. Default off, geo follows the exit; use `identity_country` for standard country pinning on plans that include it.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -2132,7 +2204,7 @@
                 "type": "null"
               }
             ],
-            "description": "Named persistent profile (multi-accounting). Resolves to a durable identity_id (→ the same browser identity every time) + optional saved storage_state (→ cookies/localStorage) for the calling org. Reuses the exact identity+cookies on every request, with no 30-minute sticky-session expiry. 404 if the named profile does not exist for the org.",
+            "description": "Named persistent profile (multi-accounting). Resolves to a durable identity_id (→ the same browser identity every time) + optional saved storage_state (→ cookies/localStorage) for the calling org. Reuses the exact identity+cookies on every request, with no short same-session token expiry. 404 if the named profile does not exist for the org.",
             "title": "Profile"
           },
           "proxy": {
@@ -2144,7 +2216,7 @@
                 "type": "null"
               }
             ],
-            "description": "Bring-your-own proxy URL. Schemes: socks5, socks5h, http, https. Any credentials in the URL are redacted from logs. Example: socks5://user:pass@host:1080.",
+            "description": "Your own proxy URL. Schemes: socks5, socks5h, http, https. Any credentials in the URL are redacted from logs. Example: socks5://host:1080. Include credentials in the URL when your provider requires them.",
             "title": "Proxy"
           },
           "routing_mode": {
@@ -2185,7 +2257,7 @@
                 "type": "null"
               }
             ],
-            "description": "Sticky-session token (paid tiers). Requests sharing a token reuse the same identity → same exit + cookies (returning-visitor coherence). Bounded TTL; opaque [A-Za-z0-9._-], max 128 chars.",
+            "description": "Same-session token (paid plans). Requests that share a token reuse the same browser identity, network exit, and cookies (returning visitor). Bounded TTL; opaque [A-Za-z0-9._-], max 128 chars.",
             "title": "Session"
           },
           "stream": {
@@ -2225,6 +2297,7 @@
                 "items": {
                   "type": "string"
                 },
+                "maxItems": 100,
                 "type": "array"
               },
               {
@@ -2232,20 +2305,6 @@
               }
             ],
             "title": "Urls"
-          },
-          "device": {
-            "type": "string",
-            "enum": [
-              "random",
-              "random_desktop",
-              "random_mobile",
-              "random_windows",
-              "random_android",
-              "random_ios"
-            ],
-            "title": "Device",
-            "description": "Device class for the population identity draw. 'random' (default) = unchanged. The random_* classes restrict which real-population devices may be drawn (weights inside the class unchanged); with engine 'auto' the engine follows the drawn device (iOS -> webkit always, android -> chrome). An engine the class cannot render on -> 422 device_engine_mismatch. Not combinable with identity / profile; identity_spec's operating system must lie inside the class. For a fixed device use profile=<name>. Cloud only: where no population draw runs (self-host / direct egress) a non-random class -> 422 device_unsupported.",
-            "default": "random"
           }
         },
         "title": "ScrapeRequest",
@@ -2372,7 +2431,7 @@
           },
           "geo_force": {
             "default": false,
-            "description": "Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).",
+            "description": "Advanced geo override for entitled accounts. When enabled, uses the pinned `identity_country` timezone and location even if it differs from the exit IP. Ignored when your account is not entitled. Default off, geo follows the exit; use `identity_country` for standard country pinning on plans that include it.",
             "title": "Geo Force",
             "type": "boolean"
           },
@@ -2633,6 +2692,57 @@
       },
       "SessionCreateRequest": {
         "properties": {
+          "bandwidth_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bandwidth Class"
+          },
+          "browser_behavior": {
+            "default": false,
+            "title": "Browser Behavior",
+            "type": "boolean"
+          },
+          "cdp": {
+            "default": false,
+            "description": "Wait for a CDP/WS endpoint before returning. Chromium always does; for firefox/webkit the create returns as soon as the browser context is ready.",
+            "title": "Cdp",
+            "type": "boolean"
+          },
+          "device": {
+            "default": "random",
+            "description": "Device class for the population identity draw. 'random' (default) = the unchanged population draw for the requested engine. 'random_desktop' (windows/macos/linux), 'random_mobile' (ios/android), 'random_windows', 'random_android', 'random_ios' restrict WHICH real-population devices may be drawn; the weights inside the class stay the real OS/browser/device shares. When engine is omitted (or 'auto') the engine is routed from the drawn device: iOS -> webkit (always), android -> chrome, desktop -> chrome/firefox/webkit per the real browser share. An explicit engine the class cannot render on (e.g. random_ios + chrome) is rejected with 422 device_engine_mismatch, never re-routed. With random_ios / random_mobile, leave engine unset or set it to 'auto' so the engine follows the drawn device. With identity_config/profile the operating system must lie inside the class (422 device_identity_mismatch). 'static' pins ONE fixed device: pass device_seed (the same seed always yields the same device and a byte-stable fingerprint), or a profile, or an identity_config carrying reuse_identity_seed (422 device_static_requires_seed otherwise).",
+            "enum": [
+              "random",
+              "random_desktop",
+              "random_mobile",
+              "random_windows",
+              "random_android",
+              "random_ios",
+              "static"
+            ],
+            "title": "Device",
+            "type": "string"
+          },
+          "device_seed": {
+            "anyOf": [
+              {
+                "maximum": 9223372036854776000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "device='static' only: a stable non-negative integer, scoped to YOUR organization (the server derives the identity from org + seed, so another org's seed 1 is a different device). Seeds the population device draw AND pins the fingerprint, so every create from this org with the same seed (and engine) is the same device. Store it to bring the same device back.",
+            "title": "Device Seed"
+          },
           "engine": {
             "default": "chrome",
             "enum": [
@@ -2654,8 +2764,8 @@
                 "type": "null"
               }
             ],
-            "title": "Identity Config",
-            "description": "Explicit identity claim (IdentityRequest shape: operating system, browser, device_model, viewport, locale, timezone, reuse_identity_seed). viewport is optional: a desktop claim (windows/macos/linux) without viewport defaults to \"any\" (a prevalence-weighted real windowed size for that claim, the same draw as the population default). A mobile claim (ios/android) takes its viewport from device_model; without device_model a prevalence-weighted catalog device is drawn. Omit identity_config entirely to draw a population identity for the requested engine. reuse_identity_seed (returning visitor): send back the `reuse_identity_seed` value a previous create from YOUR org returned to get the same device again; it is scoped to your organization server-side (another org sending the same value gets an unrelated device). identity_id is NOT a replay handle; a non-integer value is ignored (fresh device)."
+            "description": "Explicit identity claim (IdentityRequest shape: operating system, browser, device_model, viewport, locale, timezone, reuse_identity_seed). viewport is optional: a desktop claim (windows/macos/linux) without viewport defaults to \"any\" (a prevalence-weighted real windowed size for that claim, the same draw as the population default). A mobile claim (ios/android) takes its viewport from device_model; without device_model a prevalence-weighted catalog device is drawn. Omit identity_config entirely to draw a population identity for the requested engine. reuse_identity_seed (returning visitor): send back the `reuse_identity_seed` value a previous create from YOUR org returned to get the same device again; it is scoped to your organization server-side (another org sending the same value gets an unrelated device). identity_id is NOT a replay handle; a non-integer value is ignored (fresh device).",
+            "title": "Identity Config"
           },
           "identity_country": {
             "anyOf": [
@@ -2692,35 +2802,6 @@
               }
             ],
             "title": "Proxy"
-          },
-          "device": {
-            "type": "string",
-            "enum": [
-              "random",
-              "random_desktop",
-              "random_mobile",
-              "random_windows",
-              "random_android",
-              "random_ios",
-              "static"
-            ],
-            "title": "Device",
-            "description": "Device class for the population identity draw. 'random' (default) = the unchanged population draw for the requested engine. 'random_desktop' (windows/macos/linux), 'random_mobile' (ios/android), 'random_windows', 'random_android', 'random_ios' restrict WHICH real-population devices may be drawn; the weights inside the class stay the real OS/browser/device shares. When engine is omitted (or 'auto') the engine is routed from the drawn device: iOS -> webkit (always), android -> chrome, desktop -> chrome/firefox/webkit per the real browser share. An explicit engine the class cannot render on (e.g. random_ios + chrome) is rejected with 422 device_engine_mismatch, never re-routed. NOTE: an explicitly sent engine='chrome' counts as explicit even though it equals the default, so a client that always serializes engine must send 'auto' (or omit it) with random_ios / random_mobile. With identity_config/profile the operating system must lie inside the class (422 device_identity_mismatch). 'static' pins ONE fixed device: pass device_seed (the same seed always yields the same device and a byte-stable fingerprint), or a profile, or an identity_config carrying reuse_identity_seed (422 device_static_requires_seed otherwise).",
-            "default": "random"
-          },
-          "device_seed": {
-            "anyOf": [
-              {
-                "type": "integer",
-                "maximum": 9.223372036854776e+18,
-                "minimum": 0.0
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Device Seed",
-            "description": "device='static' only: a stable non-negative integer, scoped to YOUR organization (the server derives the identity from org + seed, so another org's seed 1 is a different device). Seeds the population device draw AND pins the fingerprint, so every create from this org with the same seed (and engine) is the same device. Store it to bring the same device back."
           }
         },
         "title": "SessionCreateRequest",
@@ -2799,10 +2880,10 @@
         "type": "object"
       },
       "TakeoverActionBody": {
-        "description": "",
+        "description": "Request body for starting or ending an interactive takeover.",
         "properties": {
           "action": {
-            "description": "'mint' or 'release'",
+            "description": "'mint' to start, 'release' to end",
             "title": "Action",
             "type": "string"
           }
@@ -3019,7 +3100,7 @@
         "type": "object"
       },
       "WebhookDeliveryPublic": {
-        "description": "Wire-public delivery log representation. 13 wire-public fields per webhook_deliveries schema. All fields are operator/integrator-facing, no secret material.",
+        "description": "A single webhook delivery attempt from the delivery log. Contains delivery status and timing metadata only; no signing secrets.",
         "properties": {
           "attempt": {
             "title": "Attempt",
@@ -3330,6 +3411,12 @@
       }
     },
     "securitySchemes": {
+      "apiKeyHeader": {
+        "description": "Alternative to Authorization: Bearer, send the same GhostCrawl API key as X-Api-Key: gck_YOUR_KEY_HERE. Both transports are accepted by the runtime; when both are supplied, Authorization (or an X-Admin-Key) takes precedence and X-Api-Key is ignored.",
+        "in": "header",
+        "name": "X-Api-Key",
+        "type": "apiKey"
+      },
       "bearerAuth": {
         "bearerFormat": "GCK",
         "description": "Paste your API key as: Authorization: Bearer gck_YOUR_KEY_HERE",
@@ -3433,13 +3520,98 @@
   "info": {
     "description": "The GhostCrawl web data API: scrape, crawl, search, and extract any URL with real browser engines and consistent identity profiles.",
     "title": "GhostCrawl API",
-    "version": "2.3.8"
+    "version": "2.3.9"
   },
   "openapi": "3.1.0",
   "paths": {
+    "/v1/agent": {
+      "post": {
+        "description": "BETA / opt-in. The REST agent lane is disabled by default and returns 404 until enabled for your account/deployment (see the 404 response below). The agent capability is generally available via the MCP `ghostcrawl_agent` tool; this REST surface is still stabilising. Contact support to enable it.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Task policy failed, task URL failed gateway policy, proxy failed policy, or tenant/workspace proxy constraint"
+          },
+          "404": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "example": "Not Found",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Returned when the agent capability is not enabled for this account or deployment. The agent lane runs server-side orchestration, the navigate / act / observe steps execute on GhostCrawl's managed browsers, and calls your bring-your-own (BYO) LLM for the reasoning step via the `X-LLM-Api-Key` / `X-LLM-Provider` request headers. While the capability is not enabled the route returns 404; once enabled it returns the agent execution envelope. The BYO LLM is the only part you supply, the orchestration itself is hosted."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CapacityExhausted429"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AgentBudgetExceededEnvelope"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Either capacity exhausted (Retry-After header present, CapacityExhausted429 body) or per-session max_total_llm_calls budget exceeded (X-Ghostcrawl-Warning: budget-exceeded).",
+            "headers": {
+              "Retry-After": {
+                "$ref": "#/components/headers/RetryAfter"
+              },
+              "X-Ghostcrawl-Warning": {
+                "schema": {
+                  "enum": [
+                    "budget-exceeded"
+                  ],
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Startup config-preflight gate blocked request handling"
+          }
+        },
+        "summary": "Start agent lane request (beta, opt-in; 404 until enabled for your account)",
+        "x-beta": true
+      }
+    },
     "/v1/cdp/frame": {
       "post": {
-        "description": "Capture a JPEG frame of a live browser session. Returns a single base64-encoded JPEG frame of a live interactive session. Gating: 1. Tenant authentication 2. Revocation check 3. 4. Session ownership (the session must belong to the authenticated organisation) Returns 200 {\"format\":\"jpeg\",\"data\":\"<base64>\",\"engine\",\"width\",\"height\"} on success; 403 cdp_not_enabled (tier) / cdp_revoked; 404 session_not_found; 502 frame_failed.",
+        "description": "Capture a single JPEG frame from a live browser session. Purpose: grab a still image of a running, interactive session for a live-view preview. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `session_id` (required) identifies the live session; `quality` (optional, 1-100, default 60) sets JPEG quality. Request: POST /v1/cdp/frame with a JSON body such as {\"session_id\": \"sess_123\", \"quality\": 60}. Success: 200 with {\"format\": \"jpeg\", \"data\": \"<base64-jpeg>\", \"engine\": \"chrome\", \"width\": 1280, \"height\": 720}. Errors: 401 for missing credentials, 403 when live view is not enabled for your plan or access has been revoked, 404 when the session is not found, and 502 if the frame could not be captured. Billing: each capture counts toward your plan's request quota. Limits: one frame per call; poll at a reasonable interval. Access is enforced in four steps: authentication, a revocation check, an entitlement check, and Ownership verification that the session belongs to your account. Data and privacy: this operation reads a transient frame from your own session and returns it in the response; GhostCrawl does not retain the frame or the captured page content. See the Privacy Policy and Cookie Notice for retention details.",
         "operationId": "cdp_frame_v1_cdp_frame_post",
         "parameters": [
           {
@@ -3489,10 +3661,16 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "data": "<base64-jpeg>",
+                  "engine": "chrome",
+                  "format": "jpeg",
+                  "height": 720,
+                  "width": 1280
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "A captured JPEG frame."
           },
           "422": {
             "content": {
@@ -3569,10 +3747,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "ok": true,
+                  "step_type": "navigate"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Step dispatched."
           },
           "422": {
             "content": {
@@ -3649,10 +3830,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "expires_in_seconds": 120,
+                  "url": "wss://example.com/cdp/sess_123"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Short-lived CDP endpoint URL."
           },
           "422": {
             "content": {
@@ -3758,7 +3942,7 @@
     },
     "/v1/crawl-runs": {
       "get": {
-        "description": "cursor pagination. {items, next_cursor, total_count}. change in; created_at_from > created_at_to → 400 (not 422). Error envelope for 403 unchanged (at error layer).",
+        "description": "List crawl runs with cursor pagination. Purpose: retrieve the crawl runs in your account, newest first. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `limit` (optional, default 20) sets page size; `cursor` (optional) continues a previous page, omit it on the first request and pass the returned `next_cursor` to fetch the next page; `created_at_from` and `created_at_to` (optional) filter by creation time. Request: GET /v1/crawl-runs?limit=20. Success: 200 with a cursor-paginated page {\"items\": [.], \"next_cursor\": \"<opaque>\", \"total_count\": 42}, where each item is a crawl-run object with id, status, seed_url, and timestamps. Errors: 401 for missing credentials, 403 if your key lacks read permission, and 400 when `created_at_from` is later than `created_at_to` (an inverted date range). Billing: listing is free and counts as a read request toward your quota. Limits: page size is capped and cursors are opaque, do not construct them. Data and privacy: this read-only operation returns crawl-run metadata from your own account; GhostCrawl retains run metadata for the life of your account. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_crawl_runs_v1_crawl_runs_get",
         "parameters": [
           {
@@ -3879,7 +4063,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "items": [
+                    {
+                      "created_at": "2026-11-17T00:00:00Z",
+                      "id": "cr_123",
+                      "seed_url": "https://example.com",
+                      "status": "completed"
+                    }
+                  ],
+                  "total_count": 1
+                }
               }
             },
             "description": "Successful Response"
@@ -3900,7 +4094,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "List crawl runs (canonical envelope)",
+        "summary": "List crawl runs",
         "tags": [
           "crawl-runs"
         ]
@@ -3970,10 +4164,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "completed_at": 1763323260,
+                  "pages_crawled": 12,
+                  "pages_failed": 0,
+                  "run_id": "cr_123",
+                  "started_at": 1763323200,
+                  "status": "completed"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Crawl run accepted."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -4089,10 +4290,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "completed_at": 1763323260,
+                  "pages_crawled": 12,
+                  "pages_failed": 0,
+                  "run_id": "cr_123",
+                  "started_at": 1763323200,
+                  "status": "completed"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Current crawl run status."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -4200,10 +4408,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "completed_at": 1763323260,
+                  "pages_crawled": 12,
+                  "pages_failed": 0,
+                  "run_id": "cr_123",
+                  "started_at": 1763323200,
+                  "status": "completed"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Crawl run after cancellation."
           },
           "422": {
             "content": {
@@ -4290,10 +4505,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "completed_at": 1763323260,
+                  "pages_crawled": 12,
+                  "pages_failed": 0,
+                  "run_id": "cr_123",
+                  "started_at": 1763323200,
+                  "status": "completed"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Crawl run after resuming."
           },
           "422": {
             "content": {
@@ -4489,7 +4711,7 @@
     },
     "/v1/datasets": {
       "get": {
-        "description": "cursor pagination. (created_at, id) base64 tuple; created_at_from > created_at_to → 400 (not 422).",
+        "description": "List datasets with cursor pagination. Purpose: retrieve the datasets stored in your account, newest first. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `limit` (optional, default 20) sets page size; `cursor` (optional) continues a previous page, omit it initially and pass the returned `next_cursor` to fetch more; `created_at_from` and `created_at_to` (optional) filter by creation time. Request: GET /v1/datasets?limit=20. Success: 200 with {\"items\": [.], \"next_cursor\": \"<opaque>\", \"total_count\": 4}, where each item is a dataset object with id, name, and timestamps. Errors: 401 for missing credentials, 403 if your key lacks read permission, and 400 when `created_at_from` is later than `created_at_to`. Billing: listing is free and counts as a read request. Limits: page size is capped; cursors are opaque. Data and privacy: this read-only operation returns dataset metadata from your own account; a dataset you saved is retained until you delete it. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_datasets_v1_datasets_get",
         "parameters": [
           {
@@ -4610,7 +4832,16 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "items": [
+                    {
+                      "created_at": "2026-11-17T00:00:00Z",
+                      "id": "ds_123",
+                      "name": "my-dataset"
+                    }
+                  ],
+                  "total_count": 1
+                }
               }
             },
             "description": "Successful Response"
@@ -4949,10 +5180,20 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "rows": [
+                    {
+                      "payload": {
+                        "field": "value"
+                      },
+                      "row_id": "row_123",
+                      "written_at": "2026-11-17T00:00:00Z"
+                    }
+                  ]
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Paginated rows."
           },
           "422": {
             "content": {
@@ -5039,10 +5280,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "appended": 2
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Append result."
           },
           "422": {
             "content": {
@@ -5060,7 +5303,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Append rows to a dataset (landing zone)",
+        "summary": "Append rows to a dataset",
         "tags": [
           "datasets"
         ]
@@ -5290,7 +5533,7 @@
     },
     "/v1/extract": {
       "post": {
-        "description": "structured extraction: deterministic (no model) or connect-your-model. GhostCrawl is a HARNESS, not an AI provider: it fetches and prepares clean content; your OWN connected model does any semantic extraction. GhostCrawl never runs inference on an operator key. CONNECT-YOUR-AI (a prompt but NO model_provider): returns 422 model_provider_required, connect your AI/LLM (pass model_provider) to run semantic extraction. Never a silent empty. DETERMINISTIC (model_provider absent, default): 1. The schema is validated (input guard). 2. The URL is validated against private/loopback/metadata targets. 3. The page is fetched and rendered. 4. Structured data is read natively from the page's schema.org JSON-LD / microdata / Open Graph. 5. The result is validated against the schema, 422 on mismatch (field path only). Returns {\"url\",\"data\",\"token_estimate\"}. When the page embedded NO matching structured data (every field null/empty), the response also carries a non-fatal \"warnings\":[\"no_structured_data: …pass model_provider…\"] so an all-null 200 is not mistaken for a failure. BRING-YOUR-OWN-MODEL (model_provider present): 1. Target URLs are resolved (urls or [url]). 2. The schema is validated if present. 3. At least one of prompt or schema is required, 400 prompt_or_schema_required otherwise. 4. Model credentials are validated, 400 invalid_model_provider on error (the message never echoes the key). 5. Every target URL is validated before fetching, 400 ssrf_blocked. 6. Each URL is fetched and converted to clean Markdown. 7. Your connected model performs the extraction. 8. With a schema present, the result is validated, 422 on mismatch. Returns {\"urls\",\"data\",\"token_estimate\"}. Security: 401 without a valid Bearer token. - model_provider.api_key is request-scoped: never persisted, logged, or echoed. - Error responses never echo the schema body, fetched content, or credentials.",
+        "description": "structured extraction: deterministic (no model) or connect-your-model. GhostCrawl fetches and renders the URL and reads structured data from the page. For fields that are not present as structured data, connect your own AI provider by passing `model_provider` and its credentials; your connected model then performs the semantic extraction. CONNECT-YOUR-AI (a prompt but NO model_provider): returns 422 model_provider_required, connect your AI/LLM (pass model_provider) to run semantic extraction. Never a silent empty. DETERMINISTIC (model_provider absent, default): 1. The schema is validated (input guard). 2. The URL is validated against private/loopback/metadata targets. 3. The page is fetched and rendered. 4. Structured data is read natively from the page's schema.org JSON-LD / microdata / Open Graph. 5. The result is validated against the schema, 422 on mismatch (field path only). Returns {\"url\",\"data\",\"token_estimate\"}. When the page embedded NO matching structured data (every field null/empty), the response also carries a non-fatal \"warnings\":[\"no_structured_data: …pass model_provider…\"] so an all-null 200 is not mistaken for a failure. BRING-YOUR-OWN-MODEL (model_provider present): 1. Target URLs are resolved (urls or [url]). 2. The schema is validated if present. 3. At least one of prompt or schema is required, 400 prompt_or_schema_required otherwise. 4. Model credentials are validated, 400 invalid_model_provider on error (the message never echoes the key). 5. Every target URL is validated before fetching, 400 ssrf_blocked. 6. Each URL is fetched and converted to clean Markdown. 7. Your connected model performs the extraction. 8. With a schema present, the result is validated, 422 on mismatch. Returns {\"urls\",\"data\",\"token_estimate\"}. Security: 401 without a valid Bearer token. - model_provider.api_key is request-scoped: never persisted, logged, or echoed. - Error responses never echo the schema body, fetched content, or credentials.",
         "operationId": "saas_extract_v1_extract_post",
         "parameters": [
           {
@@ -5353,6 +5596,11 @@
           "200": {
             "content": {
               "application/json": {
+                "example": {
+                  "data": {},
+                  "token_estimate": 42,
+                  "url": "https://example.com"
+                },
                 "schema": {
                   "additionalProperties": true,
                   "title": "Response Saas Extract V1 Extract Post",
@@ -5360,7 +5608,7 @@
                 }
               }
             },
-            "description": "Successful Response"
+            "description": "Extracted data (deterministic) or model-backed extraction result."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -5456,10 +5704,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "deleted": true
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Deletion result."
           },
           "422": {
             "content": {
@@ -5532,10 +5782,16 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "key": "my-key",
+                  "value": {
+                    "hello": "world"
+                  },
+                  "value_type": "json"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Stored entry."
           },
           "422": {
             "content": {
@@ -5620,10 +5876,14 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "key": "my-key",
+                  "size": 42,
+                  "value_type": "json"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Stored entry metadata."
           },
           "422": {
             "content": {
@@ -5859,10 +6119,15 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "closed": [
+                    "https://example.com/popup"
+                  ],
+                  "count": 1
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Closed popup tabs."
           },
           "422": {
             "content": {
@@ -7019,7 +7284,7 @@
     },
     "/v1/profiles": {
       "get": {
-        "description": "cursor pagination. new endpoint. silently created_at_from > created_at_to → 400 (not 422).",
+        "description": "List browser profiles with cursor pagination. Purpose: retrieve the browser profiles saved in your account, newest first. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `limit` (optional, default 20) sets page size; `cursor` (optional) continues a previous page, omit it initially and pass the returned `next_cursor` to fetch more; `created_at_from` and `created_at_to` (optional) filter by creation time. Request: GET /v1/profiles?limit=20. Success: 200 with {\"items\": [.], \"next_cursor\": \"<opaque>\", \"total_count\": 7}, where each item is a profile object with id, name, and timestamps. Errors: 401 for missing credentials, 403 if your key lacks read permission, and 400 when `created_at_from` is later than `created_at_to`. Billing: listing is free and counts as a read request. Limits: page size is capped; cursors are opaque. Data and privacy: this read-only operation returns profile metadata from your own account; GhostCrawl retains profile metadata for the life of your account. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_profiles_v1_profiles_get",
         "parameters": [
           {
@@ -7140,7 +7405,16 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "items": [
+                    {
+                      "created_at": "2026-11-17T00:00:00Z",
+                      "id": "prof_123",
+                      "name": "my-profile"
+                    }
+                  ],
+                  "total_count": 1
+                }
               }
             },
             "description": "Successful Response"
@@ -7484,9 +7758,260 @@
         ]
       }
     },
+    "/v1/realtime/capabilities": {
+      "get": {
+        "description": "Report whether the real-time interactive browser is usable for this caller. Clients call this before starting a live view so they can show the live surface, an upgrade prompt, or a not-configured state without a failed offer round-trip. - `interactive`: realtime gateway is configured and the caller has the ``interactive_session`` capability. The UI shows live view only when true. - `entitled`: the account grant alone (so UIs can distinguish \"upgrade\" from \"not available on this deployment\"). - `reason`: why ``interactive`` is false (``gateway_unavailable`` | ``capability_not_granted``). - `transport`: always ``webrtc``. - `turn`: whether TURN/ICE relay servers are configured. - `ice_servers`: STUN/TURN servers for the browser peer connection (only when entitled on a configured instance); empty otherwise.",
+        "operationId": "realtime_capabilities_v1_realtime_capabilities_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Realtime Capabilities V1 Realtime Capabilities Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Realtime Capabilities",
+        "tags": [
+          "realtime"
+        ]
+      }
+    },
+    "/v1/realtime/{session_id}/close": {
+      "post": {
+        "description": "Tear down the WebRTC peer for a session (best-effort, idempotent). Same ownership check as the offer endpoint. Stops the server-side peer and capture loop promptly and clears the active-view guard so a fresh view can open without waiting for token TTL. Safe if the gateway is already gone, the client has usually already dropped its peer; this reclaims server resources eagerly.",
+        "operationId": "realtime_close_v1_realtime__session_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Realtime Close V1 Realtime  Session Id  Close Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Realtime Close",
+        "tags": [
+          "realtime"
+        ]
+      }
+    },
+    "/v1/realtime/{session_id}/offer": {
+      "post": {
+        "description": "Begin a real-time interactive session: exchange SDP, return the gateway answer.",
+        "operationId": "realtime_offer_v1_realtime__session_id__offer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RTOfferBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Realtime Offer V1 Realtime  Session Id  Offer Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Realtime Offer",
+        "tags": [
+          "realtime"
+        ]
+      }
+    },
     "/v1/recordings": {
       "get": {
-        "description": "cursor pagination. items[*] shape unchanged. created_at_from > created_at_to → 400 (not 422).",
+        "description": "List recordings with cursor pagination. Purpose: retrieve the recordings saved in your account, newest first. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `limit` (optional, default 20) sets page size; `cursor` (optional) continues a previous page, omit it initially and pass the returned `next_cursor` to fetch more. Request: GET /v1/recordings?limit=20. Success: 200 with {\"items\": [.], \"next_cursor\": \"<opaque>\", \"total_count\": 5}, where each item is a recording object with id, session_id, status, and timestamps. Errors: 401 for missing credentials, 403 if your key lacks read permission, and 400 when `created_at_from` is later than `created_at_to`. Billing: listing is free and counts as a read request. Limits: page size is capped; cursors are opaque. Data and privacy: this read-only operation returns recording metadata from your own account; GhostCrawl retains a recording until you delete it. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_recordings_v1_recordings_get",
         "parameters": [
           {
@@ -7607,7 +8132,17 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "items": [
+                    {
+                      "created_at": "2026-11-17T00:00:00Z",
+                      "id": "rec_123",
+                      "session_id": "sess_123",
+                      "status": "completed"
+                    }
+                  ],
+                  "total_count": 1
+                }
               }
             },
             "description": "Successful Response"
@@ -7628,7 +8163,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "List recordings (cursor-paginated),",
+        "summary": "List recordings (cursor-paginated)",
         "tags": [
           "recordings"
         ]
@@ -7834,7 +8369,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "engine": "chrome",
+                  "frame_count": 42,
+                  "manifest_url": "https://cdn.example.com/recordings/rec_123/manifest.m3u8",
+                  "status": "completed"
+                }
               }
             },
             "description": "Successful Response"
@@ -7940,7 +8480,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "frames": [
+                    "recordings/rec_123/0001.jpg",
+                    "recordings/rec_123/0002.jpg"
+                  ],
+                  "next_cursor": 2
+                }
               }
             },
             "description": "Successful Response"
@@ -7970,7 +8516,7 @@
     },
     "/v1/recordings/{session_id}/visual/start": {
       "post": {
-        "description": "Start a visual recording for a live session. Creates a session_recordings row. Returns 201 with the recording row id. Security gates (in order): 1. 2. 3. ownership gate: session ownership verified",
+        "description": "Start a visual recording of a live browser session. Purpose: begin recording the visible frames of a running session so you can review or export it later. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `session_id` (required, path) identifies the live session. Request: POST /v1/recordings/{session_id}/visual/start with no body. Success: 201 with {\"recording_id\": \"rec_123\", \"session_id\": \"sess_123\", \"status\": \"recording\"}. Errors: 401 for missing credentials, 403 when your plan does not include visual recording or the required permission is missing, and 404 when the session is not found. Billing: recording time counts toward your plan's quota. Limits: one active recording per session; call the stop endpoint to finalize it. Access is checked in three steps: authentication, an entitlement check, and Ownership verification that the session belongs to your account. Data and privacy: this operation creates a recording of your own session; captured frames are retained only for the lifetime of the recording and can be deleted at any time. See the Privacy Policy and Cookie Notice for details.",
         "operationId": "start_visual_recording_v1_recordings__session_id__visual_start_post",
         "parameters": [
           {
@@ -8019,7 +8565,11 @@
           "201": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "recording_id": "rec_123",
+                  "session_id": "sess_123",
+                  "status": "recording"
+                }
               }
             },
             "description": "Successful Response"
@@ -8098,7 +8648,11 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "manifest_ref": "recordings/rec_123/manifest.m3u8",
+                  "session_id": "sess_123",
+                  "status": "completed"
+                }
               }
             },
             "description": "Successful Response"
@@ -8128,7 +8682,7 @@
     },
     "/v1/schedules": {
       "get": {
-        "description": "list.",
+        "description": "List schedules in your account. Purpose: retrieve the cron schedules you have created for recurring scrapes and crawls. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: none. Request: GET /v1/schedules. Success: 200 with a JSON list of schedule objects, each with id, target URL, cron expression, and last-run status. Errors: 401 for missing credentials and 403 if your key lacks read permission. Billing: listing is free and counts as a read request. Limits: the list is scoped to your account. Data and privacy: this read-only operation returns schedule metadata from your own account; GhostCrawl retains it for the life of your account. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_schedules_v1_schedules_get",
         "parameters": [
           {
@@ -8168,7 +8722,14 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": [
+                  {
+                    "cron": "0 9 * * *",
+                    "id": "sch_123",
+                    "last_run_status": "completed",
+                    "url": "https://example.com"
+                  }
+                ]
               }
             },
             "description": "Successful Response"
@@ -8900,10 +9461,15 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "created_at": "2026-11-17T00:00:00Z",
+                  "page_url_host": "example.com",
+                  "png_base64": "<base64-png>",
+                  "ref": "00000000-0000-0000-0000-000000000000"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Stored screenshot blob."
           },
           "422": {
             "content": {
@@ -8992,10 +9558,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "engine": "brave",
+                  "extras": {},
+                  "items": [
+                    {
+                      "snippet": "Today: 18 C and clear.",
+                      "title": "Paris weather forecast",
+                      "url": "https://example.com/weather"
+                    }
+                  ],
+                  "query": "weather in Paris",
+                  "total": 1
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Search results."
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
@@ -9042,7 +9620,7 @@
     },
     "/v1/search/jobs/{job_id}": {
       "get": {
-        "description": "200 + SearchResult when done (real result items = GREEN); 202 {status:\"running\"} while the extended rotation is still going (carrying ``deadline``/``poll_max_seconds`` so the client loop is bounded); 200 {status:\"open\", items:[]} on honest exhaustion (challenged/0-result, never a faked GREEN); 200 {status:\"temporarily_unavailable\"} when the deadline passes with the record still ``running`` (retryable terminal); 404 if unknown/expired/foreign. Ownership-scoped: a job created by another tenant reads as 404. BOUNDED-TERMINAL CONTRACT (no infinite poll): every poll resolves to a terminal within the stamped deadline, whatever happens server-side. A 404 is TERMINAL, the job expired or is unknown; the query may be retried at a HUMAN pace after Retry-After, but a 404 must NEVER be auto-interpreted as \"resubmit the same query in a tight loop\" (that is the one behavior that turns a recoverable miss into an infinite loop). See the SDK/MCP wrapper.",
+        "description": "Poll an asynchronous search job. 200 with a SearchResult envelope when results are ready; 202 {status:\"running\"} while the search is still in progress (carrying ``deadline``/``poll_max_seconds`` so the client loop is bounded); 200 {status:\"open\", items:[]} when the search completed without results; 200 {status:\"temporarily_unavailable\"} when the deadline passes with the job still running (retryable terminal); 404 if the job is unknown, expired, or belongs to another tenant. Every poll resolves to a terminal status within the stamped deadline. A 404 is terminal: the job expired or is unknown. If you retry the query, wait for the interval in Retry-After rather than polling in a tight loop.",
         "operationId": "search_job_poll_v1_search_jobs__job_id__get",
         "parameters": [
           {
@@ -9093,10 +9671,22 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "engine": "brave",
+                  "extras": {},
+                  "items": [
+                    {
+                      "snippet": "Today: 18 C and clear.",
+                      "title": "Paris weather forecast",
+                      "url": "https://example.com/weather"
+                    }
+                  ],
+                  "query": "weather in Paris",
+                  "total": 1
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Search job result or terminal status."
           },
           "422": {
             "content": {
@@ -9140,10 +9730,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "actions": 3,
+                  "reloaded": true
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Reload result."
           },
           "422": {
             "content": {
@@ -9188,10 +9781,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "reloaded": true
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Reload result."
           },
           "422": {
             "content": {
@@ -9218,7 +9813,7 @@
     },
     "/v1/selfhost/byo/proxy": {
       "put": {
-        "description": "**Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{\"proxies\": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system`` (CLAUDE.md residential-proxy rule). Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.",
+        "description": "**Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{\"proxies\": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system``. Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.",
         "operationId": "put_selfhost_byo_proxy_v1_selfhost_byo_proxy_put",
         "requestBody": {
           "content": {
@@ -9236,10 +9831,13 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "count": 2,
+                  "reloaded": true
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Reload result."
           },
           "422": {
             "content": {
@@ -9651,7 +10249,7 @@
     },
     "/v1/sessions/{session_id}": {
       "get": {
-        "description": "return the session lease record (org-owned) or 404. Reads; a missing lease OR a cross-org lease → 404). tenant_id is not echoed.",
+        "description": "return the session record (org-owned) or 404. A missing record OR a cross-org record → 404). tenant_id is not echoed.",
         "operationId": "get_session_v1_sessions__session_id__get",
         "parameters": [
           {
@@ -9721,7 +10319,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Get a session by id (lease)",
+        "summary": "Get a session by id",
         "tags": [
           "sessions"
         ]
@@ -9895,7 +10493,7 @@
     },
     "/v1/sessions/{session_id}/release": {
       "post": {
-        "description": "unpin the session and free the slot. Reads session, verifies org ownership, then writes back `pinned=False` + `released_at=<epoch>`.",
+        "description": "unpin the session and free the slot. Verifies org ownership, then marks the session unpinned (`pinned=False` + `released_at=<epoch>`). The session record is not deleted, its lifetime is managed automatically; we only unpin.",
         "operationId": "release_session_v1_sessions__session_id__release_post",
         "parameters": [
           {
@@ -9966,6 +10564,83 @@
           }
         ],
         "summary": "Release/unpin a sticky session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{session_id}/step": {
+      "post": {
+        "operationId": "session_step_v1_sessions__session_id__step_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Api-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Drive one step (navigate) on a live session",
         "tags": [
           "sessions"
         ]
@@ -10114,10 +10789,12 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "released": true
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Takeover released."
           },
           "422": {
             "content": {
@@ -10222,7 +10899,7 @@
     },
     "/v1/sessions/{session_id}/terminate": {
       "post": {
-        "description": "end the session by deleting its lease. Owner-checked against the lease (cross-org → 404,. Unlike /release (which only unpins), terminate removes the lease so the session is gone; any live browser behind it is then torn down on the next cleanup sweep. Idempotent-ish: a second terminate → 404 (already gone).",
+        "description": "end the session. Owner-checked (cross-org → 404,. Unlike /release (which only unpins), terminate removes the session record so the session is gone; any live browser behind it is then torn down on the next cleanup sweep. Idempotent-ish: a second terminate → 404 (already gone).",
         "operationId": "terminate_session_v1_sessions__session_id__terminate_post",
         "parameters": [
           {
@@ -10292,7 +10969,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Terminate a session (delete the lease)",
+        "summary": "Terminate a session",
         "tags": [
           "sessions"
         ]
@@ -10300,7 +10977,7 @@
     },
     "/v1/storage-states": {
       "get": {
-        "description": "owner-scoped cursor pagination.",
+        "description": "List storage states with cursor pagination. Purpose: retrieve the saved browser storage states in your account, newest first. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `limit` (optional, default 20) sets page size; `cursor` (optional) continues a previous page. Request: GET /v1/storage-states?limit=20. Success: 200 with a cursor-paginated page whose items are storage-state metadata objects (id, name, cookie_count, origins_count, blob_bytes, created_at, updated_at). Errors: 401 for missing credentials, 403 if your key lacks read permission, and 404 when a requested storage state does not exist. Billing: listing is free and counts as a read request. Limits: page size is capped; cursors are opaque. Data and privacy: this read-only operation returns metadata only, the encrypted cookie blob is never included. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_storage_states_v1_storage_states_get",
         "parameters": [
           {
@@ -10368,7 +11045,20 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "example": {
+                  "items": [
+                    {
+                      "blob_bytes": 4096,
+                      "cookie_count": 3,
+                      "created_at": "2026-11-17T00:00:00Z",
+                      "id": "ss_123",
+                      "name": "my-state",
+                      "origins_count": 2,
+                      "updated_at": "2026-11-17T00:00:00Z"
+                    }
+                  ],
+                  "total_count": 1
+                }
               }
             },
             "description": "Successful Response"
@@ -10523,13 +11213,11 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
+          "204": {
             "description": "Successful Response"
+          },
+          "404": {
+            "description": "No active binding found for this profile"
           },
           "422": {
             "content": {
@@ -10601,13 +11289,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            },
+          "204": {
             "description": "Successful Response"
+          },
+          "404": {
+            "description": "Storage state not found"
           },
           "422": {
             "content": {
@@ -10797,7 +11483,7 @@
     },
     "/v1/webhooks": {
       "get": {
-        "description": "cursor pagination. without it → 403.",
+        "description": "List webhooks with cursor pagination. Purpose: retrieve the webhook endpoints registered in your account. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `limit` (optional, default 20) sets page size; `cursor` (optional) continues a previous page. On the initial request omit the cursor; when a next_cursor is returned, pass it as `cursor` to fetch the following page. Errors: 401 for missing credentials and 403 if your key is not entitled to use a restricted filter (that filtered view is available only to keys with the corresponding permission). Success: 200 with {\"items\": [.], \"next_cursor\": \"<opaque>\", \"total\": 3}, where each item is a webhook object with id, url, and event list; secrets are never returned. Billing: listing is free and counts as a read request. Limits: page size is capped; next_cursor may be empty on the last page. Data and privacy: this read-only operation returns webhook configuration from your own account; webhook secrets are never included. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_webhooks_v1_webhooks_get",
         "parameters": [
           {
@@ -10918,6 +11604,19 @@
           "200": {
             "content": {
               "application/json": {
+                "example": {
+                  "items": [
+                    {
+                      "active": true,
+                      "events": [
+                        "job.completed"
+                      ],
+                      "id": "wh_123",
+                      "url": "https://example.com/hook"
+                    }
+                  ],
+                  "total": 1
+                },
                 "schema": {
                   "$ref": "#/components/schemas/WebhookListResponse"
                 }

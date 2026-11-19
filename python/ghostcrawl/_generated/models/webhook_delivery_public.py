@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 @dataclass
 class WebhookDeliveryPublic(AdditionalDataHolder, Parsable):
     """
-    Wire-public delivery log representation. 13 wire-public fields per webhook_deliveries schema. All fields are operator/integrator-facing, no secret material.
+    Wire-public delivery log representation. 13 wire-public fields per webhook_deliveries schema.
     """
     # Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.
     additional_data: dict[str, Any] = field(default_factory=dict)

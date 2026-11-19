@@ -9,10 +9,10 @@ Pydantic params validation.
 
 ## Install
 
-The current release is **2.3.8** (`ghostcrawl-langchain==2.3.8`):
+The current release is **2.3.9** (`ghostcrawl-langchain==2.3.9`):
 
 ```bash
-pip install ghostcrawl-langchain==2.3.8
+pip install ghostcrawl-langchain==2.3.9
 ```
 
 **Publish = yes** (public PyPI `ghostcrawl-langchain`).

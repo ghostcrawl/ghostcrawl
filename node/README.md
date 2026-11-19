@@ -8,10 +8,10 @@ The official TypeScript/JavaScript client for the [GhostCrawl](https://ghostcraw
 
 ## Install
 
-The current release is **2.3.8** (`@ghostcrawl/sdk@2.3.8`):
+The current release is **2.3.9** (`@ghostcrawl/sdk@2.3.9`):
 
 ```bash
-npm install @ghostcrawl/sdk@2.3.8
+npm install @ghostcrawl/sdk@2.3.9
 ```
 
 Requires Node.js >= 18.

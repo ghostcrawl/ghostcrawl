@@ -12,13 +12,12 @@ pip install ghostcrawl==2.3.8
 
 Requires Python 3.10+. Runtime dependencies: `httpx>=0.28.1`.
 
-### First step: runtime setup
+### Managed cloud or self-host
 
-The client talks to the GhostCrawl API (hosted cloud or your own machine). To run
-it locally, use the single unified terminal-install path — Docker, the three
-browser engines and your API key — documented at
-**https://docs.ghostcrawl.io/self-host**. One launcher covers Linux, macOS and
-Windows; no per-SDK installer is needed.
+The client talks to the GhostCrawl API. With a cloud API key it points at
+`https://api.ghostcrawl.io` — no Docker, browsers, or local runtime required.
+If you prefer to run the service yourself, follow
+**https://docs.ghostcrawl.io/self-host** and point the client at your local base URL.
 
 > The default client is **synchronous** — no `await`, no `asyncio.run`. Every
 > method returns a typed result directly. Prefer async? Import `AsyncGhostCrawl`
