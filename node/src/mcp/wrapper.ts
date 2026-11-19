@@ -85,7 +85,7 @@ function canonicalTool(name: string): string {
 
 /** Options accepted by GhostCrawlMCPClient constructor. */
 export interface GhostCrawlMCPClientOptions {
-  /** Full URL to the MCP HTTP endpoint, e.g. http://localhost:8090/mcp */
+  /** Full URL to the MCP HTTP endpoint, e.g. https://mcp.ghostcrawl.io (cloud) or http://localhost:47700/mcp (self-host Docker). No public standalone MCP server package. */
   mcpUrl: string;
   /** GhostCrawl API key — sourced from GHOSTCRAWL_API_KEY env var by callers */
   apiKey: string;

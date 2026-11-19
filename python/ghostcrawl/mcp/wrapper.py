@@ -87,7 +87,9 @@ class GhostCrawlMCPClient:
     Parameters
     ----------
     mcp_url:
-        Full URL of the MCP endpoint, e.g. ``http://localhost:8090/mcp``.
+        Full URL of the MCP endpoint, e.g. ``https://mcp.ghostcrawl.io``
+        (cloud) or ``http://localhost:47700/mcp`` (self-host Docker image).
+        There is no public standalone MCP server package.
     api_key:
         Bearer token for the API.  Read from ``GHOSTCRAWL_API_KEY`` env var
         in CLI contexts; passed explicitly when constructing programmatically.

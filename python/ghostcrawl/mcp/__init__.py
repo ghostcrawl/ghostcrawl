@@ -11,7 +11,9 @@ Usage::
 
     async def main():
         client = GhostCrawlMCPClient(
-            mcp_url="http://localhost:8090/mcp",
+            # Cloud: https://mcp.ghostcrawl.io
+            # Self-host Docker image: http://localhost:47700/mcp
+            mcp_url="https://mcp.ghostcrawl.io",
             api_key="your-api-key",
         )
         result = await client.navigate(url="https://example.com")

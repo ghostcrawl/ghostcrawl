@@ -148,9 +148,12 @@ else:
 ```
 
 > The interactive MCP lane (`navigate` / `act` / `observe`) is available in the Python and
-> Node SDKs only — see `ghostcrawl.mcp.wrapper.GhostCrawlMCPClient`. It is also BYO.
-> The MCP client is **optional**: it is not pulled into the default install, so add the
-> extra when you need it — `pip install ghostcrawl[mcp]`.
+> Node SDKs only — see `ghostcrawl.mcp.wrapper.GhostCrawlMCPClient`. That wrapper is an
+> optional **MIT client** (`pip install ghostcrawl[mcp]`) that lets **your** AI agent
+> talk to GhostCrawl's **proprietary** MCP endpoint: managed cloud
+> (`https://mcp.ghostcrawl.io`) or the MCP server inside the self-host Docker image
+> (`http://localhost:47700/mcp`). GhostCrawl does not host an AI model on cloud or
+> self-host today. There is no public, standalone MCP server package.
 
 ## Browser sessions
 

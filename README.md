@@ -12,7 +12,8 @@
 Real Chrome, Firefox, and WebKit browsers in the cloud, so your agents and
 scrapers get reliable page results without managing a single browser, queue, or exit.
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Client toolkit: MIT](https://img.shields.io/badge/client%20toolkit-MIT-blue.svg)](LICENSE)
+[![Cloud+%20self--host:%20EULA](https://img.shields.io/badge/cloud%20%2B%20self--host-EULA-important.svg)](https://docs.ghostcrawl.io/legal/eula)
 [![PyPI](https://img.shields.io/pypi/v/ghostcrawl.svg?label=pypi%20ghostcrawl)](https://pypi.org/project/ghostcrawl/)
 [![npm](https://img.shields.io/npm/v/@ghostcrawl/sdk.svg?label=npm%20%40ghostcrawl%2Fsdk)](https://www.npmjs.com/package/@ghostcrawl/sdk)
 [![Docs](https://img.shields.io/badge/docs-ghostcrawl.io-111827.svg)](https://ghostcrawl.io)
@@ -47,8 +48,11 @@ It works two ways, same API and SDKs for both:
 - **Self-host:** run the container on your own machine, your own IP, your own
   data. Free forever.
 
-GhostCrawl is **MCP-native**: every capability is exposed as a Model Context
-Protocol surface, so any agent can drive it directly.
+GhostCrawl is **MCP-native**: connect *your* AI agent or IDE to the same API over
+MCP on the managed cloud (`mcp.ghostcrawl.io`) or inside the self-host Docker
+image. GhostCrawl does not run an AI model on cloud or self-host today — MCP is
+the connection surface for tools you already use. There is no separate public
+MCP server package.
 
 ---
 
@@ -59,7 +63,9 @@ Protocol surface, so any agent can drive it directly.
   one balance.
 - **One API, every workflow.** Scrape, crawl, extract structured data, control a
   live session, run SERP queries, store results, on one consistent surface.
-- **MCP-native.** The full user API is available to agents over MCP out of the box.
+- **MCP-native.** Point your AI agent at GhostCrawl's cloud MCP or the MCP
+  endpoint inside the self-host Docker image (proprietary; not a public package).
+  GhostCrawl provides the browsers and tools — you bring the model.
 - **Typed SDKs.** First-class SDKs for Python, Node/TypeScript, Go, Java, C#/.NET,
   Ruby, and PHP — plus a CLI and a LangChain integration.
 - **Run it free.** The self-host image is free; the cloud adds managed routing,
@@ -179,8 +185,16 @@ CSV/JSON.
 
 ## Use it from an agent (MCP)
 
-GhostCrawl's full user API is available over MCP. Point any MCP-capable agent at
-`mcp.ghostcrawl.io` with your API key:
+MCP lets **your** AI agent or IDE drive GhostCrawl. GhostCrawl does not ship or
+host an AI model on cloud or self-host today — you connect the tools you already
+use to our browsers.
+
+MCP is part of the **cloud service** and the **self-host Docker image** (both
+proprietary under the [Software License](https://docs.ghostcrawl.io/legal/eula)).
+This repository ships MIT **client** examples and SDK wrappers only — not an MCP
+server you install from GitHub or PyPI.
+
+**Cloud** — point any MCP-capable agent at `mcp.ghostcrawl.io` with your API key:
 
 ```json
 {
@@ -195,9 +209,9 @@ GhostCrawl's full user API is available over MCP. Point any MCP-capable agent at
 }
 ```
 
-The MCP surface exposes navigate, act, extract, screenshot, scrape, crawl, and
-more, the same managed browsers behind the REST API. See
-[`examples/mcp/`](examples/mcp/).
+**Self-host** — after the Docker image is running, use
+`http://localhost:47700/mcp` with the same API key. See
+[`examples/mcp/`](examples/mcp/) and [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
 
 ---
 
@@ -296,12 +310,14 @@ Open an issue on this repository, or email
 ## License
 
 The GhostCrawl client toolkit in this repository (the SDKs, the CLI, the example
-cookbook, the MCP server, and the docs) is released under the [MIT License](LICENSE),
-so you can embed and build on it freely. © GhostCrawl, LLC.
+cookbook, and the docs) is released under the [MIT License](LICENSE), so you can
+embed and build on it freely. © GhostCrawl, LLC.
 
-The managed cloud service and the self-host engine image are a separate, commercially
-licensed product governed by the [GhostCrawl Terms of Service](https://docs.ghostcrawl.io/legal/terms).
-Using the cloud API or running the self-host image requires a valid GhostCrawl account.
+The managed cloud service and the self-host engine image — including the MCP
+server that ships with them — are a separate, commercially licensed product under
+the [GhostCrawl Software License](https://docs.ghostcrawl.io/legal/eula) and
+[Terms of Service](https://docs.ghostcrawl.io/legal/terms). Using the cloud API
+or running the self-host image requires a valid GhostCrawl account.
 
 ---
 

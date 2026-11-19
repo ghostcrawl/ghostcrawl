@@ -1,17 +1,27 @@
-# MCP examples
+# MCP client examples
 
-GhostCrawl's full user API is available over the Model Context Protocol (MCP) at
-`https://mcp.ghostcrawl.io`. Any MCP-capable agent can connect with your API key
-as a bearer token.
+These files configure an MCP **client** (your AI agent / IDE) to talk to
+GhostCrawl's MCP endpoint. They are **not** an MCP server package, and GhostCrawl
+does not host an AI model for you today — you bring the agent; we provide the
+browsers and tools.
+
+GhostCrawl MCP is available only as:
+
+| Mode | Endpoint | License |
+|------|----------|---------|
+| Managed cloud | `https://mcp.ghostcrawl.io` | Proprietary (cloud / EULA) |
+| Self-host Docker image | `http://localhost:47700/mcp` | Proprietary (self-host image / EULA) |
+
+There is no public, standalone `ghostcrawl-mcp-server` install. The MIT-licensed
+pieces here are client configs and the optional SDK wrappers
+(`pip install ghostcrawl[mcp]`, `@ghostcrawl/sdk`).
 
 | File | What it shows |
 |------|---------------|
-| `config.json` | Drop-in MCP server config for agent clients. |
-| `client.py` | Connect to the MCP surface from Python. |
+| `config.json` | Agent **client** connection config for the hosted MCP endpoint. |
+| `client.py` | Connect from Python via the MIT SDK MCP client wrapper. |
 
-## Configure an MCP client
-
-Add GhostCrawl to your agent's MCP server list (see [`config.json`](config.json)):
+## Configure an MCP client (cloud)
 
 ```json
 {
@@ -26,8 +36,8 @@ Add GhostCrawl to your agent's MCP server list (see [`config.json`](config.json)
 }
 ```
 
-The MCP surface exposes navigate, act, extract, screenshot, scrape, crawl, and
-more — the same managed browsers behind the REST API.
+## Self-host Docker
 
-To use a self-hosted instance instead, point the URL at your local MCP endpoint
-(default `http://localhost:3143`).
+Run the proprietary image first
+([self-host guide](https://docs.ghostcrawl.io/self-host)), then point the same
+client config at `http://localhost:47700/mcp`.

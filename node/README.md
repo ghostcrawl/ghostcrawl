@@ -291,8 +291,10 @@ try {
 
 ## MCP Wrapper
 
-The MCP wrapper drives the same API as `createGhostCrawlClient`, over the Model
-Context Protocol. It is **optional** — the MCP SDK is not installed by default, so
+The MCP wrapper lets **your** AI agent drive the same API as `createGhostCrawlClient`
+  over the Model Context Protocol. GhostCrawl does not host an AI model today —
+  you connect your agent to our cloud or self-host MCP endpoint. It is **optional** —
+  the MCP SDK is not installed by default, so
 install the peer dependency first:
 
 ```bash
@@ -304,7 +306,8 @@ npm install @modelcontextprotocol/sdk
 import { GhostCrawlMCPClient } from "@ghostcrawl/sdk";
 
 const mcp = new GhostCrawlMCPClient({
-  mcpUrl: "https://api.ghostcrawl.io/mcp",
+  // Cloud MCP (proprietary). Self-host Docker: http://localhost:47700/mcp
+  mcpUrl: "https://mcp.ghostcrawl.io",
   apiKey: "gck_live_YOUR_KEY",
 });
 
