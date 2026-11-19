@@ -4,10 +4,10 @@ The official Python client for the [GhostCrawl](https://ghostcrawl.io) API. Coll
 
 ## Install
 
-The current release is **2.3.8** (`ghostcrawl==2.3.8`):
+The current release is **2.3.9** (`ghostcrawl==2.3.9`):
 
 ```bash
-pip install ghostcrawl==2.3.8
+pip install ghostcrawl==2.3.9
 ```
 
 Requires Python 3.10+. Runtime dependencies: `httpx>=0.28.1`.

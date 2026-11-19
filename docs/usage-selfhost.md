@@ -122,9 +122,9 @@ On the free self-host tier:
   identity files are fine; hosted non-stock needs Plus / paid.
 
 Raise seats and unlock premium routing / identities / behavior with
-**Self-host Plus ($9/mo)** or any paid cloud plan — buy in the
-[cloud dashboard](https://app.ghostcrawl.io) (billing → Self-host Plus). Your
-license entitlement unlocks it on the next boot; no extra container config.
+**Self-host Plus ($9/mo)** or any paid cloud plan — choose **Contact sales** in the
+[cloud dashboard](https://app.ghostcrawl.io/dashboard/contact?plan=selfhost_bundle).
+Your license entitlement unlocks it on the next boot; no extra container config.
 
 You can also set a local concurrency ceiling in the dashboard
 (`http://localhost:47700/dashboard`) within what your license allows. Higher

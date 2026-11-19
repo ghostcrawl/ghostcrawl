@@ -928,6 +928,15 @@ export class SessionsClient {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         return callKiota(this._v1.sessions.byProfile_Id(profileId).recording.stop.post(null));
     }
+
+    /**
+     * Drive one navigate/act step on a live session.
+     * POST /v1/sessions/{session_id}/step via the shared authenticated transport.
+     */
+    async step(sessionId: string, body: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+        if (!this._request) throw new Error("step requires the parent client transport");
+        return (await this._request("POST", `/v1/sessions/${encodeURIComponent(sessionId)}/step`, body)) as Record<string, unknown>;
+    }
 }
 
 /**

@@ -1206,6 +1206,21 @@ class SessionsClient:
             self._core.v1.sessions.by_profile_id(profile_id).recording.stop.post(None)
         )
 
+    async def step(
+        self, session_id: str, body: dict | None = None, **kwargs: typing.Any
+    ) -> dict:
+        """Drive one navigate/act step on a live session.
+
+        Calls ``POST /v1/sessions/{session_id}/step``. The generated core may
+        lack a ``step`` builder, so this routes through the shared Kiota
+        request adapter via ``_post_json``.
+        """
+        payload: dict = dict(body or {})
+        payload.update(kwargs)
+        return await self._post_json(
+            f"/v1/sessions/{session_id}/step", payload or None
+        )
+
     async def _post_json(
         self, path: str, body: dict | None = None
     ) -> dict:

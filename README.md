@@ -54,19 +54,9 @@ Protocol surface, so any agent can drive it directly.
 
 ## Why GhostCrawl?
 
-- **It gets through.** Pages render and return authentic results where ordinary
-  headless setups get blocked or fed altered content.
-- **Access challenges.** Included on every paid plan: renders are compatible with
-  common anti-automation checks; no separate solver is required, within the limits
-  of the AUP. For publicly accessible content you are authorized to collect, routine
-  checks are satisfied as part of a normal render. Credential-gated, paywalled, or
-  otherwise restricted content you are not authorized to access is out of scope —
-  see the [Acceptable Use Policy](https://docs.ghostcrawl.io/legal/aup).
-- **Three real engines.** Chrome, Firefox, and WebKit. Pick one or let
-  `auto` choose. The same site looks the same to GhostCrawl as it does to a
-  real visitor.
-- **Zero browser ops.** No queues, no exits to rotate, no fleet to babysit. On
-  cloud, that's all included; routing rotates automatically.
+- **Real browsers, real behavior.** Real Chrome, Firefox, and WebKit render every
+  page like a real visitor, so you get complete, faithful data at scale. One API,
+  one balance.
 - **One API, every workflow.** Scrape, crawl, extract structured data, control a
   live session, run SERP queries, store results, on one consistent surface.
 - **MCP-native.** The full user API is available to agents over MCP out of the box.
@@ -86,7 +76,6 @@ Protocol surface, so any agent can drive it directly.
 | **Extract** | Pull structured JSON from a page against a schema you provide. Deterministic by default — reads the structured data pages already embed and fills your schema, no model to configure. |
 | **Browser control** | Drive a live session: navigate, click, type, scroll, screenshot. |
 | **Agent (MCP)** | Give an agent a goal; it navigates and acts to complete it. |
-| **Access challenge handling** | Renders are compatible with common anti-automation checks — no separate solver required, within the limits of the AUP. Included on paid plans. |
 | **Search / SERP** | Query search engines and verticals (web, news, shopping, and more). |
 | **Sessions** | Sticky, reusable browser sessions with consistent identity. |
 | **Identity profiles** | Persistent, coherent browser identities that survive across runs. |
@@ -233,17 +222,14 @@ PowerShell equivalents on one page:
 
 Advanced: [`docker-compose.yml.template`](docker-compose.yml.template) or the full
 [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host) guide. The
-published image is `linux/amd64` — native on Intel/x86 and the canonical live image
-(not replaced). A native `linux/arm64` leg is being built and staged for 2.3.9 but
-is **not publicly published yet**; no public arm64 tag exists today. **Apple Silicon
-(M-series)** runs the native arm64 leg once it ships (Docker Desktop translates the
-amd64 image until then). **ARM Windows** has no native arm64 image — Docker uses
-amd64 emulation. Each of the three engines (Chromium, Firefox, WebKit) is gated for
-native arm64 in 2.3.9; per-engine status is recorded when the sign-off evidence lands.
+published image is `linux/amd64` only — native on Intel/x86. There is no public
+`linux/arm64` tag yet (planned after 2.3.9). **Apple Silicon (M-series)** and
+**ARM Windows** run the amd64 image via Docker Desktop emulation today.
 
 Free tier = **one browser per engine** + stock Windows Chrome / Windows Firefox /
 Mac Safari. **Self-host Plus ($9/mo)** or any paid plan unlocks more seats and
-premium routing / identities / behavior (buy in the cloud dashboard).
+premium routing / identities / behavior — choose **Contact sales** in the
+[cloud dashboard](https://app.ghostcrawl.io/dashboard/contact?plan=selfhost_bundle).
 
 > Managed exit routing is a cloud-only feature. Self-host requests egress from
 > your own machine's network unless you enable premium routing.
@@ -253,8 +239,8 @@ premium routing / identities / behavior (buy in the cloud dashboard).
 ## Pricing
 
 The self-host image is free forever (with the seat limits above). Add **Self-host
-Plus ($9/mo)** for more seats plus premium routing, identities, and behavior —
-those are included free on every paid cloud plan.
+Plus ($9/mo)** for more seats plus premium routing, identities, and behavior via
+**Contact sales** — those are included free on every paid cloud plan.
 
 Cloud plans are metered in **credits**. A request spends credits based on how much
 **data** it pulls and how hard the target is to reach, so cost scales with the work:
