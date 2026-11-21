@@ -46,7 +46,7 @@ class ScrapeRequest(AdditionalDataHolder, Parsable):
     engine: Optional[ScrapeRequest_engine] = ScrapeRequest_engine("auto")
     from .scrape_request_format import ScrapeRequest_format
 
-    # Response format. 'html' (default): the fully rendered DOM. 'markdown': returns a {markdown, chunks, citations, token_estimate} envelope with prompt-injection-neutralized, token-budgeted output. 'pdf': returns application/pdf bytes (Chrome identities only; Firefox and WebKit return 400 pdf_engine_unsupported).
+    # Response format. 'html' (default): the fully rendered DOM. 'markdown': returns a {markdown, chunks, citations, token_estimate} envelope with prompt-injection-neutralized, token-budgeted output. 'pdf': returns application/pdf bytes. The PDF-capable engine is selected automatically for any requested engine (capability pin).
     format: Optional[ScrapeRequest_format] = ScrapeRequest_format("html")
     # When screenshot=true, capture the FULL document height instead of just the visible viewport. Ignored when screenshot_selector is set.
     full_page: Optional[bool] = False

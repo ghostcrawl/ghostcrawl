@@ -161,8 +161,7 @@ console.log(page.status_code, page.bytes, "bytes");
 const png = await client.screenshot({ url: "https://example.com", full_page: true });
 writeFileSync("page.png", png);
 
-// PDF — returns a Uint8Array of application/pdf bytes (Chrome-only; a Firefox/WebKit
-// identity throws an Error carrying statusCode 400 pdf_engine_unsupported)
+// PDF — returns a Uint8Array of application/pdf bytes (any engine; the PDF-capable engine is selected automatically)
 const pdf = await client.pdf({ url: "https://example.com", paperFormat: "a4" });
 writeFileSync("page.pdf", pdf);
 ```
@@ -326,7 +325,7 @@ const nav = await mcp.navigate({ url: "https://example.com" });
 | URL map | `client.map({ url })` | Discover all reachable URLs |
 | Content | `client.content({ url })` | Rendered content JSON envelope |
 | Screenshot | `client.screenshot({ url })` | Capture a URL to PNG bytes |
-| PDF | `client.pdf({ url })` | Render a URL to PDF bytes (Chrome-only) |
+| PDF | `client.pdf({ url })` | Render a URL to PDF bytes (any engine) |
 | Agent (BYO) | `client.agent({ task })` | NL browser task — account-gated, BYO model |
 | Crawl runs | `client.crawlRuns` | start, list, get, cancel |
 | Sessions | `client.sessions` | create, extend, release |

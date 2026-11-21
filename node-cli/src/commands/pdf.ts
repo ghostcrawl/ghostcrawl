@@ -6,7 +6,7 @@ import { getClient, emit, fail } from "../client.js";
 
 export function pdfCommand(): Command {
   return new Command("pdf")
-    .description("Render a URL to PDF via /v1/pdf (Chrome-only; writes PDF bytes to a file)")
+    .description("Render a URL to PDF via /v1/pdf (any engine; writes PDF bytes to a file)")
     .argument("<url>", "URL to render to PDF")
     .option("--paper-format <fmt>", "Paper format (a4 | letter | legal | tabloid)", "a4")
     .option("--landscape", "Landscape orientation", false)
@@ -19,7 +19,7 @@ export function pdfCommand(): Command {
       ) => {
         const client = getClient();
         try {
-          // Wraps the real node SDK pdf() method → POST /v1/pdf. PDF is Chrome-only:
+          // Wraps the real node SDK pdf() method → POST /v1/pdf. PDF is capability-pinned:
           // pin a chrome identity_spec so the server's random identity draw is
           // deterministic (else a non-chrome draw 400s), mirroring the reference lanes.
           const bytes = await client.pdf({

@@ -33,7 +33,7 @@ class PdfRequestBuilder(BaseRequestBuilder):
     async def post(self,body: PdfRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
         render a URL to PDF. Equivalent to /v1/scrape with format=pdf. Returns application/pdf bytes. Supported on Chrome identities; Firefox and WebKit return 400. The URL is validated and all traffic egresses through your configured proxy. Requires a paid plan and is subject to your request quota (same as /v1/extract).
-        param body: POST /v1/pdf request body, render a URL to PDF. Renders the target URL to a PDF document. Supported on Chrome identities; requests that resolve to a Firefox or WebKit identity return 400 pdf_engine_unsupported. Security: - The URL is validated against private/loopback/metadata targets. - All traffic egresses through your configured proxy. - Subject to your daily request quota.
+        param body: POST /v1/pdf request body, render a URL to PDF. Renders the target URL to a PDF document. Any requested engine produces real PDF bytes — the PDF-capable engine is selected automatically (capability pin). Security: - The URL is validated against private/loopback/metadata targets. - All traffic egresses through your configured proxy. - Subject to your daily request quota.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
         """
@@ -54,7 +54,7 @@ class PdfRequestBuilder(BaseRequestBuilder):
     def to_post_request_information(self,body: PdfRequest, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
         render a URL to PDF. Equivalent to /v1/scrape with format=pdf. Returns application/pdf bytes. Supported on Chrome identities; Firefox and WebKit return 400. The URL is validated and all traffic egresses through your configured proxy. Requires a paid plan and is subject to your request quota (same as /v1/extract).
-        param body: POST /v1/pdf request body, render a URL to PDF. Renders the target URL to a PDF document. Supported on Chrome identities; requests that resolve to a Firefox or WebKit identity return 400 pdf_engine_unsupported. Security: - The URL is validated against private/loopback/metadata targets. - All traffic egresses through your configured proxy. - Subject to your daily request quota.
+        param body: POST /v1/pdf request body, render a URL to PDF. Renders the target URL to a PDF document. Any requested engine produces real PDF bytes — the PDF-capable engine is selected automatically (capability pin). Security: - The URL is validated against private/loopback/metadata targets. - All traffic egresses through your configured proxy. - Subject to your daily request quota.
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
         """

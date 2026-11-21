@@ -15,14 +15,14 @@ if TYPE_CHECKING:
 @dataclass
 class PdfRequest(AdditionalDataHolder, Parsable):
     """
-    POST /v1/pdf request body, render a URL to PDF. Renders the target URL to a PDF document. Supported on Chrome identities; requests that resolve to a Firefox or WebKit identity return 400 pdf_engine_unsupported. Security: - The URL is validated against private/loopback/metadata targets. - All traffic egresses through your configured proxy. - Subject to your daily request quota.
+    POST /v1/pdf request body, render a URL to PDF. Renders the target URL to a PDF document. Any requested engine produces real PDF bytes — the PDF-capable engine is selected automatically (capability pin). Security: - The URL is validated against private/loopback/metadata targets. - All traffic egresses through your configured proxy. - Subject to your daily request quota.
     """
     # Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.
     additional_data: dict[str, Any] = field(default_factory=dict)
 
     from .pdf_request_engine import PdfRequest_engine
 
-    # Engine override. PDF is chrome-only; 'firefox' or 'webkit' returns 400 pdf_engine_unsupported immediately (before dispatch).
+    # Engine override. Engine override. PDF output is produced by the PDF-capable engine regardless of the requested value (transparent capability pin).
     engine: Optional[PdfRequest_engine] = PdfRequest_engine("auto")
     # Bypass geo-coherence: claim identity_country's geo (timezone + geolocation) REGARDLESS of the exit IP. Requires a pinned identity_country + geo_select tier. Default off (geo follows the exit; forcing may create an IP<->timezone mismatch).
     geo_force: Optional[bool] = False

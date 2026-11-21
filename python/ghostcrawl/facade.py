@@ -2694,9 +2694,9 @@ class GhostCrawlClient:
     ) -> bytes:
         """Render a URL to a PDF document and return the raw ``application/pdf`` bytes.
 
-        Delegates to ``POST /v1/pdf``. PDF output is Chrome-only — a request that
+        Delegates to ``POST /v1/pdf``. PDF output uses the PDF-capable engine automatically — a request that
         resolves to a Firefox or WebKit identity is rejected with
-        ``InvalidRequestError`` (400 ``pdf_engine_unsupported``).
+        a real PDF render (the engine is capability-pinned).
 
         Routed through the Kiota request adapter (auth + base URL + transport) —
         the generated core has no ``pdf`` builder (the route serves binary, not
@@ -2716,7 +2716,7 @@ class GhostCrawlClient:
         landscape : bool
             Render in landscape orientation. Default ``False``.
         engine : str
-            Browser engine. PDF is Chrome-only; ``"firefox"`` / ``"webkit"`` are
+            Browser engine. PDF is produced by the PDF-capable engine regardless of the requested value; ``"firefox"`` / ``"webkit"`` are
             rejected before dispatch. Default ``"auto"`` (resolves to Chrome).
 
         Returns

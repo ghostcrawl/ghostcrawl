@@ -1042,9 +1042,9 @@ def pdf(
     ),
     pretty: bool = typer.Option(False, "--pretty", help="Indent JSON output."),
 ) -> None:
-    """Render a URL to PDF via /v1/pdf (Chrome-only; writes PDF bytes to a file).
+    """Render a URL to PDF via /v1/pdf (any engine; writes PDF bytes to a file).
 
-    PDF output is Chrome-only, so — mirroring the Node CLI — the engine is
+    PDF output is capability-pinned to the PDF-capable engine, so — mirroring the Node CLI — the engine is
     pinned to ``"chrome"`` rather than exposed as a flag.
     """
     client = _get_client()

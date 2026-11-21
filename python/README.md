@@ -110,8 +110,8 @@ png = client.screenshot(url="https://example.com", full_page=True)
 with open("page.png", "wb") as f:
     f.write(png)
 
-# PDF — returns raw application/pdf bytes (Chrome-only; a Firefox/WebKit
-# identity raises InvalidRequestError with 400 pdf_engine_unsupported)
+# PDF — returns raw application/pdf bytes (any engine; the PDF-capable engine is selected automatically, so a Firefox/WebKit
+# identity still receives real PDF bytes)
 pdf = client.pdf(url="https://example.com", paper_format="a4")
 with open("page.pdf", "wb") as f:
     f.write(pdf)
@@ -237,7 +237,7 @@ names, parameters, and typed results.
 | URL map | `client.map(url=…)` | Discover all reachable URLs |
 | Content | `client.content(url=…)` | Rendered content JSON envelope |
 | Screenshot | `client.screenshot(url=…)` | Capture a URL to PNG bytes |
-| PDF | `client.pdf(url=…)` | Render a URL to PDF bytes (Chrome-only) |
+| PDF | `client.pdf(url=…)` | Render a URL to PDF bytes (any engine) |
 | Agent (BYO) | `client.agent(url=…, instruction=…)` | NL browser task — account-gated, BYO model |
 | Crawl runs | `client.crawl_runs` | start (`wait=True`), wait, list, get, cancel |
 | Sessions | `client.sessions` | create, extend, release |

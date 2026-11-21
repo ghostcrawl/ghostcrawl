@@ -1839,8 +1839,8 @@ export class GhostCrawlClient {
      * writeFileSync("page.pdf", pdf);
      * ```
      *
-     * PDF output is Chrome-only; a request that resolves to a Firefox or WebKit
-     * identity is rejected with a 400 `pdf_engine_unsupported` (thrown as an
+     * PDF output is produced by the PDF-capable engine for any requested engine; a Firefox or WebKit
+     * identity is served real PDF bytes (capability-pinned)
      * `Error` carrying `statusCode`).
      */
     async pdf(options: {
