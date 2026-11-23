@@ -1,0 +1,39 @@
+name: CONTRIBUTING paths
+
+# Every public-safe surface path named in CONTRIBUTING.md's "What we accept"
+# table must resolve in the public repository root. This guards against stale
+# monorepo-relative paths being published as if they were real directories in
+# the toolkit repo.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  contributing-paths:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the public repository
+        uses: actions/checkout@v4
+
+      - name: Verify every CONTRIBUTING.md surface path exists
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            if [ -e "$path" ]; then
+              echo "ok: $path"
+            else
+              echo "FAIL: CONTRIBUTING.md names '$path' but it is not in the public repo root" >&2
+              missing=1
+            fi
+          done < <(sed -n '/^## What we accept/,/^---/p' CONTRIBUTING.md \
+                     | grep '^|' \
+                     | awk -F'|' '{gsub(/^[ \t]+|[ \t]+$/, "", $3); gsub(/`/, "", $3); print $3}' \
+                     | grep -vE '^(Path|---+)$')
+          exit "$missing"

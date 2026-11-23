@@ -11,11 +11,10 @@ Pull requests are accepted **only against the public-safe surface**:
 
 | Surface | Path |
 |---------|------|
-| Python SDK | `sdks/python/` |
-| Node SDK | `sdks/node/` |
-| Node CLI SDK | `sdks/node-cli/` |
-| Python LangChain SDK | `sdks/python-langchain/` |
-| CLI (`ghostcrawl install` 8-verb flow) | `cli/` |
+| Python SDK | `python/` |
+| Node SDK | `node/` |
+| Node CLI (the `@ghostcrawl/cli` package) | `node-cli/` |
+| Python LangChain SDK | `python-langchain/` |
 | Documentation | `docs/` |
 
 **Backend, engine, proxy, and identity changes are operator-only** and are developed
@@ -27,6 +26,12 @@ If you have an idea for a backend or engine change, open a
 instead. The operator evaluates those privately.
 
 ---
+
+> **Monorepo vs. public repo:** the private development monorepo keeps the SDKs under
+> `sdks/*` (for example `sdks/python/`). This public toolkit repo publishes them at the
+> root, so the paths in the table above are `python/`, `node/`, `node-cli/`, and
+> `python-langchain/` — use those when locating code here. A CI check verifies that
+> every path named in the table exists in this repository.
 
 ## PR process
 
@@ -50,27 +55,27 @@ instead. The operator evaluates those privately.
 
 ## Code style
 
-### Python SDKs (`sdks/python/`, `sdks/python-langchain/`)
+### Python SDKs (`python/`, `python-langchain/`)
 
 - Formatter: `black` (project default, no config changes needed).
 - Type checking: `mypy --strict` must pass on changed files.
 - Tests: `pytest` — add or update tests for any behavioral change.
 
 ```bash
-cd sdks/python
+cd python
 pip install -e ".[dev]"
 mypy ghostcrawl/
 pytest
 ```
 
-### TypeScript SDKs (`sdks/node/`, `sdks/node-cli/`)
+### TypeScript SDKs (`node/`, `node-cli/`)
 
 - Linting: `eslint` (project config).
 - Type checking: `tsc --noEmit` must pass.
 - Tests: `npm test`.
 
 ```bash
-cd sdks/node
+cd node
 npm install
 npm run lint
 npm run typecheck

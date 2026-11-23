@@ -10,7 +10,7 @@ The current release is **2.3.9** (`ghostcrawl==2.3.9`):
 pip install ghostcrawl==2.3.9
 ```
 
-Requires Python 3.10+. Runtime dependencies: `httpx>=0.28.1`.
+Requires Python 3.11+. Runtime dependencies: `httpx>=0.28.1`.
 
 ### Managed cloud or self-host
 
@@ -69,7 +69,7 @@ os.environ["GHOSTCRAWL_API_KEY"] = "gck_live_YOUR_KEY"
 client = GhostCrawl()
 ```
 
-Every request sends `Authorization: Bearer <token>`. This is the only auth scheme the API accepts.
+Every request sends `Authorization: Bearer <token>` by default. The API also accepts the same account key in an `X-Api-Key` header (set it as a custom header); if both are present, `Authorization` wins. See the [authentication guide](https://docs.ghostcrawl.io/authentication) for details.
 
 ## Extract structured data
 

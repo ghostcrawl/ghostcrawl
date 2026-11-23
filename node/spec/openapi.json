@@ -91,9 +91,6 @@
       "AgentRequest": {
         "additionalProperties": false,
         "properties": {
-          "api_key": {
-            "type": "string"
-          },
           "callback_url": {
             "type": "string"
           },
@@ -108,6 +105,25 @@
           "profile_id": {
             "description": "Optional stable profile identifier. When supplied on a successful sync `/v1/agent` call, the executed step trace is recorded into the in-process action cache (keyed by `(profile_id, task)`) and can be replayed via `POST /v1/agent/action-cache/replay`. Response payload includes `action_cache_recorded: true|false` so callers can confirm cache durability.",
             "type": "string"
+          },
+          "provider_config": {
+            "additionalProperties": false,
+            "description": "Bring-your-own LLM connection settings for this request. Tenant and workspace are derived from your authenticated credentials and cannot be overridden here.",
+            "properties": {
+              "api_key": {
+                "description": "Your model-provider API key for this request.",
+                "type": "string"
+              },
+              "base_url": {
+                "description": "OpenAI-compatible chat completions base URL.",
+                "type": "string"
+              },
+              "model": {
+                "description": "Model identifier used for the reasoning step.",
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "proxy": {
             "$ref": "#/components/schemas/ProxyConfig"
@@ -159,12 +175,6 @@
               }
             },
             "type": "object"
-          },
-          "tenant_id": {
-            "type": "string"
-          },
-          "workspace_id": {
-            "type": "string"
           }
         },
         "required": [
@@ -3463,7 +3473,7 @@
     },
     "securitySchemes": {
       "apiKeyHeader": {
-        "description": "Alternative to Authorization: Bearer, send the same GhostCrawl API key as X-Api-Key: gck_YOUR_KEY_HERE. Both transports are accepted by the runtime; when both are supplied, Authorization (or an X-Admin-Key) takes precedence and X-Api-Key is ignored.",
+        "description": "Alternative to Authorization: Bearer, send the same GhostCrawl API key as X-Api-Key: gck_YOUR_KEY_HERE. Both transports are accepted by the runtime; when both are supplied, Authorization takes precedence and X-Api-Key is ignored. An internal administrative credential, not available to API customers, also takes precedence.",
         "in": "header",
         "name": "X-Api-Key",
         "type": "apiKey"
@@ -3613,7 +3623,7 @@
                 }
               }
             },
-            "description": "Returned when the agent capability is not enabled for this account or deployment. The agent lane runs server-side orchestration, the navigate / act / observe steps execute on GhostCrawl's managed browsers, and calls your bring-your-own (BYO) LLM for the reasoning step via the `X-LLM-Api-Key` / `X-LLM-Provider` request headers. While the capability is not enabled the route returns 404; once enabled it returns the agent execution envelope. The BYO LLM is the only part you supply, the orchestration itself is hosted."
+            "description": "Returned when the agent capability is not enabled for this account or deployment. The agent lane runs server-side orchestration, the navigate / act / observe steps execute on GhostCrawl's managed browsers, and calls your bring-your-own (BYO) LLM for the reasoning step using the `provider_config` object in the request body (`base_url`, `api_key`, `model`). Tenant and workspace are derived from your authenticated credentials, never from request fields. While the capability is not enabled the route returns 404; once enabled it returns the agent execution envelope. The BYO LLM is the only part you supply, the orchestration itself is hosted."
           },
           "429": {
             "content": {
@@ -10256,6 +10266,33 @@
               "maxLength": 256,
               "minLength": 8,
               "pattern": "^[\\x20-\\x7E]{8,256}$",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Your own search-provider key, as `Bearer <provider-key>`. Required for the bring-your-own-API engines `brave`, `tavily`, and `bing`; not needed for the native keyless engines `google`, `yandex`, and `duckduckgo`, which GhostCrawl fetches itself. Used for this request only and scrubbed afterwards, never stored or logged. Not the same as your GhostCrawl account key.",
+            "in": "header",
+            "name": "X-Provider-Authorization",
+            "required": false,
+            "schema": {
+              "pattern": "^Bearer\\s+\\S+$",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional search-engine selector. Allowed values: `brave`, `tavily`, `google`, `bing`, `yandex`, `duckduckgo`. The `engine` field in the request body takes precedence when both are supplied; if neither is supplied the native keyless default is used.",
+            "in": "header",
+            "name": "X-Ghostcrawl-Search-Engine",
+            "required": false,
+            "schema": {
+              "enum": [
+                "brave",
+                "tavily",
+                "google",
+                "bing",
+                "yandex",
+                "duckduckgo"
+              ],
               "type": "string"
             }
           }
