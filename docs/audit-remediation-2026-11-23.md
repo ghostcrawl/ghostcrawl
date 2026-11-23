@@ -123,7 +123,8 @@ Both hosted Pages projects were rebuilt and deployed in this session: the docume
 | Claim | Live result after deploy |
 |---|---|
 | Terms/EULA proprietary vs MIT | Live legal pages agree: MIT toolkit, proprietary cloud/self-host image; no Delaware governing law. Refuted. |
-| Trust page bans authenticated sessions / dated 20 Oct | Live page now says 19 November 2026 and qualifies the restriction to content the customer is **not authorized** to access; authorized customer sessions supported. Fixed by deploy. |
+| Trust page prohibits authenticated sessions | Live page now qualifies the restriction to content the customer is **not authorized** to access; authorized customer sessions supported. Fixed by deploy. |
+| Trust date Oct 20 | Live page now says 19 November 2026. Fixed by deploy. |
 | npm README Bearer-only | Published `@ghostcrawl/sdk@2.3.91` README documents X-Api-Key; no "only auth scheme" claim. Refuted. |
 | NuGet 2.3.8 / net8 | NuGet index contains 2.3.91; cache-busted package download HTTP 200, registration `listed:true`. Refuted. |
 | PHP README 8.1 / About proprietary | Public docs/install says Python 3.11+, examples/node says Node 22+; GitHub About says MIT (client toolkit); Packagist requires PHP >=8.3. Refuted. |
@@ -131,5 +132,7 @@ Both hosted Pages projects were rebuilt and deployed in this session: the docume
 | SLA lacks no-credits remedy | Live page now states no service credits and support-priority remedy. Fixed by deploy. |
 | Self-host checksum after execution | Live page now orders download → checksum verification (fail-closed) → chmod → execute. Fixed by deploy. |
 | Homepage free limits absent | Live `plans.json` free card now lists one interactive session per engine, one persisted identity, minimal built-in behavior. Fixed by deploy. |
+
+**Claim-list reconstruction (10 vs 9 vs 11).** The private claim list has 11 entries; this public table has 10 because the "Governing law Delaware vs California" claim was folded into the Terms/EULA row above (all live legal pages say California). Conversely, the single merged Trust row was split back into its two independently re-checked claims, using the private list's exact phrasings — "Trust page prohibits authenticated sessions" and "Trust date Oct 20", both **Fixed by deploy**. The result is 10 rows: **6 fixed / 4 refuted**, matching the prose at the start of this section.
 
 Section 4 remains the authoritative open-risk list. No production runtime, browser fleet, or billing system was changed; only documentation sites were deployed.
