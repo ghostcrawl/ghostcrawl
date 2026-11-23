@@ -13,7 +13,7 @@ self-host Docker image (run the engines on your machine).
 pip install ghostcrawl
 ```
 
-Requires Python 3.10+. Also installs the `ghostcrawl` CLI for API commands
+Requires Python 3.11+. Also installs the `ghostcrawl` CLI for API commands
 (`scrape`, `crawl`, `extract`, …).
 
 **Node:**
@@ -22,7 +22,7 @@ Requires Python 3.10+. Also installs the `ghostcrawl` CLI for API commands
 npm install @ghostcrawl/sdk
 ```
 
-Requires Node.js 18+.
+Requires Node.js 22+.
 
 Store a cloud key once:
 

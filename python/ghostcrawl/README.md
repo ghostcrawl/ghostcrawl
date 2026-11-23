@@ -14,7 +14,7 @@ The full, canonical README lives at the package root: [`../README.md`](../README
 pip install ghostcrawl
 ```
 
-Requires Python 3.10+.
+Requires Python 3.11+.
 
 ## Quickstart
 

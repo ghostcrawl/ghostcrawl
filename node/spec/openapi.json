@@ -88,6 +88,110 @@
         ],
         "type": "object"
       },
+      "AgentCompletedEnvelope": {
+        "properties": {
+          "headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Optional HTTP response header hints for non-fatal warnings (for example `X-Ghostcrawl-Warning: timing-marker-missing`). Present only when the response includes header hints; omitted otherwise.",
+            "type": "object"
+          },
+          "lane": {
+            "enum": [
+              "rest"
+            ],
+            "type": "string"
+          },
+          "payload": {
+            "properties": {
+              "extracted": {
+                "type": "object"
+              },
+              "status": {
+                "enum": [
+                  "completed"
+                ],
+                "type": "string"
+              },
+              "steps": {
+                "items": {
+                  "properties": {
+                    "action": {
+                      "type": "string"
+                    },
+                    "fields": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "index": {
+                      "type": "integer"
+                    },
+                    "observation": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "completed"
+                      ],
+                      "type": "string"
+                    },
+                    "type": {
+                      "enum": [
+                        "observe",
+                        "act",
+                        "extract"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "steps_executed": {
+                "type": "integer"
+              },
+              "timing": {
+                "$ref": "#/components/schemas/ProbeTiming"
+              }
+            },
+            "required": [
+              "status",
+              "steps_executed",
+              "steps",
+              "extracted"
+            ],
+            "type": "object"
+          },
+          "route": {
+            "enum": [
+              "/agent"
+            ],
+            "type": "string"
+          },
+          "session_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              200
+            ],
+            "type": "integer"
+          }
+        },
+        "required": [
+          "route",
+          "lane",
+          "session_id",
+          "status",
+          "payload"
+        ],
+        "type": "object"
+      },
       "AgentRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1681,6 +1785,26 @@
           "url"
         ],
         "title": "PdfRequest",
+        "type": "object"
+      },
+      "ProbeTiming": {
+        "description": "Single-probe timing entry attached to sync /v1/scrape and /v1/agent response payloads. Both fields are nullable: null indicates the in-page timing marker was missing or malformed for this probe.",
+        "properties": {
+          "launch_ms": {
+            "description": "Browser cold-spawn cost in ms; null on missing marker.",
+            "nullable": true,
+            "type": "integer"
+          },
+          "probe_ms": {
+            "description": "In-page probe work cost in ms; null on missing marker.",
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "launch_ms",
+          "probe_ms"
+        ],
         "type": "object"
       },
       "ProblemDetails": {
@@ -3588,6 +3712,22 @@
     "/v1/agent": {
       "post": {
         "description": "BETA / opt-in. The REST agent lane is disabled by default and returns 404 until enabled for your account/deployment (see the 404 response below). The agent capability is generally available via the MCP `ghostcrawl_agent` tool; this REST surface is still stabilising. Contact support to enable it.",
+        "operationId": "post_v1_agent",
+        "parameters": [
+          {
+            "description": "Optional idempotency key (8-256 ASCII printable characters). Supply a fresh UUID or ULID per logically distinct request. Replaying the same request with the same key returns the cached response without re-execution; the same key with a different body is rejected.",
+            "example": "01HX4RZPQ8XVWMQFGKN3JST7BZ",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "maxLength": 256,
+              "minLength": 8,
+              "pattern": "^[\\x20-\\x7E]{8,256}$",
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3599,6 +3739,16 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentCompletedEnvelope"
+                }
+              }
+            },
+            "description": "The agent task completed. The envelope carries the executed step trace, any extracted data, and an engine fidelity receipt."
+          },
           "400": {
             "content": {
               "application/json": {
@@ -3666,6 +3816,11 @@
             "description": "Startup config-preflight gate blocked request handling"
           }
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "summary": "Start agent lane request (beta, opt-in; 404 until enabled for your account)",
         "x-beta": true
       }
@@ -6349,11 +6504,7 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "security": [],
         "summary": "Confirm newsletter subscription",
         "tags": [
           "newsletter",
@@ -6361,7 +6512,7 @@
         ]
       },
       "post": {
-        "operationId": "confirm_v1_newsletter_confirm_get",
+        "operationId": "confirm_v1_newsletter_confirm_post",
         "parameters": [
           {
             "in": "query",
@@ -6396,11 +6547,7 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "security": [],
         "summary": "Confirm newsletter subscription",
         "tags": [
           "newsletter",
@@ -6443,11 +6590,7 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "security": [],
         "summary": "Subscribe to product updates (double opt-in)",
         "tags": [
           "newsletter",
@@ -6492,11 +6635,7 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "security": [],
         "summary": "Unsubscribe from product updates (one-click)",
         "tags": [
           "newsletter",
@@ -6504,7 +6643,7 @@
         ]
       },
       "post": {
-        "operationId": "unsubscribe_v1_newsletter_unsubscribe_get",
+        "operationId": "unsubscribe_v1_newsletter_unsubscribe_post",
         "parameters": [
           {
             "in": "query",
@@ -6539,11 +6678,7 @@
             "description": "Validation Error"
           }
         },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "security": [],
         "summary": "Unsubscribe from product updates (one-click)",
         "tags": [
           "newsletter",

@@ -6,7 +6,7 @@ Thanks for your interest in contributing to the GhostCrawl Python SDK!
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - pip
 
 ### Installation

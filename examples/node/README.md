@@ -11,7 +11,7 @@ export GHOSTCRAWL_API_KEY="YOUR_API_KEY"
 | `crawl.mjs` | Start a crawl run and read its status. |
 | `extract.mjs` | Extract structured JSON against a schema. |
 
-Run any example (Node 18+):
+Run any example (Node 22+):
 
 ```bash
 node scrape.mjs

@@ -140,7 +140,7 @@ export class GhostCrawlAuthError extends GhostCrawlError {
     }
 }
 
-/** 402 — Quota exceeded; upgrade your plan or contact us at https://ghostcrawl.io/billing. */
+/** 402 — Quota exceeded; upgrade your plan or contact us at https://ghostcrawl.io/#pricing. */
 export class GhostCrawlQuotaError extends GhostCrawlError {
     public readonly code?: string;
     public readonly retryable?: boolean;
