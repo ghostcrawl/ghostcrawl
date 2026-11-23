@@ -55,7 +55,7 @@ def _run(value: Any) -> Any:
 # Top-level app
 # ---------------------------------------------------------------------------
 
-__version__ = "2.3.9"  # keep in sync with sdks/python/pyproject.toml (test_version_matches_pyproject guards drift)
+__version__ = "2.4.0"  # keep in sync with sdks/python/pyproject.toml (test_version_matches_pyproject guards drift)
 
 
 def _version_callback(value: bool) -> None:
@@ -67,9 +67,9 @@ def _version_callback(value: bool) -> None:
 
 app = typer.Typer(
     name="ghostcrawl",
-    # Version banner MUST track __version__ (2.3.9) — check_version_stamp.sh gates
+    # Version banner MUST track __version__ (2.4.0) — check_version_stamp.sh gates
     # this exact line so a stale literal (the old v0.5.0 drift) cannot linger.
-    help="GhostCrawl command-line interface (v2.3.9).",
+    help="GhostCrawl command-line interface (v2.4.0).",
     no_args_is_help=True,
     add_completion=False,
 )
@@ -340,8 +340,8 @@ def _validate_key(api_key: str, base_url: str) -> None:
 # ---------------------------------------------------------------------------
 
 # Customer-safe image tag — never expose engine codenames or internal mechanics
-# on this surface (self-host ships as ghostcrawl:2.3.9 on get.ghostcrawl.io).
-_SELF_HOST_IMAGE = "get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.3.9"
+# on this surface (self-host ships as ghostcrawl:2.4.0 on get.ghostcrawl.io).
+_SELF_HOST_IMAGE = "get.ghostcrawl.io/ghostcrawl/ghostcrawl:2.4.0"
 _SELF_HOST_BASE_URL = "http://localhost:47700"
 
 _SELF_HOST_CONFIG_TEMPLATE = f"""# GhostCrawl self-host configuration.

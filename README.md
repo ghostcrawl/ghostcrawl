@@ -242,7 +242,7 @@ PowerShell equivalents on one page:
 Advanced: [`docker-compose.yml.template`](docker-compose.yml.template) or the full
 [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host) guide. The
 published image is `linux/amd64` only — native on Intel/x86. There is no public
-`linux/arm64` tag yet (planned after 2.3.9). **Apple Silicon (M-series)** and
+`linux/arm64` tag yet. **Apple Silicon (M-series)** and
 **ARM Windows** run the amd64 image via Docker Desktop emulation today.
 
 Free tier = **one browser per engine** + stock Windows Chrome / Windows Firefox /

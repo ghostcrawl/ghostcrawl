@@ -8,10 +8,10 @@ same JSON output format.
 
 ## Install
 
-Product version **2.3.9**; published npm package latest **2.3.91** (a 2.3.9-band patch identifier — registry artifacts are immutable). Source version files remain at 2.3.9:
+Product version **2.4.0**; published npm package latest **2.3.91** (a 2.4.0-band patch identifier — registry artifacts are immutable). Source version files remain at 2.4.0:
 
 ```bash
-npm install -g @ghostcrawl/cli@2.3.9
+npm install -g @ghostcrawl/cli@2.4.0
 ```
 
 Requires Node.js 22 or newer (Node.js >= 22 in `package.json` engines). The `ghostcrawl init` and `ghostcrawl install` verbs below

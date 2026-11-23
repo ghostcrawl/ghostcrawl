@@ -1,6 +1,6 @@
 {
   "name": "@ghostcrawl/cli",
-  "version": "2.3.9",
+  "version": "2.4.0",
   "description": "GhostCrawl command-line interface",
   "homepage": "https://github.com/ghostcrawl/ghostcrawl",
   "repository": {
@@ -36,7 +36,7 @@
     "test:parity": "vitest run --config vitest.parity.config.ts"
   },
   "dependencies": {
-    "@ghostcrawl/sdk": "^2.3.9",
+    "@ghostcrawl/sdk": "^2.4.0",
     "commander": "^14.0.3"
   },
   "devDependencies": {
