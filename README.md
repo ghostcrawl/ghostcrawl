@@ -21,7 +21,6 @@ scrapers get reliable page results without managing a single browser, queue, or 
 [![MCP](https://img.shields.io/badge/MCP-native-7c3aed.svg)](#use-it-from-an-agent-mcp)
 [![Self-host](https://img.shields.io/badge/self--host-free-16a34a.svg)](#self-host-free)
 [![Engines](https://img.shields.io/badge/engines-Chrome%20%C2%B7%20Firefox%20%C2%B7%20WebKit-0f172a.svg)](#capabilities)
-[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/ghostcrawl)
 
 [Website](https://ghostcrawl.io) ·
 [Docs](https://docs.ghostcrawl.io) ·
@@ -29,9 +28,308 @@ scrapers get reliable page results without managing a single browser, queue, or 
 [Ghostopia](https://ghostcrawl.io/ghostopia) ·
 [API](https://api.ghostcrawl.io) ·
 [MCP](https://mcp.ghostcrawl.io) ·
-[Examples](examples/) ·
-[☕ Buy me a coffee](https://buymeacoffee.com/ghostcrawl)
+[Examples](examples/)
 
 ⭐ **If GhostCrawl is useful to you, a star helps other developers find it.**
+
+<a href="https://buymeacoffee.com/ghostcrawl"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" width="180" /></a>
+
+</div>
+
+---
+
+## What is GhostCrawl?
+
+GhostCrawl is a web-data API for crawling, scraping, structured extraction, and
+full browser automation. You send a URL or a goal; GhostCrawl drives a real
+browser, gets through, and returns clean results: HTML, Markdown, screenshots,
+or structured JSON.
+
+It works two ways, same API and SDKs for both:
+
+- **Managed cloud:** point a client at `api.ghostcrawl.io` and go. We run the
+  browsers, pick the engine, and route every request automatically. Nothing to
+  operate.
+- **Self-host:** run the container on your own machine, your own IP, your own
+  data. Free forever.
+
+GhostCrawl is **MCP-native**: connect *your* AI agent or IDE to the same API over
+MCP on the managed cloud (`mcp.ghostcrawl.io`) or inside the self-host Docker
+image. GhostCrawl does not run an AI model on cloud or self-host today — MCP is
+the connection surface for tools you already use. There is no separate public
+MCP server package.
+
+---
+
+## Why GhostCrawl?
+
+- **Real browsers, real behavior.** Real Chrome, Firefox, and WebKit render every
+  page like a real visitor, so you get complete, faithful data at scale. One API,
+  one balance.
+- **One API, every workflow.** Scrape, crawl, extract structured data, control a
+  live session, run SERP queries, store results, on one consistent surface.
+- **MCP-native.** Point your AI agent at GhostCrawl's cloud MCP or the MCP
+  endpoint inside the self-host Docker image (proprietary; not a public package).
+  GhostCrawl provides the browsers and tools — you bring the model.
+- **Typed SDKs.** First-class SDKs for Python, Node/TypeScript, Go, Java, C#/.NET,
+  Ruby, and PHP — plus a CLI and a LangChain integration.
+- **Run it free.** The self-host image is free; the cloud adds managed routing,
+  higher concurrency, and live session view.
+
+---
+
+## Capabilities
+
+| Capability | What it does |
+|------------|--------------|
+| **Scrape** | Fetch a single page rendered by a real browser → HTML / Markdown / text. |
+| **Crawl** | Follow links from a seed URL with depth and page limits; resumable runs. |
+| **Extract** | Pull structured JSON from a page against a schema you provide. Deterministic by default — reads the structured data pages already embed and fills your schema, no model to configure. |
+| **Browser control** | Drive a live session: navigate, click, type, scroll, screenshot. |
+| **Agent (MCP)** | Give an agent a goal; it navigates and acts to complete it. |
+| **Search / SERP** | Query search engines and verticals (web, news, shopping, and more). |
+| **Sessions** | Sticky, reusable browser sessions with consistent identity. |
+| **Identity profiles** | Persistent, coherent browser identities that survive across runs. |
+| **Storage** | Datasets, screenshots, and recordings, managed for you. |
+| **Authentic browser identity** | Every session presents a coherent, authentic browser identity. |
+
+---
+
+## Quickstart
+
+### 1. Get an API key
+
+Create an account at [ghostcrawl.io](https://ghostcrawl.io), verify your email,
+log in, and mint a key from your dashboard. Keys look like `gck_live_…` and are
+sent as a bearer token on every request.
+
+### 2. Call the API
+
+**curl:**
+
+```bash
+curl https://api.ghostcrawl.io/v1/scrape \
+  -H "Authorization: Bearer $GHOSTCRAWL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "format": "markdown"}'
+```
+
+**Python** ([`ghostcrawl`](https://pypi.org/project/ghostcrawl/)):
+
+```bash
+pip install ghostcrawl
+```
+
+```python
+from ghostcrawl import GhostCrawl
+
+client = GhostCrawl(token="gck_live_YOUR_KEY")  # or api_key=…
+result = client.scrape(url="https://example.com", format="markdown")
+print(result)
+```
+
+**Node / TypeScript** ([`@ghostcrawl/sdk`](https://www.npmjs.com/package/@ghostcrawl/sdk)):
+
+```bash
+npm install @ghostcrawl/sdk
+```
+
+```typescript
+import { GhostCrawlClient } from '@ghostcrawl/sdk';
+
+const client = new GhostCrawlClient({ token: 'gck_live_YOUR_KEY' });
+const result = await client.scrape({ url: 'https://example.com', format: 'markdown' });
+console.log(result);
+```
+
+**CLI** ([`@ghostcrawl/cli`](https://www.npmjs.com/package/@ghostcrawl/cli)):
+
+```bash
+npm install -g @ghostcrawl/cli
+ghostcrawl scrape https://example.com --engine chrome
+```
+
+**LangChain** ([`ghostcrawl-langchain`](https://pypi.org/project/ghostcrawl-langchain/)):
+
+```bash
+pip install ghostcrawl-langchain
+```
+
+```python
+import os
+os.environ["GHOSTCRAWL_API_KEY"] = "YOUR_API_KEY"
+
+from ghostcrawl_langchain import GhostCrawlScrapeTool
+
+tool = GhostCrawlScrapeTool()
+print(tool.invoke({"url": "https://example.com"}))
+```
+
+Every engine accepts an `engine` of `chrome`, `firefox`, or `webkit`, or `auto`
+to let GhostCrawl choose. Runnable versions of every snippet, plus crawl,
+extract, agent, and MCP examples, live in [`examples/`](examples/).
+
+Prefer clicking first? The site playground at
+[ghostcrawl.io/#playground](https://ghostcrawl.io/#playground) shows real
+scrape / extract / screenshot / crawl responses (cached engine output) with
+copy-paste SDK snippets — no key required to look.
+
+---
+
+## Ghostopia — see the workforce
+
+[Ghostopia](https://github.com/ghostcrawl/ghostopia) is a visual scraping
+workforce powered by GhostCrawl: a pixel-art town where every ghost is a real
+browser session. Type a product name, watch exact-match offers come back, export
+CSV/JSON.
+
+- Marketing preview: [ghostcrawl.io/ghostopia](https://ghostcrawl.io/ghostopia)
+- Run locally: clone → set your key → `make run` → http://localhost:8000
+
+---
+
+## Use it from an agent (MCP)
+
+MCP lets **your** AI agent or IDE drive GhostCrawl. GhostCrawl does not ship or
+host an AI model on cloud or self-host today — you connect the tools you already
+use to our browsers.
+
+MCP is part of the **cloud service** and the **self-host Docker image** (both
+proprietary under the [Software License](https://docs.ghostcrawl.io/legal/eula)).
+This repository ships MIT **client** examples and SDK wrappers only — not an MCP
+server you install from GitHub or PyPI.
+
+**Cloud** — point any MCP-capable agent at `mcp.ghostcrawl.io` with your API key:
+
+```json
+{
+  "mcpServers": {
+    "ghostcrawl": {
+      "url": "https://mcp.ghostcrawl.io",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+**Self-host** — after the Docker image is running, use
+`http://localhost:47700/mcp` with the same API key. See
+[`examples/mcp/`](examples/mcp/) and [docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
+
+---
+
+## Self-host (free)
+
+Run GhostCrawl on your own machine. Your compute, your IP, your data.
+
+**Easiest (Linux, macOS, Windows):** download the Docker-only launcher and run it.
+It handles the RAM filesystem, storage, localhost binding, health check, and lifecycle.
+
+```bash
+curl -fsSLO https://dev.ghostcrawl.io/ghostcrawl.sh && chmod +x ghostcrawl.sh
+./ghostcrawl.sh start
+```
+
+The same launcher runs on Linux, macOS and Windows — one shared, shell-safe command set,
+with no Windows-only installer. It prompts for your API key. Commands: `start`, `stop`,
+`restart`, `status`, `logs`, `update`, `uninstall`. Dashboard:
+`http://localhost:47700/dashboard`. Full guide — all six install requirements and inline
+PowerShell equivalents on one page:
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host).
+
+Advanced: [`docker-compose.yml.template`](docker-compose.yml.template) or the full
+[docs.ghostcrawl.io/self-host](https://docs.ghostcrawl.io/self-host) guide. The
+published image is `linux/amd64` only — native on Intel/x86. There is no public
+`linux/arm64` tag yet (planned after 2.3.9). **Apple Silicon (M-series)** and
+**ARM Windows** run the amd64 image via Docker Desktop emulation today.
+
+Free tier = **one browser per engine** + stock Windows Chrome / Windows Firefox /
+Mac Safari. **Self-host Plus ($9/mo)** or any paid plan unlocks more seats and
+premium routing / identities / behavior — choose **Contact sales** in the
+[cloud dashboard](https://app.ghostcrawl.io/dashboard/contact?plan=selfhost_bundle).
+
+> Managed exit routing is a cloud-only feature. Self-host requests egress from
+> your own machine's network unless you enable premium routing.
+
+---
+
+## Pricing
+
+The self-host image is free forever (with the seat limits above). Add **Self-host
+Plus ($9/mo)** for more seats plus premium routing, identities, and behavior via
+**Contact sales** — those are included free on every paid cloud plan.
+
+Cloud plans are metered in **credits**. A request spends credits based on how much
+**data** it pulls and how hard the target is to reach, so cost scales with the work:
+light pages on standard targets use the fewest credits, while large or media-heavy
+pages and protected targets use more, all from one balance. You're only charged for
+what your jobs actually use. Top up anytime; top-ups never expire.
+
+See [ghostcrawl.io](https://ghostcrawl.io) for the full, current pricing.
+
+---
+
+## SDKs
+
+| Language | Package | Install |
+|----------|---------|---------|
+| Python | [`ghostcrawl`](https://pypi.org/project/ghostcrawl/) | `pip install ghostcrawl` |
+| Node / TypeScript | [`@ghostcrawl/sdk`](https://www.npmjs.com/package/@ghostcrawl/sdk) | `npm install @ghostcrawl/sdk` |
+| Go | [`ghostcrawl-go`](https://github.com/GhostCrawl/ghostcrawl-go) | `go get github.com/GhostCrawl/ghostcrawl-go/v2` |
+| Java | `io.ghostcrawl:ghostcrawl-java` | Maven / Gradle (Maven Central) |
+| C# / .NET | [`GhostcrawlApi`](https://www.nuget.org/packages/GhostcrawlApi/) | `dotnet add package GhostcrawlApi` |
+| Ruby | [`ghostcrawl`](https://rubygems.org/gems/ghostcrawl) | `gem install ghostcrawl` |
+| CLI | [`@ghostcrawl/cli`](https://www.npmjs.com/package/@ghostcrawl/cli) | `npm install -g @ghostcrawl/cli` |
+| LangChain | [`ghostcrawl-langchain`](https://pypi.org/project/ghostcrawl-langchain/) | `pip install ghostcrawl-langchain` |
+| PHP | [`ghostcrawl/ghostcrawl`](https://packagist.org/packages/ghostcrawl/ghostcrawl) | `composer require ghostcrawl/ghostcrawl` |
+
+---
+
+## Documentation
+
+- [Install](docs/install.md): SDKs and the self-host CLI flow.
+- [Cloud usage](docs/usage-cloud.md): managed API + MCP, auth, engine selection.
+- [Self-host usage](docs/usage-selfhost.md): running the image locally.
+- [Bring your own self-host](docs/byo-selfhost.md): run it on your own terms.
+- [Examples](examples/): runnable snippets for every SDK, the CLI, curl, and MCP.
+
+Full API reference and interactive examples live at
+[ghostcrawl.io](https://ghostcrawl.io).
+
+---
+
+## Contributing & Security
+
+- Contributions to the SDKs, CLI, and docs are welcome. See
+  [CONTRIBUTING.md](CONTRIBUTING.md).
+- Found a vulnerability? Please report it privately. See
+  [SECURITY.md](.github/SECURITY.md).
+
+## Support
+
+Open an issue on this repository, or email
+[contact@ghostcrawl.io](mailto:contact@ghostcrawl.io).
+
+## License
+
+The GhostCrawl client toolkit in this repository (the SDKs, the CLI, the example
+cookbook, and the docs) is released under the [MIT License](LICENSE), so you can
+embed and build on it freely. © GhostCrawl, LLC.
+
+The managed cloud service and the self-host engine image — including the MCP
+server that ships with them — are a separate, commercially licensed product under
+the [GhostCrawl Software License](https://docs.ghostcrawl.io/legal/eula) and
+[Terms of Service](https://docs.ghostcrawl.io/legal/terms). Using the cloud API
+or running the self-host image requires a valid GhostCrawl account.
+
+---
+
+<div align="center">
+
+<img src="images/github-social.png" alt="GhostCrawl · move through the web like a ghost" width="640">
+
+**[Get started at ghostcrawl.io →](https://ghostcrawl.io)**
 
 </div>
