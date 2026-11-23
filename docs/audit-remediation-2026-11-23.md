@@ -113,3 +113,23 @@ From a clean clone of the public repository:
 5. Treat section 4 as the authoritative open-risk list: items there are intentionally unresolved, not hidden.
 
 No credentials, customer data, or production infrastructure are required for this review.
+
+## 6. Independent re-audit response (2026-11-23)
+
+An independent reviewer claimed 10 public discrepancies. Each was re-checked against live HTTP, live registries, and the GitHub API. Six were caused by source fixes that had not been **deployed**; four were already false on the live surfaces.
+
+Both hosted Pages projects were rebuilt and deployed in this session: the documentation portal (`ghostcrawl-docs`, 87 routes) and the marketing/blog site (`ghostcrawl-marketing` + `ghostcrawl-blog`, edge cache purged).
+
+| Claim | Live result after deploy |
+|---|---|
+| Terms/EULA proprietary vs MIT | Live legal pages agree: MIT toolkit, proprietary cloud/self-host image; no Delaware governing law. Refuted. |
+| Trust page bans authenticated sessions / dated 20 Oct | Live page now says 19 November 2026 and qualifies the restriction to content the customer is **not authorized** to access; authorized customer sessions supported. Fixed by deploy. |
+| npm README Bearer-only | Published `@ghostcrawl/sdk@2.3.91` README documents X-Api-Key; no "only auth scheme" claim. Refuted. |
+| NuGet 2.3.8 / net8 | NuGet index contains 2.3.91; cache-busted package download HTTP 200, registration `listed:true`. Refuted. |
+| PHP README 8.1 / About proprietary | Public docs/install says Python 3.11+, examples/node says Node 22+; GitHub About says MIT (client toolkit); Packagist requires PHP >=8.3. Refuted. |
+| Security page Bearer-only | Live page now says Bearer and X-Api-Key are both supported. Fixed by deploy. |
+| SLA lacks no-credits remedy | Live page now states no service credits and support-priority remedy. Fixed by deploy. |
+| Self-host checksum after execution | Live page now orders download → checksum verification (fail-closed) → chmod → execute. Fixed by deploy. |
+| Homepage free limits absent | Live `plans.json` free card now lists one interactive session per engine, one persisted identity, minimal built-in behavior. Fixed by deploy. |
+
+Section 4 remains the authoritative open-risk list. No production runtime, browser fleet, or billing system was changed; only documentation sites were deployed.
