@@ -157,7 +157,7 @@ pip install ghostcrawl-langchain
 
 ```python
 import os
-os.environ["GHOSTCRAWL_API_KEY"] = "YOUR_API_KEY"
+os.environ["GHOSTCRAWL_API_KEY"] = "YOUR_API_KEY"  # pragma: allowlist secret — documentation placeholder
 
 from ghostcrawl_langchain import GhostCrawlScrapeTool
 
