@@ -30,7 +30,7 @@ scrapers get reliable page results without managing a single browser, queue, or 
 [MCP](https://mcp.ghostcrawl.io) ·
 [Examples](examples/)
 
-⭐ **If GhostCrawl is useful to you, a star helps other developers find it.**
+⭐ **[If GhostCrawl is useful to you, a star helps other developers find it.](https://github.com/ghostcrawl/ghostcrawl/stargazers)**
 
 <a href="https://buymeacoffee.com/ghostcrawl"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" width="180" /></a>
 

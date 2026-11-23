@@ -14,7 +14,7 @@ Product version **2.3.9**; published npm package latest **2.3.91** (a 2.3.9-band
 npm install -g @ghostcrawl/cli@2.3.9
 ```
 
-Requires Node.js >= 18. The `ghostcrawl init` and `ghostcrawl install` verbs below
+Requires Node.js 22 or newer (Node.js >= 22 in `package.json` engines). The `ghostcrawl init` and `ghostcrawl install` verbs below
 are the CLI's own first-run commands; keep them — they are the real CLI surface,
 not a per-SDK runtime installer.
 

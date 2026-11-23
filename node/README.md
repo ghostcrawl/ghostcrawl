@@ -3,7 +3,7 @@
 The official TypeScript/JavaScript client for the [GhostCrawl](https://ghostcrawl.io) API. Collect web data at scale — scrape, crawl, search, extract structured data, manage browser sessions, and automate the full data-collection pipeline.
 
 - **ESM + CJS dual build** with full `.d.ts` type declarations.
-- **Zero runtime HTTP dependency** — built on `globalThis.fetch` (Node.js 18+).
+- **Zero runtime HTTP dependency** — built on `globalThis.fetch` (Node.js 22+).
 - **TypeScript-first**, works from plain JavaScript too.
 
 ## Install
@@ -14,7 +14,7 @@ Product version **2.3.9**; published npm package latest **2.3.91** (a 2.3.9-band
 npm install @ghostcrawl/sdk@2.3.9
 ```
 
-Requires Node.js >= 18.
+Requires Node.js >= 22.
 
 ### First step: runtime setup
 
