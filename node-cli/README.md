@@ -8,7 +8,7 @@ same JSON output format.
 
 ## Install
 
-The current release is **2.3.9** (`@ghostcrawl/cli@2.3.9`):
+Product version **2.3.9**; published npm package latest **2.3.91** (a 2.3.9-band patch identifier — registry artifacts are immutable). Source version files remain at 2.3.9:
 
 ```bash
 npm install -g @ghostcrawl/cli@2.3.9

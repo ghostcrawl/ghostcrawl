@@ -4,7 +4,7 @@ The official Python client for the [GhostCrawl](https://ghostcrawl.io) API. Coll
 
 ## Install
 
-The current release is **2.3.9** (`ghostcrawl==2.3.9`):
+Product version **2.3.9**; published PyPI package latest **2.3.91** (a 2.3.9-band patch identifier — registry artifacts are immutable). Source version files remain at 2.3.9:
 
 ```bash
 pip install ghostcrawl==2.3.9

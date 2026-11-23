@@ -3593,6 +3593,1705 @@
           "code",
           "retryable"
         ]
+      },
+      "CancelAction": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "const": "cancel",
+            "title": "Action",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "run_id"
+        ],
+        "title": "CancelAction",
+        "type": "object"
+      },
+      "ListAction": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "const": "list",
+            "title": "Action",
+            "type": "string"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cursor"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "ListAction",
+        "type": "object"
+      },
+      "ResumeAction": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "const": "resume",
+            "title": "Action",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "run_id"
+        ],
+        "title": "ResumeAction",
+        "type": "object"
+      },
+      "StartAction": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "const": "start",
+            "title": "Action",
+            "type": "string"
+          },
+          "seed_urls": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Seed Urls",
+            "type": "array"
+          },
+          "follow_patterns": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Follow Patterns"
+          },
+          "max_depth": {
+            "default": 3,
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Max Depth",
+            "type": "integer"
+          },
+          "max_pages": {
+            "default": 100,
+            "maximum": 10000,
+            "minimum": 1,
+            "title": "Max Pages",
+            "type": "integer"
+          },
+          "politeness_ms": {
+            "default": 1000,
+            "maximum": 60000,
+            "minimum": 0,
+            "title": "Politeness Ms",
+            "type": "integer"
+          },
+          "max_concurrency": {
+            "default": 2,
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Max Concurrency",
+            "type": "integer"
+          },
+          "respect_robots_txt": {
+            "default": true,
+            "title": "Respect Robots Txt",
+            "type": "boolean"
+          },
+          "profile_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Profile Id"
+          },
+          "engine": {
+            "default": "auto",
+            "enum": [
+              "auto",
+              "chrome",
+              "firefox",
+              "webkit"
+            ],
+            "title": "Engine",
+            "type": "string"
+          },
+          "wait_until": {
+            "anyOf": [
+              {
+                "const": "completed",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wait Until"
+          },
+          "timeout_s": {
+            "anyOf": [
+              {
+                "maximum": 300,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Timeout S"
+          },
+          "extract_schema": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extract Schema"
+          },
+          "extract_prompt": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extract Prompt"
+          }
+        },
+        "required": [
+          "action",
+          "seed_urls"
+        ],
+        "title": "StartAction",
+        "type": "object"
+      },
+      "StatusAction": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "const": "status",
+            "title": "Action",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "run_id"
+        ],
+        "title": "StatusAction",
+        "type": "object"
+      },
+      "ActStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "act",
+            "title": "Type",
+            "type": "string"
+          },
+          "instruction": {
+            "title": "Instruction",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "instruction"
+        ],
+        "title": "ActStep",
+        "type": "object"
+      },
+      "ClickStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "click",
+            "title": "Type",
+            "type": "string"
+          },
+          "selector": {
+            "title": "Selector",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "selector"
+        ],
+        "title": "ClickStep",
+        "type": "object"
+      },
+      "CookiesStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "cookies",
+            "title": "Type",
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "get",
+              "set",
+              "delete"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "filter": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Filter"
+          },
+          "cookies": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cookies"
+          }
+        },
+        "required": [
+          "type",
+          "action"
+        ],
+        "title": "CookiesStep",
+        "type": "object"
+      },
+      "DomSnapshotStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "dom_snapshot",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "DomSnapshotStep",
+        "type": "object"
+      },
+      "DownloadFileStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "download_file",
+            "title": "Type",
+            "type": "string"
+          },
+          "selector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Selector"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "DownloadFileStep",
+        "type": "object"
+      },
+      "EvalStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "eval",
+            "title": "Type",
+            "type": "string"
+          },
+          "script": {
+            "title": "Script",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "script"
+        ],
+        "title": "EvalStep",
+        "type": "object"
+      },
+      "ExtractStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "extract",
+            "title": "Type",
+            "type": "string"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Schema"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Instruction"
+          },
+          "dataset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Dataset"
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Idempotency Key"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "ExtractStep",
+        "type": "object"
+      },
+      "FillStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "fill",
+            "title": "Type",
+            "type": "string"
+          },
+          "selector": {
+            "title": "Selector",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "selector",
+          "value"
+        ],
+        "title": "FillStep",
+        "type": "object"
+      },
+      "NavigateStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "navigate",
+            "title": "Type",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "wait_for": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wait For"
+          },
+          "extract_schema": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extract Schema"
+          },
+          "headers": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Headers"
+          },
+          "timeout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Timeout"
+          },
+          "javascript_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Javascript Enabled"
+          },
+          "record_har": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Record Har"
+          },
+          "record_dom": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Record Dom"
+          }
+        },
+        "required": [
+          "type",
+          "url"
+        ],
+        "title": "NavigateStep",
+        "type": "object"
+      },
+      "NetworkHARStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "network_har",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "NetworkHARStep",
+        "type": "object"
+      },
+      "NetworkStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "network",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "NetworkStep",
+        "type": "object"
+      },
+      "ObserveStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "observe",
+            "title": "Type",
+            "type": "string"
+          },
+          "instruction": {
+            "title": "Instruction",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "instruction"
+        ],
+        "title": "ObserveStep",
+        "type": "object"
+      },
+      "ScrapeStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "scrape",
+            "title": "Type",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "extract_schema": {
+            "additionalProperties": true,
+            "title": "Extract Schema",
+            "type": "object"
+          },
+          "wait_for": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Wait For"
+          },
+          "headers": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Headers"
+          },
+          "timeout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Timeout"
+          },
+          "javascript_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Javascript Enabled"
+          },
+          "record_har": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Record Har"
+          },
+          "record_dom": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Record Dom"
+          }
+        },
+        "required": [
+          "type",
+          "url",
+          "extract_schema"
+        ],
+        "title": "ScrapeStep",
+        "type": "object"
+      },
+      "ScreenshotStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "screenshot",
+            "title": "Type",
+            "type": "string"
+          },
+          "selector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Selector"
+          },
+          "full_page": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Full Page"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "ScreenshotStep",
+        "type": "object"
+      },
+      "ScrollStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "scroll",
+            "title": "Type",
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "up",
+              "down",
+              "left",
+              "right"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "distance_px": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Distance Px"
+          },
+          "selector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Selector"
+          }
+        },
+        "required": [
+          "type",
+          "direction"
+        ],
+        "title": "ScrollStep",
+        "type": "object"
+      },
+      "UploadFileStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "upload_file",
+            "title": "Type",
+            "type": "string"
+          },
+          "selector": {
+            "title": "Selector",
+            "type": "string"
+          },
+          "content_base64": {
+            "title": "Content Base64",
+            "type": "string"
+          },
+          "filename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Filename"
+          }
+        },
+        "required": [
+          "type",
+          "selector",
+          "content_base64"
+        ],
+        "title": "UploadFileStep",
+        "type": "object"
+      },
+      "WaitStep": {
+        "additionalProperties": false,
+        "properties": {
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Recorded At"
+          },
+          "replay_seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Replay Seed"
+          },
+          "expected_outcome": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected Outcome"
+          },
+          "type": {
+            "const": "wait",
+            "title": "Type",
+            "type": "string"
+          },
+          "selector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Selector"
+          },
+          "timeout_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Timeout Ms"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "WaitStep",
+        "type": "object"
+      },
+      "RecordingLifecycleResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "profile_id": {
+            "title": "Profile Id",
+            "type": "string"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "recording",
+              "finalized",
+              "aborted"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "started_at": {
+            "title": "Started At",
+            "type": "string"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ended At"
+          },
+          "step_count": {
+            "title": "Step Count",
+            "type": "integer"
+          },
+          "steps": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "act": "#/$defs/ActStep",
+                  "click": "#/$defs/ClickStep",
+                  "cookies": "#/$defs/CookiesStep",
+                  "dom_snapshot": "#/$defs/DomSnapshotStep",
+                  "download_file": "#/$defs/DownloadFileStep",
+                  "eval": "#/$defs/EvalStep",
+                  "extract": "#/$defs/ExtractStep",
+                  "fill": "#/$defs/FillStep",
+                  "navigate": "#/$defs/NavigateStep",
+                  "network": "#/$defs/NetworkStep",
+                  "network_har": "#/$defs/NetworkHARStep",
+                  "observe": "#/$defs/ObserveStep",
+                  "scrape": "#/$defs/ScrapeStep",
+                  "screenshot": "#/$defs/ScreenshotStep",
+                  "scroll": "#/$defs/ScrollStep",
+                  "upload_file": "#/$defs/UploadFileStep",
+                  "wait": "#/$defs/WaitStep"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/NavigateStep"
+                },
+                {
+                  "$ref": "#/components/schemas/WaitStep"
+                },
+                {
+                  "$ref": "#/components/schemas/ScrollStep"
+                },
+                {
+                  "$ref": "#/components/schemas/ClickStep"
+                },
+                {
+                  "$ref": "#/components/schemas/FillStep"
+                },
+                {
+                  "$ref": "#/components/schemas/CookiesStep"
+                },
+                {
+                  "$ref": "#/components/schemas/ActStep"
+                },
+                {
+                  "$ref": "#/components/schemas/ObserveStep"
+                },
+                {
+                  "$ref": "#/components/schemas/ExtractStep"
+                },
+                {
+                  "$ref": "#/components/schemas/EvalStep"
+                },
+                {
+                  "$ref": "#/components/schemas/UploadFileStep"
+                },
+                {
+                  "$ref": "#/components/schemas/DownloadFileStep"
+                },
+                {
+                  "$ref": "#/components/schemas/ScrapeStep"
+                },
+                {
+                  "$ref": "#/components/schemas/ScreenshotStep"
+                },
+                {
+                  "$ref": "#/components/schemas/NetworkHARStep"
+                },
+                {
+                  "$ref": "#/components/schemas/DomSnapshotStep"
+                },
+                {
+                  "$ref": "#/components/schemas/NetworkStep"
+                }
+              ]
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "profile_id",
+          "session_id",
+          "schema_version",
+          "status",
+          "started_at",
+          "step_count"
+        ],
+        "title": "RecordingLifecycleResponse",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -3819,6 +5518,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Start agent lane request (beta, opt-in; 404 until enabled for your account)",
@@ -3829,40 +5531,7 @@
       "post": {
         "description": "Capture a single JPEG frame from a live browser session. Purpose: grab a still image of a running, interactive session for a live-view preview. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: `session_id` (required) identifies the live session; `quality` (optional, 1-100, default 60) sets JPEG quality. Request: POST /v1/cdp/frame with a JSON body such as {\"session_id\": \"sess_123\", \"quality\": 60}. Success: 200 with {\"format\": \"jpeg\", \"data\": \"<base64-jpeg>\", \"engine\": \"chrome\", \"width\": 1280, \"height\": 720}. Errors: 401 for missing credentials, 403 when live view is not enabled for your plan or access has been revoked, 404 when the session is not found, and 502 if the frame could not be captured. Billing: each capture counts toward your plan's request quota. Limits: one frame per call; poll at a reasonable interval. Access is enforced in four steps: authentication, a revocation check, an entitlement check, and Ownership verification that the session belongs to your account. Data and privacy: this operation reads a transient frame from your own session and returns it in the response; GhostCrawl does not retain the frame or the captured page content. See the Privacy Policy and Cookie Notice for retention details.",
         "operationId": "cdp_frame_v1_cdp_frame_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3922,6 +5591,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Capture a live view frame",
@@ -3935,40 +5607,7 @@
       "post": {
         "description": "Drive a live interactive session. Dispatches a navigate/click/type step to the session: * navigate → {url} * click → {x, y, button} * type → {text} Returns 200 {\"ok\": true, \"step_type\":.} on success; 403 cdp_not_enabled / cdp_revoked; 404 session_not_found; 502 input_failed.",
         "operationId": "cdp_input_v1_cdp_input_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4016,6 +5655,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Drive a live session (navigate/click/type)",
@@ -4029,40 +5671,7 @@
       "post": {
         "description": "Mint a short-TTL signed URL for cloud CDP access. Returns 200 {\"url\": \"wss://.\", \"expires_in_seconds\": 120} on success.",
         "operationId": "cdp_url_v1_cdp_url_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4110,6 +5719,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get a live CDP endpoint URL",
@@ -4123,40 +5735,7 @@
       "post": {
         "description": "render a URL and return its content as a JSON envelope. Equivalent to /v1/scrape returning the rendered content field. Gated exactly like /v1/scrape (daily request quota + GB egress cap); works on every engine.",
         "operationId": "saas_content_v1_content_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4190,6 +5769,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Render a URL and return its content",
@@ -4283,38 +5865,6 @@
               ],
               "title": "Tags"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -4378,6 +5928,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List crawl runs",
@@ -4388,38 +5941,6 @@
       "post": {
         "operationId": "start_crawl_run_v1_crawl_runs_post",
         "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          },
           {
             "example": "01HX4RZPQ8XVWMQFGKN3JST7BZ",
             "in": "header",
@@ -4435,16 +5956,41 @@
           }
         ],
         "requestBody": {
+          "required": true,
+          "description": "Crawl run request. Exactly one `action` discriminator selects the body shape (`start`, `status`, `cancel`, `resume`, `list`).",
           "content": {
             "application/json": {
               "schema": {
-                "additionalProperties": true,
-                "title": "Body",
-                "type": "object"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/StartAction"
+                  },
+                  {
+                    "$ref": "#/components/schemas/StatusAction"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CancelAction"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ResumeAction"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ListAction"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "action",
+                  "mapping": {
+                    "cancel": "#/components/schemas/CancelAction",
+                    "list": "#/components/schemas/ListAction",
+                    "resume": "#/components/schemas/ResumeAction",
+                    "start": "#/components/schemas/StartAction",
+                    "status": "#/components/schemas/StatusAction"
+                  }
+                }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -4520,6 +6066,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Start a crawl run",
@@ -4560,38 +6109,6 @@
               "default": 300,
               "title": "Timeout S",
               "type": "integer"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -4669,6 +6186,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get crawl run status",
@@ -4688,38 +6208,6 @@
             "schema": {
               "title": "Run Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           },
           {
@@ -4789,6 +6277,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Cancel a crawl run (idempotent)",
@@ -4808,38 +6299,6 @@
             "schema": {
               "title": "Run Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           },
           {
@@ -4909,6 +6368,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Resume a paused/failed_resumable crawl run",
@@ -4922,38 +6384,6 @@
         "description": "queue an async deep crawl. Returns immediately with run_id and status=\"queued\". Webhook fires on completion when webhook_url is provided. Billing: crawl_pages_delta (Option A).",
         "operationId": "deep_crawl_v1_crawl_deep_post",
         "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          },
           {
             "example": "01HX4RZPQ8XVWMQFGKN3JST7BZ",
             "in": "header",
@@ -5001,6 +6431,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Deep crawl with strategy",
@@ -5021,38 +6454,6 @@
             "schema": {
               "title": "Run Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -5079,6 +6480,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Poll deep crawl status",
@@ -5172,38 +6576,6 @@
               ],
               "title": "Tags"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -5263,6 +6635,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List datasets with cursor pagination",
@@ -5273,40 +6648,7 @@
       "post": {
         "description": "register a new dataset sink. Credentials are stored encrypted and are never returned in the response. Duplicate names return 400 dataset_name_conflict. Success returns 201 with dataset metadata.",
         "operationId": "register_dataset_v1_datasets_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -5342,6 +6684,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Register dataset sink",
@@ -5363,38 +6708,6 @@
               "title": "Name",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -5420,6 +6733,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Delete dataset",
@@ -5439,38 +6755,6 @@
               "title": "Name",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -5496,6 +6780,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get dataset metadata",
@@ -5544,38 +6831,6 @@
               "minimum": 1,
               "title": "Limit",
               "type": "integer"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -5639,6 +6894,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get paginated dataset rows",
@@ -5659,38 +6917,6 @@
             "schema": {
               "title": "Name",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -5739,6 +6965,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Append rows to a dataset",
@@ -5751,40 +6980,7 @@
       "get": {
         "description": "",
         "operationId": "list_downloads_v1_downloads_get",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "content": {
@@ -5808,6 +7004,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List captured downloads",
@@ -5831,38 +7030,6 @@
               "title": "Download Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -5883,6 +7050,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Delete a captured download",
@@ -5903,38 +7073,6 @@
               "minLength": 1,
               "title": "Download Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -5961,6 +7099,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Fetch a captured download",
@@ -5974,38 +7115,6 @@
         "description": "structured extraction: deterministic (no model) or connect-your-model. GhostCrawl fetches and renders the URL and reads structured data from the page. For fields that are not present as structured data, connect your own AI provider by passing `model_provider` and its credentials; your connected model then performs the semantic extraction. CONNECT-YOUR-AI (a prompt but NO model_provider): returns 422 model_provider_required, connect your AI/LLM (pass model_provider) to run semantic extraction. Never a silent empty. DETERMINISTIC (model_provider absent, default): 1. The schema is validated (input guard). 2. The URL is validated against private/loopback/metadata targets. 3. The page is fetched and rendered. 4. Structured data is read natively from the page's schema.org JSON-LD / microdata / Open Graph. 5. The result is validated against the schema, 422 on mismatch (field path only). Returns {\"url\",\"data\",\"token_estimate\"}. When the page embedded NO matching structured data (every field null/empty), the response also carries a non-fatal \"warnings\":[\"no_structured_data: …pass model_provider…\"] so an all-null 200 is not mistaken for a failure. BRING-YOUR-OWN-MODEL (model_provider present): 1. Target URLs are resolved (urls or [url]). 2. The schema is validated if present. 3. At least one of prompt or schema is required, 400 prompt_or_schema_required otherwise. 4. Model credentials are validated, 400 invalid_model_provider on error (the message never echoes the key). 5. Every target URL is validated before fetching, 400 ssrf_blocked. 6. Each URL is fetched and converted to clean Markdown. 7. Your connected model performs the extraction. 8. With a schema present, the result is validated, 422 on mismatch. Returns {\"urls\",\"data\",\"token_estimate\"}. Security: 401 without a valid Bearer token. - model_provider.api_key is request-scoped: never persisted, logged, or echoed. - Error responses never echo the schema body, fetched content, or credentials.",
         "operationId": "saas_extract_v1_extract_post",
         "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          },
           {
             "example": "01HX4RZPQ8XVWMQFGKN3JST7BZ",
             "in": "header",
@@ -6083,6 +7192,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Schema-driven structured extraction",
@@ -6103,38 +7215,6 @@
             "schema": {
               "title": "Key",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -6171,6 +7251,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "DELETE a key-value entry",
@@ -6189,38 +7272,6 @@
             "schema": {
               "title": "Key",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -6272,6 +7323,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "GET a key-value entry",
@@ -6290,38 +7344,6 @@
             "schema": {
               "title": "Key",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -6378,6 +7400,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "PUT a key-value entry",
@@ -6390,40 +7415,7 @@
       "post": {
         "description": "sitemap URL discovery. 1. The seed URL is validated against private/loopback/metadata targets. 2. The request is quota-checked. 3. URLs are discovered from the site's sitemaps. 4. Results are filtered to the same registrable domain by default. 5. An optional case-insensitive substring filter is applied to URLs. 6. Results are capped at 10000 regardless of the requested limit.",
         "operationId": "submit_map_v1_map_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -6459,6 +7451,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Submit Map",
@@ -6690,40 +7685,7 @@
       "post": {
         "description": "Arrive at ``dest_url`` through a native link click from ``source_url``, engine-agnostic, so document.referrer, the Referer header and Sec-Fetch-* are produced natively by the click. Both URLs are validated server-side. Tier and ownership checks mirror /v1/cdp/input.",
         "operationId": "page_arrival_v1_page_arrival_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -6757,6 +7719,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Arrive at a page through a link click on a live session",
@@ -6769,40 +7734,7 @@
       "post": {
         "description": "Close any popup tab opened on a live cloud session (works on every engine). Every non-primary, off-host http page is closed while the primary page and same-host tabs are kept. Returns ``{closed: [urls], count}``. Tier and ownership checks mirror the other page tools.",
         "operationId": "page_close_popups_v1_page_close_popups_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -6855,6 +7787,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Close popup tabs on a live cloud session",
@@ -6867,40 +7802,7 @@
       "delete": {
         "description": "Delete cookies from the browser context of a live cloud session. With a name/domain/path filter only the matching cookies are removed; without a filter every cookie in the session is cleared.",
         "operationId": "page_cookies_delete_v1_page_cookies_delete",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -6934,6 +7836,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Delete cookies on a live cloud session",
@@ -6985,38 +7890,6 @@
               ],
               "title": "Domain"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -7042,6 +7915,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get cookies from a live cloud session",
@@ -7052,40 +7928,7 @@
       "post": {
         "description": "Add cookies to the browser context of a live cloud session.",
         "operationId": "page_cookies_set_v1_page_cookies_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7119,6 +7962,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Set cookies on a live cloud session",
@@ -7131,40 +7977,7 @@
       "post": {
         "description": "Return the current HTML of the live session's page, capped at 5 MB. Over the cap the response is ``truncated=True`` with ``dom=None``; retry with a narrower scope or use /v1/page/eval to extract a fragment.",
         "operationId": "page_dom_snapshot_v1_page_dom_snapshot_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7198,6 +8011,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Capture a DOM snapshot of a live cloud session",
@@ -7210,40 +8026,7 @@
       "post": {
         "description": "Trigger and capture a download on a live session. Clicks the trigger, captures the resulting file and returns its bytes as base64 (inline cap 10 MB; a larger file returns 403 ``too_large``). The captured file is also saved to your Downloads.",
         "operationId": "page_download_v1_page_download_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7277,6 +8060,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Trigger and capture a download from a live cloud session",
@@ -7289,40 +8075,7 @@
       "post": {
         "description": "Run caller-supplied JavaScript in the pinned page context. All execution paths (disabled, timeout-killed, result-capped, PII-filtered) are audit-logged. A pre-execution audit record is written before the watchdog fires so interrupted evaluations remain traceable, paired with a final success/failure/denied record sharing the same ``eval_id`` correlation key. The result payload is never written to the audit log, only its size and hash.",
         "operationId": "page_eval_v1_page_eval_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7356,6 +8109,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Evaluate JavaScript on the pinned page",
@@ -7368,40 +8124,7 @@
       "post": {
         "description": "Return the HAR-equivalent JSON for the live session. Captures all network traffic recorded during the session and returns it in HAR format. Responses over 5 MB return a truncation flag in the body rather than an error.",
         "operationId": "page_har_v1_page_har_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7435,6 +8158,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Capture HAR for the live session",
@@ -7447,40 +8173,7 @@
       "post": {
         "description": "Replay a mouse op-stream (move/down/up/wheel/dwell) natively on the live page of the pinned session. Engine-agnostic: every engine receives the same trusted pointer trajectory and settled click. Tier and ownership checks mirror /v1/cdp/input.",
         "operationId": "page_mouse_v1_page_mouse_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7514,6 +8207,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Replay a mouse op-stream on a live cloud session",
@@ -7526,40 +8222,7 @@
       "post": {
         "description": "Scroll the page of a live cloud session. Tier and ownership checks mirror /v1/cdp/input.",
         "operationId": "page_scroll_v1_page_scroll_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7593,6 +8256,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Scroll the page of a live cloud session",
@@ -7605,40 +8271,7 @@
       "post": {
         "description": "Visit ``url`` in a real new tab of the session's context: load it, read it briefly, then close it (the session continues on its original tab). Chrome engine only; other engines return ``unsupported``. The URL is validated server-side. Tier and ownership checks mirror /v1/cdp/input.",
         "operationId": "page_tab_visit_v1_page_tab_visit_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7672,6 +8305,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Open, read and close a new tab on a live session",
@@ -7684,40 +8320,7 @@
       "post": {
         "description": "Replay a touch op-stream (start/move/end taps) natively on the live page of the pinned session, so a mobile identity issues real trusted taps. Engine-agnostic. Tier and ownership checks mirror /v1/page/mouse.",
         "operationId": "page_touch_v1_page_touch_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7751,6 +8354,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Replay a touch op-stream on a live cloud session (mobile)",
@@ -7763,40 +8369,7 @@
       "post": {
         "description": "Set a file <input> on the page of a live session to caller-supplied bytes. The base64-decoded file is size-capped before it is applied to the input.",
         "operationId": "page_upload_v1_page_upload_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7830,6 +8403,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Upload a file to a file input on a live cloud session",
@@ -7842,40 +8418,7 @@
       "post": {
         "description": "Wait for a selector (or a timed wait) on the page of a live cloud session. A selector that never appears returns 404 ``selector_not_found``; a plain timed wait returns ``state:\"timeout\"``.",
         "operationId": "page_wait_v1_page_wait_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7909,6 +8452,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Wait for a selector or a timeout on a live cloud session",
@@ -7921,40 +8467,7 @@
       "post": {
         "description": "render a URL to PDF. Equivalent to /v1/scrape with format=pdf. Returns real application/pdf bytes for every requested engine (PDF-capable engine selected automatically). The URL is validated and all traffic egresses through your configured proxy. Requires a paid plan and is subject to your request quota (same as /v1/extract).",
         "operationId": "saas_pdf_v1_pdf_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -7986,6 +8499,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Render a URL to PDF",
@@ -8079,38 +8595,6 @@
               ],
               "title": "Tags"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -8170,6 +8654,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List profiles (cursor-paginated)",
@@ -8180,40 +8667,7 @@
       "post": {
         "description": "mint a durable {org, name} → identity binding. 409 on duplicate name; 422 on invalid identity_spec.",
         "operationId": "create_profile_v1_profiles_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -8247,6 +8701,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "",
@@ -8268,38 +8725,6 @@
               "title": "Name",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -8325,6 +8750,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Delete a named profile",
@@ -8344,38 +8772,6 @@
               "title": "Name",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -8401,6 +8797,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get a named profile by name",
@@ -8419,38 +8818,6 @@
             "schema": {
               "title": "Name",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -8487,6 +8854,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Rename a profile and/or rebind its storage_state",
@@ -8499,40 +8869,7 @@
       "get": {
         "description": "Report whether the real-time interactive browser is usable for this caller. Clients call this before starting a live view so they can show the live surface, an upgrade prompt, or a not-configured state without a failed offer round-trip. - `interactive`: realtime gateway is configured and the caller has the ``interactive_session`` capability. The UI shows live view only when true. - `entitled`: the account grant alone (so UIs can distinguish \"upgrade\" from \"not available on this deployment\"). - `reason`: why ``interactive`` is false (``gateway_unavailable`` | ``capability_not_granted``). - `transport`: always ``webrtc``. - `turn`: whether TURN/ICE relay servers are configured. - `ice_servers`: STUN/TURN servers for the browser peer connection (only when entitled on a configured instance); empty otherwise.",
         "operationId": "realtime_capabilities_v1_realtime_capabilities_get",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "content": {
@@ -8560,6 +8897,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Realtime Capabilities",
@@ -8582,38 +8922,6 @@
               "minLength": 1,
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -8644,6 +8952,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Realtime Close",
@@ -8666,38 +8977,6 @@
               "minLength": 1,
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -8738,6 +9017,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Realtime Offer",
@@ -8831,38 +9113,6 @@
               ],
               "title": "Tags"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -8926,6 +9176,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List recordings (cursor-paginated)",
@@ -8947,38 +9200,6 @@
               "title": "Recording Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -8999,6 +9220,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "",
@@ -9017,38 +9241,6 @@
             "schema": {
               "title": "Recording Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -9075,6 +9267,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "",
@@ -9095,38 +9290,6 @@
             "schema": {
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -9175,6 +9338,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get Visual Recording",
@@ -9224,38 +9390,6 @@
               "title": "Limit",
               "type": "integer"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -9301,6 +9435,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List Visual Frames",
@@ -9322,38 +9459,6 @@
             "schema": {
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -9398,6 +9503,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Start Visual Recording",
@@ -9419,38 +9527,6 @@
             "schema": {
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -9495,6 +9571,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Stop Visual Recording",
@@ -9508,40 +9587,7 @@
       "get": {
         "description": "List schedules in your account. Purpose: retrieve the cron schedules you have created for recurring scrapes and crawls. Authentication: supply your API key as Authorization: Bearer or via the X-Api-Key header. Parameters: none. Request: GET /v1/schedules. Success: 200 with a JSON list of schedule objects, each with id, target URL, cron expression, and last-run status. Errors: 401 for missing credentials and 403 if your key lacks read permission. Billing: listing is free and counts as a read request. Limits: the list is scoped to your account. Data and privacy: this read-only operation returns schedule metadata from your own account; GhostCrawl retains it for the life of your account. See the Privacy Policy and Cookie Notice.",
         "operationId": "list_schedules_v1_schedules_get",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "content": {
@@ -9592,6 +9638,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List schedules",
@@ -9602,40 +9651,7 @@
       "post": {
         "description": "create a cron-triggered scrape/crawl schedule. Validations: cron_expr must parse (422 invalid_cron) job_type must be 'scrape', 'crawl', or 'change_monitor' (422 invalid_job_type) notify_webhook must be SSRF-safe HTTPS URL if provided (422 invalid_webhook) per-org count < cap (429 schedule_cap_reached) unique name per org (409 schedule_exists)",
         "operationId": "create_schedule_v1_schedules_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -9669,6 +9685,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Create a recurring schedule",
@@ -9690,38 +9709,6 @@
               "title": "Schedule Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -9747,6 +9734,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Delete a schedule",
@@ -9766,38 +9756,6 @@
               "title": "Schedule Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -9823,6 +9781,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get one schedule (404",
@@ -9844,38 +9805,6 @@
               "title": "Schedule Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -9901,6 +9830,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List run history for a schedule",
@@ -9914,38 +9846,6 @@
         "description": "Bearer-gated scrape with identity field. Accepts: ``identity: \"id_.\"`` Re-use a persisted identity (no quota charge). - ``identity_spec: {.}`` Inline identity creation (counts against quota). - neither Host-identity fallback; warns in response. - Both → 422 invalid_request. is unreachable from this route, profile.identity_id is always populated. stream=True branch returns text/event-stream with per-tenant cap.",
         "operationId": "saas_scrape_v1_scrape_post",
         "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          },
           {
             "example": "01HX4RZPQ8XVWMQFGKN3JST7BZ",
             "in": "header",
@@ -10055,6 +9955,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Scrape a URL",
@@ -10068,38 +9971,6 @@
         "description": "concurrent URL scrape (max 20 URLs, max concurrency 10). 4-16 processes each URL with authentication. Each URL is processed (batch_identity_mode=\"persist\" → one identity is created and reused for every URL). DoS mitigations (/02):",
         "operationId": "batch_scrape_v1_scrape_batch_post",
         "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          },
           {
             "example": "01HX4RZPQ8XVWMQFGKN3JST7BZ",
             "in": "header",
@@ -10168,6 +10039,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Batch Scrape",
@@ -10181,40 +10055,7 @@
       "post": {
         "description": "capture a URL to a PNG and return the raw image/png bytes. Equivalent to /v1/scrape with screenshot=true. Gated exactly like /v1/scrape (daily request quota + GB egress cap); works on every engine. Mirrors /v1/pdf's binary-response path but returns image/png.",
         "operationId": "saas_screenshot_v1_screenshot_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -10246,6 +10087,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Capture a URL to a PNG screenshot",
@@ -10266,38 +10110,6 @@
             "schema": {
               "title": "Ref",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -10346,6 +10158,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Fetch stored screenshot blob by UUID ref",
@@ -10359,38 +10174,6 @@
         "description": "multi-backend search. Engine selection: ``engine`` body field or ``X-Ghostcrawl-Search-Engine`` header. Auth: tenant bearer + customer's search API key via ``X-Provider-Authorization: Bearer <key>`` (never persisted).",
         "operationId": "search_v1_search_post",
         "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          },
           {
             "example": "01HX4RZPQ8XVWMQFGKN3JST7BZ",
             "in": "header",
@@ -10533,6 +10316,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Search",
@@ -10555,38 +10341,6 @@
               "description": "Search job id from a 202 /v1/search handoff.",
               "title": "Job Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -10660,6 +10414,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Search Job Poll",
@@ -10721,6 +10478,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Self-host only — set the bring-your-own behavior configuration",
@@ -10779,6 +10539,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Self-host only — set the bring-your-own identity profile",
@@ -10841,6 +10604,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Self-host only — set the bring-your-own proxy configuration",
@@ -10935,38 +10701,6 @@
               ],
               "title": "Tags"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -10992,6 +10726,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List sessions (cursor-paginated)",
@@ -11004,40 +10741,7 @@
       "post": {
         "description": "explicit session creation with engine preference. Accepts engine in {chrome, firefox, webkit, auto}.",
         "operationId": "session_create_endpoint_v1_sessions_create_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -11071,6 +10775,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Session Create Endpoint",
@@ -11092,48 +10799,18 @@
               "title": "Profile Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
           "201": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RecordingLifecycleResponse"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Recording envelope. `session_id` is an alias of `profile_id` carrying the same value."
           },
           "422": {
             "content": {
@@ -11149,6 +10826,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Start an action recording for a session",
@@ -11170,48 +10850,18 @@
               "title": "Profile Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/RecordingLifecycleResponse"
+                }
               }
             },
-            "description": "Successful Response"
+            "description": "Recording envelope. `session_id` is an alias of `profile_id` carrying the same value."
           },
           "422": {
             "content": {
@@ -11227,6 +10877,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Stop and finalize an active recording",
@@ -11248,38 +10901,6 @@
               "title": "Session Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -11305,6 +10926,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Close/terminate a session (REST alias)",
@@ -11324,38 +10948,6 @@
               "title": "Session Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -11381,6 +10973,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get a session by id",
@@ -11401,38 +10996,6 @@
             "schema": {
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -11469,6 +11032,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Extend a sticky session TTL",
@@ -11490,38 +11056,6 @@
               "title": "Session Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -11547,6 +11081,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Pin a session sticky",
@@ -11568,38 +11105,6 @@
               "title": "Session Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -11625,6 +11130,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Release/unpin a sticky session",
@@ -11645,38 +11153,6 @@
               "title": "Session Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -11702,6 +11178,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Drive one step (navigate) on a live session",
@@ -11723,38 +11202,6 @@
               "minLength": 1,
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -11793,6 +11240,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Start or release an interactive session takeover",
@@ -11814,38 +11264,6 @@
               "minLength": 1,
               "title": "Session Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -11882,6 +11300,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Takeover Release Endpoint",
@@ -11904,38 +11325,6 @@
               "title": "Session Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -11961,6 +11350,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Mint Takeover Token Endpoint",
@@ -11982,38 +11374,6 @@
               "title": "Session Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -12039,6 +11399,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Terminate a session",
@@ -12078,38 +11441,6 @@
               "minimum": 1,
               "title": "Limit",
               "type": "integer"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -12186,6 +11517,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List storage states with cursor pagination",
@@ -12196,40 +11530,7 @@
       "post": {
         "description": "snapshot browser storage state from a live session. Captures the current cookies, localStorage, and session storage from the named active profile and saves it encrypted under the given name. Returns storage state metadata on success (credentials are never returned). Storage blobs over 5 MB return storage_state_too_large (400). Pass ``session_id`` to capture from a live cloud session; on a self-hosted deployment ``profile_id`` alone captures from the local active page.",
         "operationId": "save_storage_state_v1_storage_states_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -12265,6 +11566,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Save storage state from live session",
@@ -12277,40 +11581,7 @@
       "post": {
         "description": "clear profile sticky-attach binding. Removes the storage state binding from a profile so subsequent sessions start without a pre-loaded storage state. Returns 204.",
         "operationId": "detach_storage_state_v1_storage_states_detach_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -12342,6 +11613,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Clear storage state binding",
@@ -12362,38 +11636,6 @@
             "schema": {
               "title": "Id Or Name",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -12418,6 +11660,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Delete storage state",
@@ -12436,38 +11681,6 @@
             "schema": {
               "title": "Id Or Name",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -12494,6 +11707,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get storage state metadata",
@@ -12514,38 +11730,6 @@
             "schema": {
               "title": "Id Or Name",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -12582,6 +11766,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Sticky-attach storage state to profile",
@@ -12675,38 +11862,6 @@
               ],
               "title": "Tags"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -12747,6 +11902,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List webhooks (cursor-paginated)",
@@ -12758,40 +11916,7 @@
       "post": {
         "description": "Create a new webhook subscription. Returns the webhook plus the plaintext signing secret once. Store the secret immediately, it cannot be recovered; only rotation via /rotate-secret provides a new one.",
         "operationId": "create_webhook_v1_webhooks_post",
-        "parameters": [
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
@@ -12827,6 +11952,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Register a webhook",
@@ -12849,38 +11977,6 @@
               "title": "Webhook Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -12901,6 +11997,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Delete webhook",
@@ -12920,38 +12019,6 @@
             "schema": {
               "title": "Webhook Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -12980,6 +12047,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Get webhook by id",
@@ -13083,38 +12153,6 @@
               ],
               "title": "Tags"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -13142,6 +12180,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "List delivery log (cursor-paginated)",
@@ -13173,38 +12214,6 @@
               "title": "Delivery Id",
               "type": "string"
             }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
-            }
           }
         ],
         "responses": {
@@ -13232,6 +12241,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Re-enqueue a failed delivery",
@@ -13253,38 +12265,6 @@
             "schema": {
               "title": "Webhook Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "header",
-            "name": "authorization",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          },
-          {
-            "in": "header",
-            "name": "X-Api-Key",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Api-Key"
             }
           }
         ],
@@ -13313,6 +12293,9 @@
         "security": [
           {
             "bearerAuth": []
+          },
+          {
+            "apiKeyHeader": []
           }
         ],
         "summary": "Rotate webhook signing secret (previous secret valid during grace period).",
