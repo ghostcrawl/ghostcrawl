@@ -97,8 +97,7 @@ Releases on · Sponsorships optional.
   `bash -n`, JSON parse).
 - SDK names + install commands match the published packages: `ghostcrawl`
   (PyPI), `@ghostcrawl/sdk` / `@ghostcrawl/cli` (npm registry patches 2.3.91),
-  `ghostcrawl-langchain` (PyPI). Product version 2.4.0; registry patch releases
-  track the 2.4.0 / 2.3.91 line. API base `https://api.ghostcrawl.io`,
+  `ghostcrawl-langchain` (PyPI). Product version 2.4.0; published registry patches are 2.3.91 (2.4.0 registry publish held pending operator go). API base `https://api.ghostcrawl.io`,
   MCP `https://mcp.ghostcrawl.io`, Bearer auth with `gck_live_…` keys.
 
 ---
