@@ -8,7 +8,7 @@ The official TypeScript/JavaScript client for the [GhostCrawl](https://ghostcraw
 
 ## Install
 
-Product version **2.4.0**; published npm package latest **2.3.91** (a 2.4.0-band patch identifier — registry artifacts are immutable). Source version files remain at 2.4.0:
+Product version **2.4.0**; published npm package latest **2.3.91** (a 2.3.9-band patch identifier from the prior release — registry artifacts are immutable; product is now 2.4.0). Source version files remain at 2.4.0:
 
 ```bash
 npm install @ghostcrawl/sdk@2.4.0

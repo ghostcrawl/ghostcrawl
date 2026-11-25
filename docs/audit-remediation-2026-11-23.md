@@ -1,7 +1,14 @@
 # GhostCrawl — public-surface audit remediation record
 
+> **Historical point-in-time record (2026-11-23).** Product version and registry identifiers below
+> describe that date only. On 2026-11-23 the product was advanced to **2.4.0**, and on 2026-11-24/25
+> the 2.4.0 self-host image, cloud fleet, and operator daemon were deployed. The `2.3.91` registry
+> patch IDs remain truthful immutable history (registries are not overwritten); current version
+> state is published in the project's release notes and documentation. Do not read the "canonical
+> version" lines below as current.
+
 **Date:** 2026-11-23
-**Product version:** 2.3.9 (canonical). No 2.4.0 release was created.
+**Product version at that date:** 2.3.9. No 2.4.0 release existed yet.
 **Scope:** independent review of a third-party public-surface audit (55 findings: legal/licensing, API contract, SDK registries, self-host, billing, trust, UX, Ghostopia) followed by a second source-level and security deep dive.
 
 This document is written so an independent reviewer can reproduce the claims from public sources. It records what was fixed, what was deliberately accepted, and what remains open. Nothing here is a certification of the full audit document's own "Definition of Done" (authenticated dashboard walkthroughs, every-route live execution, full private-repository security review) — those are separate workstreams.
