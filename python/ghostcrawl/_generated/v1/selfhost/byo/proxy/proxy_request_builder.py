@@ -32,7 +32,7 @@ class ProxyRequestBuilder(BaseRequestBuilder):
     
     async def put(self,body: ProxyPutRequestBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> Optional[bytes]:
         """
-        **Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{"proxies": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system`` (CLAUDE.md residential-proxy rule). Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.
+        **Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{"proxies": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system``. Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: bytes
@@ -53,7 +53,7 @@ class ProxyRequestBuilder(BaseRequestBuilder):
     
     def to_put_request_information(self,body: ProxyPutRequestBody, request_configuration: Optional[RequestConfiguration[QueryParameters]] = None) -> RequestInformation:
         """
-        **Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{"proxies": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system`` (CLAUDE.md residential-proxy rule). Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.
+        **Self-host deployments only.** Validate + persist a BYO proxy JSON document, then reload the provider. Contract: ``{"proxies": [ {url, operating system,.},. ]}``. Each entry MUST carry a ``url`` and ``operating system``. Malformed → 422 invalid_proxy_json (no write). Success → write to the proxies.json target + reload via LocalProxyProvider → {reloaded, count}.
         param body: The request body
         param request_configuration: Configuration for the request such as headers, query parameters, and middleware options.
         Returns: RequestInformation
